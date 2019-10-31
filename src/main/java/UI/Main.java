@@ -17,8 +17,6 @@ public class Main extends Application {
         primaryStage.setTitle("Battleship");
         primaryStage.setScene(game.getScene());
         
-        
-        
         primaryStage.show();
     }
     

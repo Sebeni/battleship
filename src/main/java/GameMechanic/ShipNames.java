@@ -3,7 +3,7 @@ package GameMechanic;
 public enum ShipNames {
     CARRIER,
     BATTLESHIP,
-    DESTROYER,
+    CRUISER,
     SUBMARINE,
-    PATROL_BOAT;
+    DESTROYER;
 }

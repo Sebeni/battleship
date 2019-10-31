@@ -1,0 +1,16 @@
+
+#shipButtonsActive {
+    -fx-padding: 15px 25px;
+    -fx-font-size: 14px;
+    -fx-text-align: center;
+    -fx-outline: none;
+    -fx-color: #fff;
+    -fx-background-color: #4CAF50;
+    -fx-border: none;
+    -fx-border-radius: 15px;
+    -fx-min-width: 200px;
+    -fx-min-height: 50px;
+}
+
+#shipButtonsActive:hover {-fx-background-color: #3e8e41}
+

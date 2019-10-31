@@ -15,8 +15,8 @@ public class ButtonListCreator {
     /**
      * This method creates 100 buttons to populate player Fire Pane Grid (place where player puts his fire choices)
      * also adds them to the specific grid pane playerFirePaneTop (top)
-     * @return
-     * populated list of fire buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
+     *
+     * @return populated list of fire buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
      */
     public static List<Button> createFireButtonList() {
         List<Button> fireButtonList = new ArrayList<>();
@@ -49,7 +49,7 @@ public class ButtonListCreator {
 
                     button.setDisable(true);
                     //TODO
-                    //changing color accordingly to cpu ship placement
+                    //changing color accordingly to cpu ship placement for now red
                     button.setStyle("-fx-background-color: red");
 
                 });
@@ -62,20 +62,20 @@ public class ButtonListCreator {
      * This method creates 100 buttons to populate player Player Location Pane (place where player puts his ships
      * and where are marked cpu's choices)
      * also adds them to the specific grid pane (bottom) playerLocationBoardBottom
-     * @return
-     * populated list of location buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
+     *
+     * @return populated list of location buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
      */
-    public static List<Button> createLocationButtonList(){
+    public static List<Button> createLocationButtonList() {
         List<Button> locationButtonList = new ArrayList<>();
         GridPane playerLocationBoard = Game.getPlayerLocationBoardBottom();
 
         int placementButtonCounter = 0;
 
-        for(int column = 0; column < 10; column++){
-            for (int row = 0; row < 10; row++){
+        for (int column = 0; column < 10; column++) {
+            for (int row = 0; row < 10; row++) {
                 //text on buttons only for debug
                 Button button = new Button();
-                if(Game.debug){
+                if (Game.debug) {
                     button.setText("" + placementButtonCounter);
                     placementButtonCounter++;
                 }
@@ -84,27 +84,38 @@ public class ButtonListCreator {
                 button.setStyle("-fx-focus-traversable: false;");
 
 
-                button.setMinSize(30,30);
-                button.setPrefSize(40,40);
+                button.setMinSize(30, 30);
+                button.setPrefSize(40, 40);
                 playerLocationBoard.add(button, column, row);
                 locationButtonList.add(button);
 
+                //reading X and Y coordinates
                 button.setOnAction(event -> {
-                    Integer xParam = GridPane.getColumnIndex(button);
-                    Integer yParam = GridPane.getRowIndex(button);
-                    if(Game.debug){
-                        System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
-                    }
+                    if (Game.getCurrentShip() != null) {
 
-                    button.setDisable(true);
-                    //TODO
-                    //changing color accordingly to ship placement
-                    button.setStyle("-fx-background-color: yellow");
+
+                        Ship current = Game.getCurrentShip();
+                        if (current.getShipMaxSize() > current.getShipFieldCount()) {
+                            Integer xParam = GridPane.getColumnIndex(button);
+                            Integer yParam = GridPane.getRowIndex(button);
+                            if (Game.debug) {
+                                System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
+                            }
+
+                            current.setCoordinates(xParam, yParam);
+                            button.setStyle("-fx-background-color: yellow");
+                            button.setDisable(true);
+                        } else {
+
+                            Game.setCurrentShip(null);
+                        }
+
+                    }
                 });
             }
         }
         return locationButtonList;
     }
-    
-    
+
 }
+    
