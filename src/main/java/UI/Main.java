@@ -11,10 +11,18 @@ public class Main extends Application {
     
     
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        debugOn(true);
         Game game = Game.getInstance(primaryStage);
         primaryStage.setTitle("Battleship");
         primaryStage.setScene(game.getScene());
+        
+        
+        
         primaryStage.show();
+    }
+    
+    private void debugOn(boolean debugMode){
+        Game.setDebug(debugMode);
     }
 }

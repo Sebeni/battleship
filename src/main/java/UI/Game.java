@@ -1,10 +1,14 @@
 package UI;
 
+import GameMechanic.ButtonListCreator;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -16,10 +20,25 @@ public class Game {
     private Scene scene;
     private double width = 800;
     private double height = 1000;
-    
-    //buttons are added in order; so 35 button equals to coordinates (3, 5)
-    private List<Button> fireButtonList = new ArrayList<>();
+    public static boolean debug;
 
+
+    //root for fire buttons
+    private static GridPane playerFirePaneTop = new GridPane();
+    private List<Button> fireButtonList = ButtonListCreator.createFireButtonList();
+
+    //root for location buttons
+    private static GridPane playerLocationBoardBottom = new GridPane();
+    private List<Button> locationButtonList = ButtonListCreator.createLocationButtonList();
+
+    
+    //left buttons - name of the ships
+    private static VBox leftPane = new VBox(10);
+    private List<Button> shipNameButtonListLeft = new ArrayList<>();
+    
+   
+    
+    
     public static Game getInstance(Stage primaryStage){
         if(game == null) {
             game = new Game(primaryStage);
@@ -39,51 +58,53 @@ public class Game {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(50, 50, 50, 50));
         
-        GridPane playerFirePane = new GridPane();
         
-        int counter = 0;
+        //center pane
+        VBox centerPane = new VBox(20);
         
+        centerPane.getChildren().addAll(playerFirePaneTop, playerLocationBoardBottom);
+        centerPane.setAlignment(Pos.CENTER);
         
-        for(int y = 0; y < 10; y++){
-            for (int x = 0; x < 10; x++){
-                //text on buttons only for debug
-                Button button = new Button("" + counter++);
-                button.setMinSize(30,30);
-                button.setPrefSize(40,40);
-                playerFirePane.add(button, y, x);
-                fireButtonList.add(button);
-                
-                button.setOnAction(event -> {
-                    Integer xParam = GridPane.getColumnIndex(button);
-                    Integer yParam = GridPane.getRowIndex(button);
-                    System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
-                });
-            }
-        }
+        layout.setCenter(centerPane);
 
-        System.out.println(fireButtonList.get(35));
-        
-        
 
-        layout.setCenter(playerFirePane);
+        //left pane
+        leftPane.setPadding(new Insets(10));
+        
+        Button carrierButton = new Button("Carrier - 5 spaces");
+        
+        Button battleshipButton = new Button("Battleship - 4 spaces");
+        Button cruiserButton = new Button("Cruiser - 3 spaces");
+        Button submarineButton = new Button("Submarine - 3 spaces");
+        Button destroyerButton = new Button("Destroyer - 2 spaces");
         
         
+        leftPane.getChildren().addAll(carrierButton, battleshipButton, cruiserButton, submarineButton, destroyerButton);
+        leftPane.setAlignment(Pos.CENTER);
+        
+        layout.setLeft(leftPane);
+        
+        //down pane
+        HBox downPane = new HBox(10);
         
         
-
         //exit button
         Button exit = new Button("Exit");
         exit.setPrefSize(130,20);
         exit.setOnAction(event -> AfterClick.closeProgram(window));
-        layout.setBottom(exit);
         
         
+        downPane.getChildren().addAll(exit);
+
+        layout.setBottom(downPane);
         
         //setting scene
         
         scene = new Scene(layout, width, height);
 
     }
+
+   
 
     public Scene getScene() {
         return this.scene;
@@ -101,4 +122,15 @@ public class Game {
         return window;
     }
 
+    public static GridPane getPlayerLocationBoardBottom() {
+        return playerLocationBoardBottom;
+    }
+
+    public static GridPane getPlayerFirePaneTop() {
+        return playerFirePaneTop;
+    }
+
+    public static void setDebug(boolean debug) {
+        Game.debug = debug;
+    }
 }
