@@ -1,6 +1,6 @@
 package GameMechanic;
 
-public enum ShipNames {
+public enum ShipName {
     CARRIER,
     BATTLESHIP,
     CRUISER,

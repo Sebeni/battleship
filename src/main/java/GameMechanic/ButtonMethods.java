@@ -97,11 +97,10 @@ public class ButtonMethods {
                 button.setOnAction(event -> {
                     //only working when player selected ship
                     if (Game.getCurrentShip() != null) {
+                        Ship currentShip = Game.getCurrentShip();
 
-
-                        Ship current = Game.getCurrentShip();
                         //check if all spaces were used
-                        if (current.getShipMaxSize() > current.getShipFieldCount()) {
+                        if (currentShip.getShipMaxSize() > currentShip.getShipFieldCount()) {
                             Integer xParam = GridPane.getColumnIndex(button);
                             Integer yParam = GridPane.getRowIndex(button);
                             if (Game.debug) {
@@ -111,11 +110,12 @@ public class ButtonMethods {
                             
                             //placement validation
                             //check is needed with any other than first placement
-                            if(current.getShipFieldCount() > 0) {
+                            if(currentShip.getShipFieldCount() > 0) {
                                 if(shipPlacementCheck(xParam, yParam)){
-                                    current.setCoordinates(xParam, yParam);
+                                    currentShip.setCoordinates(xParam, yParam);
                                     button.setStyle("-fx-background-color: yellow");
                                     button.setDisable(true);
+                                    Game.changingShipPartLabel();
                                 } else {
                                     AlertBox.display("Warning", "Ship parts must be placed in adjacent cells");
                                 }
@@ -124,9 +124,10 @@ public class ButtonMethods {
                                 //TODO
                                 //first placement doesn't need check (later can be implemented to check if horizontally and vertically 
                                 // current ship can be placed)
-                                current.setCoordinates(xParam, yParam);
+                                currentShip.setCoordinates(xParam, yParam);
                                 button.setStyle("-fx-background-color: yellow");
                                 button.setDisable(true);
+                                Game.changingShipPartLabel();
                             }
                             
                             
@@ -145,14 +146,14 @@ public class ButtonMethods {
     
     private static boolean shipPlacementCheck(int xToCheck, int yToCheck){
         boolean result = false;
-        int[][] currentShipCoordinates = Game.getCurrentShip().getCoordinates();
+        String[] currentShipCoordinates = Game.getCurrentShip().getCoordinates();
 //        List<List<Integer>> possibleChoices = new ArrayList<>();
 
         //second placement
         if(Game.getCurrentShip().getShipFieldCount() == 1){
             //possible choices: +- 1 
-            int xFirstShipPart = currentShipCoordinates[0][0];
-            int yFirstShipPart = currentShipCoordinates[0][1];
+            int xFirstShipPart = Character.getNumericValue(currentShipCoordinates[0].charAt(0));
+            int yFirstShipPart = Character.getNumericValue(currentShipCoordinates[0].charAt(1));
             
             int xDiff = xFirstShipPart - xToCheck;
             int yDiff = yFirstShipPart - yToCheck;

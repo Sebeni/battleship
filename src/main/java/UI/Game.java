@@ -2,15 +2,17 @@ package UI;
 
 import GameMechanic.ButtonMethods;
 import GameMechanic.Ship;
-import GameMechanic.ShipNames;
+import GameMechanic.ShipName;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.layout.*;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class Game {
     private double height = 1000;
     public static boolean debug;
     private static Ship currentShip;
+    private static Label labelShipPartsPlaced;
     
     private List<Ship> playerShips = new ArrayList<>();
     
@@ -56,65 +59,48 @@ public class Game {
         
 //      root pane
         BorderPane layout = new BorderPane();
+        
         layout.setPadding(new Insets(50, 50, 50, 50));
+        
+        
         
 //      center pane
         VBox centerPane = new VBox(20);
         
+
+        labelShipPartsPlaced = new Label();
+
+
+
         //TODO
         //playerFirePane should be added ONLY after all ships have been placed
-        centerPane.getChildren().addAll(playerFirePaneTop, playerLocationBoardBottom);
-        centerPane.setAlignment(Pos.CENTER);
+        centerPane.getChildren().addAll(playerFirePaneTop, labelShipPartsPlaced, playerLocationBoardBottom);
         
         layout.setCenter(centerPane);
+        BorderPane.setAlignment(centerPane, Pos.CENTER);
+        
         
 //      left pane
         leftPane.setPadding(new Insets(10));
         
-        
         Button carrierButton = new Button("Carrier - 5 spaces");
-        carrierButton.setOnAction(event -> {
-            Ship ship = new Ship(5, ShipNames.CARRIER);
-            currentShip = ship;
-            playerShips.add(ship);
-            ((Button) event.getSource()).setDisable(true);
-        });
+        carrierButton.setOnAction(new ShipButtonEventHandler(ShipName.CARRIER));
         shipNameButtonListWest.add(carrierButton);
         
         Button battleshipButton = new Button("Battleship - 4 spaces");
-        battleshipButton.setOnAction(event -> {
-            Ship ship = new Ship(4, ShipNames.BATTLESHIP);
-            currentShip = ship;
-            playerShips.add(ship);
-            ((Button) event.getSource()).setDisable(true);
-        });
+        battleshipButton.setOnAction(new ShipButtonEventHandler(ShipName.BATTLESHIP));
         shipNameButtonListWest.add(battleshipButton);
      
         Button cruiserButton = new Button("Cruiser - 3 spaces");
-        cruiserButton.setOnAction(event -> {
-            Ship ship = new Ship(3, ShipNames.CRUISER);
-            currentShip = ship;
-            playerShips.add(ship);
-            ((Button) event.getSource()).setDisable(true);
-        });
+        cruiserButton.setOnAction(new ShipButtonEventHandler(ShipName.CRUISER));
         shipNameButtonListWest.add(cruiserButton);
         
         Button submarineButton = new Button("Submarine - 3 spaces");
-        submarineButton.setOnAction(event -> {
-            Ship ship = new Ship(3, ShipNames.SUBMARINE);
-            currentShip = ship;
-            playerShips.add(ship);
-            ((Button) event.getSource()).setDisable(true);
-        });
+        submarineButton.setOnAction(new ShipButtonEventHandler(ShipName.SUBMARINE));
         shipNameButtonListWest.add(submarineButton);
         
         Button destroyerButton = new Button("Destroyer - 2 spaces");
-        destroyerButton.setOnAction(event -> {
-            Ship ship = new Ship(2, ShipNames.DESTROYER);
-            currentShip = ship;
-            playerShips.add(ship);
-            ((Button) event.getSource()).setDisable(true);
-        });
+        destroyerButton.setOnAction(new ShipButtonEventHandler(ShipName.DESTROYER));
         shipNameButtonListWest.add(destroyerButton);
         
         for(Button b : shipNameButtonListWest){
@@ -124,6 +110,7 @@ public class Game {
         leftPane.getChildren().addAll(carrierButton, battleshipButton, cruiserButton, submarineButton, destroyerButton);
         leftPane.setAlignment(Pos.BOTTOM_CENTER);
         layout.setLeft(leftPane);
+        
         
 //        down pane
         HBox downPane = new HBox(10);
@@ -138,12 +125,40 @@ public class Game {
 
         layout.setBottom(downPane);
         
-        //setting scene
+        
+//        setting scene
         scene = new Scene(layout, width, height);
         scene.getStylesheets().add("gameStyles.css");
 
     }
-    
+
+    class ShipButtonEventHandler implements EventHandler<ActionEvent>{
+        private ShipName shipToHandleName;
+
+        public ShipButtonEventHandler(ShipName shipToHandle) {
+            this.shipToHandleName = shipToHandle;
+        }
+
+        @Override
+        public void handle(ActionEvent event) {
+            Ship shipToHandle = new Ship(shipToHandleName);
+
+            currentShip = shipToHandle;
+            playerShips.add(shipToHandle);
+            changingShipPartLabel();
+            ((Button) event.getSource()).setDisable(true);
+        }
+    }
+
+    /**
+     * Changing label above playerLocationBoardBottom
+     */
+    public static void changingShipPartLabel(){
+        labelShipPartsPlaced.setText("Current ship: " + currentShip.getName() + 
+                ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipFieldCount()));
+        labelShipPartsPlaced.setTextAlignment(TextAlignment.CENTER);
+    }
+
     public Scene getScene() {
         return this.scene;
     }
@@ -179,4 +194,9 @@ public class Game {
     public static void setCurrentShip(Ship currentShip) {
         Game.currentShip = currentShip;
     }
+
+    public static Label getLabelShipPartsPlaced() {
+        return labelShipPartsPlaced;
+    }
+    
 }

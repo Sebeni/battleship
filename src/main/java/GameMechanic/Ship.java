@@ -2,6 +2,9 @@ package GameMechanic;
 
 import UI.Game;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Ship {
     /**
      * By default ships should be this size:
@@ -11,18 +14,27 @@ public class Ship {
      *  	Submarine 	3
      *  	Destroyer 	2 
      */
+    private static Map<ShipName, Integer> allShipsMaxSize = new HashMap<>();
+    static {
+        allShipsMaxSize.put(ShipName.CARRIER, 5);
+        allShipsMaxSize.put(ShipName.BATTLESHIP, 4);
+        allShipsMaxSize.put(ShipName.CRUISER, 3);
+        allShipsMaxSize.put(ShipName.SUBMARINE, 3);
+        allShipsMaxSize.put(ShipName.DESTROYER, 2);
+    }
+    
     
     private int shipMaxSize;
     private int shipFieldCount = 0;
     private boolean horizontalPlacement;
     
-    private ShipNames name;
-    private int[][] coordinates;
+    private ShipName name;
+    private String[] coordinates;
 
-    public Ship(int shipMaxSize, ShipNames name) {
-        this.shipMaxSize = shipMaxSize;
+    public Ship(ShipName name) {
         this.name = name;
-        coordinates = new int[shipMaxSize][2];
+        this.shipMaxSize = allShipsMaxSize.get(name);
+        this.coordinates = new String[shipMaxSize];
         if(Game.debug){
             System.out.println("Ship created! size " + shipMaxSize + " ship name " + name);
         }
@@ -32,11 +44,10 @@ public class Ship {
         if(Game.debug){
             System.out.println(shipFieldCount);
         }
+        coordinates[shipFieldCount] = ("" + x) + ("" + y);
         
-        coordinates[shipFieldCount][0] = x;
-        coordinates[shipFieldCount][1] = y;
         if(Game.debug){
-            System.out.println("Ship" +  name + "coordinates set x: " + x + " y: " + y);
+            System.out.println("Ship" +  name + "coordinates set:" + coordinates);
         }
         shipFieldCount++;
     }
@@ -57,7 +68,15 @@ public class Ship {
         this.horizontalPlacement = horizontalPlacement;
     }
 
-    public int[][] getCoordinates() {
+    public String[] getCoordinates() {
         return coordinates;
+    }
+
+    public ShipName getName() {
+        return name;
+    }
+
+    public static Map<ShipName, Integer> getAllShipsMaxSize() {
+        return allShipsMaxSize;
     }
 }
