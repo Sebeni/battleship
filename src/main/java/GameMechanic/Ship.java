@@ -32,6 +32,7 @@ public class Ship {
         if(Game.debug){
             System.out.println(shipFieldCount);
         }
+        
         coordinates[shipFieldCount][0] = x;
         coordinates[shipFieldCount][1] = y;
         if(Game.debug){

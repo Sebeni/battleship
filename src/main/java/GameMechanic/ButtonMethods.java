@@ -161,7 +161,7 @@ public class ButtonMethods {
             boolean possibleXChoice = (xDiff <= 1 && xDiff >= -1);
             boolean possibleYChoice = (yDiff <= 1 && yDiff >= -1);
             
-            //checking for further placement if player is placing horizontally(true) or vertically (false - defult)l
+            //checking for further placement if player is placing horizontally(true) or vertically (false - default)
             if(yDiff != 0){
                 Game.getCurrentShip().setHorizontalPlacement(true);
             }
