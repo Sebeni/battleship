@@ -67,7 +67,6 @@ public class Game {
 //      center pane
         VBox centerPane = new VBox(20);
         
-
         labelShipPartsPlaced = new Label();
 
 

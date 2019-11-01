@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Ship {
     /**
-     * By default ships should be this size:
+     * Ships sizes:
      *  	Carrier 	5
      *  	Battleship 	4
      *  	Cruiser 	3
