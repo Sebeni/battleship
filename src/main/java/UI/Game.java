@@ -1,6 +1,6 @@
 package UI;
 
-import GameMechanic.ButtonListCreator;
+import GameMechanic.ButtonMethods;
 import GameMechanic.Ship;
 import GameMechanic.ShipNames;
 import javafx.geometry.Insets;
@@ -29,11 +29,11 @@ public class Game {
     
     //center top - player firing board
     private static GridPane playerFirePaneTop = new GridPane();
-    private List<Button> fireButtonList = ButtonListCreator.createFireButtonList();
+    private List<Button> fireButtonList = ButtonMethods.createFireButtonList();
 
     //center bottom - player ships location
     private static GridPane playerLocationBoardBottom = new GridPane();
-    private List<Button> locationButtonList = ButtonListCreator.createLocationButtonList();
+    private List<Button> locationButtonList = ButtonMethods.createLocationButtonList();
     
     //left buttons - name of the ships
     private static VBox leftPane = new VBox(10);

@@ -14,6 +14,7 @@ public class Ship {
     
     private int shipMaxSize;
     private int shipFieldCount = 0;
+    private boolean horizontalPlacement;
     
     private ShipNames name;
     private int[][] coordinates;
@@ -45,5 +46,17 @@ public class Ship {
 
     public int getShipFieldCount() {
         return shipFieldCount;
+    }
+
+    public boolean isHorizontalPlacement() {
+        return horizontalPlacement;
+    }
+
+    public void setHorizontalPlacement(boolean horizontalPlacement) {
+        this.horizontalPlacement = horizontalPlacement;
+    }
+
+    public int[][] getCoordinates() {
+        return coordinates;
     }
 }
