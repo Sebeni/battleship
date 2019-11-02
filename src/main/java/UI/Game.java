@@ -68,8 +68,7 @@ public class Game {
         VBox centerPane = new VBox(20);
         
         labelShipPartsPlaced = new Label();
-
-
+        changingShipPartLabel();
 
         //TODO
         //playerFirePane should be added ONLY after all ships have been placed
@@ -131,7 +130,7 @@ public class Game {
 
     }
 
-    class ShipButtonEventHandler implements EventHandler<ActionEvent>{
+    private class ShipButtonEventHandler implements EventHandler<ActionEvent>{
         private ShipName shipToHandleName;
 
         public ShipButtonEventHandler(ShipName shipToHandle) {
@@ -140,12 +139,21 @@ public class Game {
 
         @Override
         public void handle(ActionEvent event) {
-            Ship shipToHandle = new Ship(shipToHandleName);
+            if(debug){
+                System.out.println(event.getSource());
+                if(currentShip != null){
+                    System.out.println(currentShip.getName());
+                }
+            }
+            
+            if(currentShip == null ||  ((currentShip.getShipMaxSize() - currentShip.getShipFieldCount()) == 0)){
+                Ship shipToHandle = new Ship(shipToHandleName);
 
-            currentShip = shipToHandle;
-            playerShips.add(shipToHandle);
-            changingShipPartLabel();
-            ((Button) event.getSource()).setDisable(true);
+                currentShip = shipToHandle;
+                playerShips.add(shipToHandle);
+                changingShipPartLabel();
+                ((Button) event.getSource()).setDisable(true);
+            }
         }
     }
 
@@ -153,9 +161,13 @@ public class Game {
      * Changing label above playerLocationBoardBottom
      */
     public static void changingShipPartLabel(){
-        labelShipPartsPlaced.setText("Current ship: " + currentShip.getName() + 
-                ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipFieldCount()));
-        labelShipPartsPlaced.setTextAlignment(TextAlignment.CENTER);
+        if(currentShip != null){
+            labelShipPartsPlaced.setText("Current ship: " + currentShip.getName() +
+                    ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipFieldCount()));
+            labelShipPartsPlaced.setTextAlignment(TextAlignment.CENTER);
+        } else {
+            labelShipPartsPlaced.setText("No ship selected");
+        }
     }
 
     public Scene getScene() {
