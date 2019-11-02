@@ -2,7 +2,9 @@ package GameMechanic;
 
 import UI.Game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Ship {
@@ -29,12 +31,12 @@ public class Ship {
     private boolean horizontalPlacement;
     
     private ShipName name;
-    private String[] coordinates;
+    private List<String> coordinates;
 
     public Ship(ShipName name) {
         this.name = name;
         this.shipMaxSize = allShipsMaxSize.get(name);
-        this.coordinates = new String[shipMaxSize];
+        this.coordinates = new ArrayList<>();
         if(Game.debug){
             System.out.println("Ship created! size " + shipMaxSize + " ship name " + name);
         }
@@ -44,7 +46,7 @@ public class Ship {
         if(Game.debug){
             System.out.println(shipFieldCount);
         }
-        coordinates[shipFieldCount] = ("" + x) + ("" + y);
+        coordinates.add(("" + x) + ("" + y));
         
         if(Game.debug){
             System.out.println("Ship" +  name + "coordinates set:" + coordinates);
@@ -68,7 +70,7 @@ public class Ship {
         this.horizontalPlacement = horizontalPlacement;
     }
 
-    public String[] getCoordinates() {
+    public List<String> getCoordinates() {
         return coordinates;
     }
 

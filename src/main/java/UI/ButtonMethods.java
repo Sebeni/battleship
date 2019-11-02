@@ -1,5 +1,6 @@
-package GameMechanic;
+package UI;
 
+import GameMechanic.Ship;
 import UI.AlertBox;
 import UI.Game;
 import javafx.event.ActionEvent;
@@ -151,7 +152,7 @@ public class ButtonMethods {
     private static boolean shipPlacementCheck(int xToCheck, int yToCheck){
         if(Game.getCurrentShip().getShipFieldCount() == 1){
             //second placement
-            String firstPlacementCoordinate = Game.getCurrentShip().getCoordinates()[0];
+            String firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
             
             //possible choices: +- 1 
             int xFirstShipPart = extractCoordinateFromString(firstPlacementCoordinate, "x");
@@ -172,8 +173,7 @@ public class ButtonMethods {
             return possibleXChoice || possibleYChoice;
         } else {
             //third and subsequent placement
-            List<String> currentCoordinates = new ArrayList<>(Arrays.asList(Game.getCurrentShip().getCoordinates()));
-            currentCoordinates.removeIf(Objects::isNull);
+            List<String> currentCoordinates = Game.getCurrentShip().getCoordinates();
             Collections.sort(currentCoordinates);
             
             String startBorder = currentCoordinates.get(0);
