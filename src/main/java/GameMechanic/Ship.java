@@ -25,7 +25,6 @@ public class Ship {
         allShipsMaxSize.put(ShipName.DESTROYER, 2);
     }
     
-    
     private int shipMaxSize;
     private int shipFieldCount = 0;
     private boolean horizontalPlacement;

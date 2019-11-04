@@ -1,5 +1,6 @@
 /*
-Bottom part buttons (placement board)
+Left
+ship buttons for placement
  */
 
 #shipButtonsPlacement {
@@ -17,6 +18,11 @@ Bottom part buttons (placement board)
 
 #shipButtonsPlacement:hover {-fx-background-color: #3e8e41}
 
+/*
+Right
+reset ship settings
+ */
+
 #shipButtonsReset {
     -fx-padding: 15px 25px;
     -fx-font-size: 14px;
@@ -31,6 +37,11 @@ Bottom part buttons (placement board)
 }
 
 #shipButtonsReset:hover {-fx-background-color: #fe010b}
+
+/*
+Center - bottom
+ship placement board
+ */
 
 #boardButton {
     -fx-focus-traversable: false;
@@ -50,7 +61,8 @@ Bottom part buttons (placement board)
 }
 
 /*
-Top part buttons fire area
+Center top
+fire area
  */
 
 #fireButtons {
@@ -58,5 +70,18 @@ Top part buttons fire area
     -fx-background-color: black;
     -fx-border-color: #04ff08;
     -fx-border-width: 1;
-    
+}
+
+#fireButtons:hover {
+    -fx-background-color:#04ff08;
+    -fx-cursor: crosshair;
+}
+
+/*
+Bottom
+exit new game
+ */
+#bottomButtons {
+    -fx-min-width: 130px;
+    -fx-min-height: 20px;
 }

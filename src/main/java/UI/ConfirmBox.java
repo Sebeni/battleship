@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConfirmBox {
-   
 
     public static boolean display(String title, String message){
         Stage window = new Stage();

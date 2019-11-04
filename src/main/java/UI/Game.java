@@ -15,9 +15,9 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Game {
-    private static Game game;
     private Stage window;
     private Scene scene;
     private double width = 1000;
@@ -43,15 +43,12 @@ public class Game {
     //right pane and buttons - reset ships
     private static VBox rightPane = new VBox(10);
     private static List<Button> resetShipButtonList = new ArrayList<>();
-    
-    public static Game getInstance(Stage primaryStage){
-        if(game == null) {
-            game = new Game(primaryStage);
-        }
-        return game;
-    }
 
-    private Game(Stage primaryStage) {
+    //bottom pane
+    private static HBox bottomPane = new HBox(10);
+    private static List<Button> bottomPaneButtonList = new ArrayList<>();
+    
+    public Game(Stage primaryStage) {
         window = primaryStage;
 
         window.setOnCloseRequest(e -> {
@@ -77,6 +74,7 @@ public class Game {
         centerPane.getChildren().addAll(playerFirePaneTop, labelShipPartsPlaced, playerLocationBoardBottom);
         centerPane.setAlignment(Pos.CENTER);
         playerFirePaneTop.setAlignment(Pos.CENTER);
+        playerFirePaneTop.setStyle("-fx-cursor: crosshair;");
         playerLocationBoardBottom.setAlignment(Pos.CENTER);
         centerPane.setPadding(new Insets(10));
         
@@ -155,37 +153,43 @@ public class Game {
         
         
 //        down pane
-        HBox downPane = new HBox(10);
-        
-        //exit button
         Button exit = new Button("Exit");
-        exit.setPrefSize(130,20);
         exit.setOnAction(event -> AfterClick.closeProgram(window));
-
-
-        downPane.getChildren().addAll(exit);
-        if(debug){
-            Button showPlayerShipList = new Button("show");
-            showPlayerShipList.setOnAction(event -> 
-                playerShips.stream().forEach(ship -> System.out.println(ship.getName()))
-            );
-            downPane.getChildren().add(showPlayerShipList);
+        bottomPaneButtonList.add(exit);
+        
+        Button newGame = new Button("New Game");
+        newGame.setOnAction(new NewGameButtonEH());
+        bottomPaneButtonList.add(newGame);
+        
+        for(Button b : bottomPaneButtonList){
+            b.setId("bottomButtons");
         }
-        downPane.setAlignment(Pos.CENTER);
+        
+        bottomPane.getChildren().addAll(exit, newGame);
+        
+        if(debug){
+            Button showPlayerShipList = new Button("show player ship list");
+            showPlayerShipList.setOnAction(event -> 
+                playerShips.forEach(ship -> System.out.println(ship.getName()))
+            );
+            
+            bottomPane.getChildren().addAll(showPlayerShipList);
+        }
+        bottomPane.setAlignment(Pos.CENTER);
 
-        layout.setBottom(downPane);
+        layout.setBottom(bottomPane);
         
         
 //        setting scene
         scene = new Scene(layout, width, height);
         scene.getStylesheets().add("gameStyles.css");
-
     }
 
+//    handlers too big to fit in lambda or anonymous class
     private class ShipPlacementButtonEH implements EventHandler<ActionEvent>{
         private ShipName shipToHandleName;
 
-        public ShipPlacementButtonEH(ShipName shipToHandle) {
+        ShipPlacementButtonEH(ShipName shipToHandle) {
             this.shipToHandleName = shipToHandle;
         }
 
@@ -212,7 +216,7 @@ public class Game {
     private class ResetPlacementButtonEH implements EventHandler<ActionEvent>{
         private ShipName shipToHandleName;
 
-        public ResetPlacementButtonEH(ShipName shipToHandleName) {
+        ResetPlacementButtonEH(ShipName shipToHandleName) {
             this.shipToHandleName = shipToHandleName;
         }
 
@@ -240,14 +244,12 @@ public class Game {
                         .findFirst()
                         .get();
                 
-                
-                List<String> coordinatesToReset = shipToReset.getCoordinates();
-                
-                for(String s : coordinatesToReset){
-                    Button toReset = locationButtonList.get(Integer.parseInt(s));
-                    toReset.setDisable(false);
-                    toReset.setId("boardButton");
-                }
+                shipToReset.getCoordinates().stream()
+                        .forEach(s -> {
+                            Button toReset = locationButtonList.get(Integer.parseInt(s));
+                            toReset.setDisable(false);
+                            toReset.setId("boardButton");
+                        });
                 
                 switch(shipToReset.getName()){
                     case CARRIER:
@@ -285,23 +287,41 @@ public class Game {
                 
                 playerShips.stream()
                         .flatMap(ship -> ship.getCoordinates().stream())
-                        .map(s -> Integer.parseInt(s))
-                        .forEach(integer -> {
-                            Button toReset = locationButtonList.get(integer);
+                        .forEach(s -> {
+                            Button toReset = locationButtonList.get(Integer.parseInt(s));
                             toReset.setId("boardButton");
                             toReset.setDisable(false);
                         });
                 
                 playerShips.clear();
                 shipPlacementButtonList.stream().forEach(button -> button.setDisable(false));
-                
             }
         }
     }
     
-    
-    
-    
+    private class NewGameButtonEH implements EventHandler<ActionEvent>{
+        @Override
+        public void handle(ActionEvent event) {
+            long shipPartsPlaced = playerShips.stream()
+                    .flatMap(ship -> ship.getCoordinates().stream())
+                    .count();
+
+            long allShipsParts = 0;
+
+            for(Map.Entry<ShipName, Integer> entry : Ship.getAllShipsMaxSize().entrySet()){
+                allShipsParts += entry.getValue();
+            }
+
+            if(shipPartsPlaced == allShipsParts) {
+                fireButtonList.forEach(button -> button.setDisable(false));
+                locationButtonList.forEach(button -> button.setDisable(true));
+                resetShipButtonList.forEach(button -> button.setDisable(true));
+                new Stage();
+            } else {
+                AlertBox.display("Place all ships", "Before starting a new game you must place all your ships!");
+            }
+        }
+    }
 
     /**
      * Changing label above playerLocationBoardBottom
@@ -355,5 +375,8 @@ public class Game {
     public static Label getLabelShipPartsPlaced() {
         return labelShipPartsPlaced;
     }
-    
+
+    public List<Ship> getPlayerShips() {
+        return playerShips;
+    }
 }

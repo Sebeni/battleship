@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    private static Game currentGame;
+    
     
     public static void main(String[] args) {
         launch(args);
@@ -13,14 +15,18 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         debugOn(true);
-        Game game = Game.getInstance(primaryStage);
+        currentGame = new Game(primaryStage);
         primaryStage.setTitle("Battleship");
-        primaryStage.setScene(game.getScene());
+        primaryStage.setScene(currentGame.getScene());
         
         primaryStage.show();
     }
     
     private void debugOn(boolean debugMode){
         Game.setDebug(debugMode);
+    }
+
+    public static Game getCurrentGame() {
+        return currentGame;
     }
 }
