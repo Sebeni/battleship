@@ -1,8 +1,6 @@
 package UI;
 
 import GameMechanic.Ship;
-import UI.AlertBox;
-import UI.Game;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -10,9 +8,6 @@ import javafx.scene.layout.GridPane;
 
 import java.util.*;
 
-/**
- * Class created to clean up Game class, provides methods connected with creating and setting actions on buttons
- */
 public class ButtonMethods {
 
 
@@ -32,7 +27,8 @@ public class ButtonMethods {
                 //text on buttons only for debug
                 Button button = new Button();
                 //removing blue border from next button
-                button.setStyle("-fx-focus-traversable: false;");
+                button.setId("fireButtons");
+                button.setDisable(true);
 
                 if (Game.debug) {
                     button.setText("" + fireButtonCounter);
@@ -85,7 +81,7 @@ public class ButtonMethods {
                 }
 
                 //removing blue border from next button
-                button.setStyle("-fx-focus-traversable: false;");
+                button.setId("boardButton");
 
 
                 button.setMinSize(30, 30);
@@ -125,11 +121,11 @@ public class ButtonMethods {
                     if (currentShip.getShipFieldCount() > 0) {
                         if (shipPlacementCheck(xParam, yParam)) {
                             currentShip.setCoordinates(xParam, yParam);
-                            button.setStyle("-fx-background-color: yellow");
+                            button.setId("boardButtonOccupy");
                             button.setDisable(true);
-                            Game.changingShipPartLabel();
+                            Game.updatingShipPartLabel();
                         } else {
-                            AlertBox.display("Warning", "Ship parts must be placed in adjacent cells");
+                            AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
                         }
 
                     } else {
@@ -137,9 +133,9 @@ public class ButtonMethods {
                         //first placement doesn't need check (later can be implemented to check if horizontally and vertically 
                         // current ship can be placed)
                         currentShip.setCoordinates(xParam, yParam);
-                        button.setStyle("-fx-background-color: yellow");
+                        button.setId("boardButtonOccupy");
                         button.setDisable(true);
-                        Game.changingShipPartLabel();
+                        Game.updatingShipPartLabel();
                     }
                 } else {
                     //if all ship parts are set current ship must be set to null

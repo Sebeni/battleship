@@ -1,5 +1,8 @@
+/*
+Bottom part buttons (placement board)
+ */
 
-#shipButtonsActive {
+#shipButtonsPlacement {
     -fx-padding: 15px 25px;
     -fx-font-size: 14px;
     -fx-text-align: center;
@@ -12,5 +15,48 @@
     -fx-min-height: 50px;
 }
 
-#shipButtonsActive:hover {-fx-background-color: #3e8e41}
+#shipButtonsPlacement:hover {-fx-background-color: #3e8e41}
 
+#shipButtonsReset {
+    -fx-padding: 15px 25px;
+    -fx-font-size: 14px;
+    -fx-text-align: center;
+    -fx-outline: none;
+    -fx-color: white;
+    -fx-background-color: #b9151b;
+    -fx-border: none;
+    -fx-border-radius: 15px;
+    -fx-min-width: 200px;
+    -fx-min-height: 50px;
+}
+
+#shipButtonsReset:hover {-fx-background-color: #fe010b}
+
+#boardButton {
+    -fx-focus-traversable: false;
+    -fx-background-color: #3ca7b3;
+}
+
+#boardButton:hover {
+    -fx-background-color: #4ddded;
+    -fx-border-color: #fbfb35;
+    -fx-border-width: 2px;
+}
+
+#boardButtonOccupy {
+    -fx-background-color: #585858;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+}
+
+/*
+Top part buttons fire area
+ */
+
+#fireButtons {
+    -fx-focus-traversable: false;
+    -fx-background-color: black;
+    -fx-border-color: #04ff08;
+    -fx-border-width: 1;
+    
+}

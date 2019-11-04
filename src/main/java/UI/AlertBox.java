@@ -21,6 +21,8 @@ public class AlertBox {
         Label label = new Label(message);
         VBox pane = new VBox(10);
         Button button = new Button("OK");
+        button.setPrefSize(130, 20);
+        
         pane.getChildren().addAll(label, button);
         pane.setAlignment(Pos.CENTER);
         button.setOnAction(e -> window.close());
