@@ -16,7 +16,7 @@ public class Ship {
      *  	Submarine 	3
      *  	Destroyer 	2 
      */
-    private static Map<ShipName, Integer> allShipsMaxSize = new HashMap<>();
+    private final static Map<ShipName, Integer> allShipsMaxSize = new HashMap<>();
     static {
         allShipsMaxSize.put(ShipName.CARRIER, 5);
         allShipsMaxSize.put(ShipName.BATTLESHIP, 4);

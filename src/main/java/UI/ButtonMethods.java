@@ -12,90 +12,44 @@ public class ButtonMethods {
 
 
     /**
-     * Creates 100 buttons to populate player Fire Pane Grid (place where player puts his fire choices)
-     * also adds them to the specific grid pane playerFirePaneTop (top)
-     *
-     * @return populated list of fire buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
+     * Create 100 buttons, place them in grid and return them in order
+     * @param toPopulate grid pane in which buttons should be placed
+     * @param cssId buttons Id specified in CSS
+     * @param disable whether buttons should be disable (true)
+     * @param eventHandler for each button
+     * @return populated list of buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
      */
-    public static List<Button> createFireButtonList() {
-        List<Button> fireButtonList = new ArrayList<>();
-        GridPane playerFirePane = Game.getPlayerFirePaneTop();
-        int fireButtonCounter = 0;
+    public static List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disable, EventHandler<ActionEvent> eventHandler){
+        List<Button> resultButtonList = new ArrayList<>();
+        GridPane gridPane = toPopulate;
 
-        for (int column = 0; column < 10; column++) {
-            for (int row = 0; row < 10; row++) {
-                //text on buttons only for debug
-                Button button = new Button();
-                //removing blue border from next button
-                button.setId("fireButtons");
-                button.setDisable(true);
-
-                if (Game.debug) {
-                    button.setText("" + fireButtonCounter);
-                    fireButtonCounter++;
-                }
-
-                button.setMinSize(30, 30);
-                button.setPrefSize(40, 40);
-                playerFirePane.add(button, column, row);
-                fireButtonList.add(button);
-
-                button.setOnAction(event -> {
-                    Integer xParam = GridPane.getColumnIndex(button);
-                    Integer yParam = GridPane.getRowIndex(button);
-                    if (Game.debug) {
-                        System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
-                    }
-
-                    button.setDisable(true);
-                    //TODO
-                    //changing color accordingly to cpu ship placement for now red
-                    button.setStyle("-fx-background-color: red");
-
-                });
-            }
-        }
-        return fireButtonList;
-    }
-
-    /**
-     * Creates 100 buttons to populate player Player Location Pane (place where player puts his ships
-     * and where are marked cpu's choices)
-     * also adds them to the specific grid pane (bottom) playerLocationBoardBottom
-     *
-     * @return populated list of location buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
-     */
-    public static List<Button> createLocationButtonList() {
-        List<Button> locationButtonList = new ArrayList<>();
-        GridPane playerLocationBoard = Game.getPlayerLocationBoardBottom();
-
-        int placementButtonCounter = 0;
+        int buttonCounter = 0;
 
         for (int column = 0; column < 10; column++) {
             for (int row = 0; row < 10; row++) {
                 //text on buttons only for debug
                 Button button = new Button();
                 if (Game.debug) {
-                    button.setText("" + placementButtonCounter);
-                    placementButtonCounter++;
+                    button.setText("" + buttonCounter);
+                    buttonCounter++;
                 }
 
-                //removing blue border from next button
-                button.setId("boardButton");
+                button.setId(cssId);
+                button.setDisable(disable);
 
 
                 button.setMinSize(30, 30);
                 button.setPrefSize(40, 40);
-                playerLocationBoard.add(button, column, row);
-                locationButtonList.add(button);
+                gridPane.add(button, column, row);
+                resultButtonList.add(button);
 
                 //reading X and Y coordinates
-                button.setOnAction(new PlacementButtonHandler());
+                button.setOnAction(eventHandler);
             }
         }
-        return locationButtonList;
+        return resultButtonList;
     }
-
+    
     static class PlacementButtonHandler implements EventHandler<ActionEvent> {
 
         @Override
@@ -203,6 +157,25 @@ public class ButtonMethods {
             
         }
         
+    }
+    
+    static class FireButtonHandler implements EventHandler<ActionEvent>{
+        @Override
+        public void handle(ActionEvent event) {
+            Button button = (Button) event.getSource();
+            
+            Integer xParam = GridPane.getColumnIndex(button);
+            Integer yParam = GridPane.getRowIndex(button);
+            if (Game.debug) {
+                System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
+            }
+
+            button.setDisable(true);
+            //TODO
+            //changing color accordingly to cpu ship placement for now red
+            button.setStyle("-fx-background-color: red");
+
+        }
     }
 
     /**

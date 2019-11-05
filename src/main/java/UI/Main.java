@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-    private static Game currentGame;
+    
     
     
     public static void main(String[] args) {
@@ -15,7 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         debugOn(true);
-        currentGame = new Game(primaryStage);
+        Game currentGame = new Game(primaryStage);
         primaryStage.setTitle("Battleship");
         primaryStage.setScene(currentGame.getScene());
         
@@ -25,8 +25,5 @@ public class Main extends Application {
     private void debugOn(boolean debugMode){
         Game.setDebug(debugMode);
     }
-
-    public static Game getCurrentGame() {
-        return currentGame;
-    }
+    
 }
