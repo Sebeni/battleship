@@ -65,14 +65,14 @@ Center top
 fire area
  */
 
-#fireButtons {
+#fireButton {
     -fx-focus-traversable: false;
     -fx-background-color: black;
     -fx-border-color: #04ff08;
     -fx-border-width: 1;
 }
 
-#fireButtons:hover {
+#fireButton:hover {
     -fx-background-color:#04ff08;
     -fx-cursor: crosshair;
 }
@@ -84,4 +84,13 @@ exit new game
 #bottomButtons {
     -fx-min-width: 130px;
     -fx-min-height: 20px;
+}
+
+/*
+For debug
+ */
+#cpuPlacement {
+    -fx-background-color: purple;
+    -fx-border-color: black;
+    -fx-color: white;
 }

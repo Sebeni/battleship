@@ -25,7 +25,7 @@ public class Ship {
         allShipsMaxSize.put(ShipName.DESTROYER, 2);
     }
     
-    private int shipMaxSize;
+    private final int shipMaxSize;
     private int shipFieldCount = 0;
     private boolean horizontalPlacement;
     
@@ -79,5 +79,13 @@ public class Ship {
 
     public static Map<ShipName, Integer> getAllShipsMaxSize() {
         return allShipsMaxSize;
+    }
+    
+    @Override
+    public String toString() {
+        return "Ship{" +
+                "name=" + name +
+                ", coordinates=" + coordinates.stream().reduce((s, s2) -> s += " " + s2) +
+                '}';
     }
 }
