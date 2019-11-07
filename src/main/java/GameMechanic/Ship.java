@@ -36,20 +36,10 @@ public class Ship {
         this.name = name;
         this.shipMaxSize = allShipsMaxSize.get(name);
         this.coordinates = new ArrayList<>();
-        if(Game.debug){
-            System.out.println("Ship created! size " + shipMaxSize + " ship name " + name);
-        }
     }
 
     public void setCoordinates(int x, int y) {
-        if(Game.debug){
-            System.out.println(shipFieldCount);
-        }
         coordinates.add(("" + x) + ("" + y));
-        
-        if(Game.debug){
-            System.out.println("Ship" +  name + "coordinates set:" + coordinates);
-        }
         shipFieldCount++;
     }
 
@@ -87,5 +77,9 @@ public class Ship {
                 "name=" + name +
                 ", coordinates=" + coordinates.stream().reduce((s, s2) -> s += " " + s2) +
                 '}';
+    }
+
+    public void setShipFieldCount(int shipFieldCount) {
+        this.shipFieldCount = shipFieldCount;
     }
 }

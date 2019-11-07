@@ -94,3 +94,7 @@ For debug
     -fx-border-color: black;
     -fx-color: white;
 }
+
+#cpuPlacement:disabled {
+    -fx-background-color: white;
+}
