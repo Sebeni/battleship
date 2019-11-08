@@ -98,3 +98,19 @@ For debug
 #cpuPlacement:disabled {
     -fx-background-color: white;
 }
+
+#hit:disabled {
+    -fx-color: orange;
+    -fx-border-color: yellow;
+    -fx-border-width: 2;
+}
+
+#sunk:disabled {
+    -fx-color: red;
+    -fx-border-color: orange;
+    -fx-border-width: 2;
+}
+
+#miss:disabled {
+    -fx-color: white;
+}

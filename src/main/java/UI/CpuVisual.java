@@ -14,11 +14,13 @@ public class CpuVisual {
     private final Stage window = new Stage();
     private final int width = 500;
     private final int height = 300;
+    private final List<Button> buttonList;
 
-    private final GridPane cpuShipPlacement = new GridPane();
-    private final List<Button> buttonList = GridPaneButtonMethods.create100ButtonList(cpuShipPlacement, "cpuPlacement", false, Event::consume);
-
-    public CpuVisual() {
+    public CpuVisual(Game game) {
+        GridPane cpuShipPlacement = new GridPane();
+        GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(game);
+        buttonList = gridMethods.create100ButtonList(cpuShipPlacement, "cpuPlacement", false, Event::consume);
+        
         if(Game.debug){
             window.setTitle("Debug visualisation of cpu ship placement");
             window.setMinWidth(width);

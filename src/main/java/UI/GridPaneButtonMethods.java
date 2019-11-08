@@ -4,13 +4,20 @@ import GameMechanic.Ship;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import java.util.*;
 
 public class GridPaneButtonMethods {
-    
+    private Game game;
+    private List<Button> gridButtonsHit = new ArrayList<>();
+
+    public GridPaneButtonMethods(Game game) {
+        this.game = game;
+    }
+
     /**
      * Create 100 buttons, place them in grid and return them in order
      *
@@ -20,7 +27,7 @@ public class GridPaneButtonMethods {
      * @param eventHandler for each button
      * @return populated list of buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
      */
-    public static List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disable, EventHandler<ActionEvent> eventHandler) {
+    public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disable, EventHandler<ActionEvent> eventHandler) {
         List<Button> resultButtonList = new ArrayList<>();
         GridPane gridPane = toPopulate;
 
@@ -56,7 +63,7 @@ public class GridPaneButtonMethods {
     }
 
 
-    public static void placementButtonHandler(ActionEvent event, Game game) {
+    public void placementButtonHandler(ActionEvent event) {
         Button button = (Button) event.getSource();
 
         //only working when player selected ship
@@ -72,7 +79,7 @@ public class GridPaneButtonMethods {
                 //check is needed with any other than first placement
                 if (currentShip.getShipFieldCount() > 0) {
                     if (shipPlacementCheck(xParam, yParam)) {
-                        currentShip.setCoordinates(xParam, yParam);
+                        currentShip.setCoordinate(xParam, yParam);
                         button.setDisable(true);
                         Game.updatingMiddleLabel();
                     } else {
@@ -88,7 +95,7 @@ public class GridPaneButtonMethods {
                     }
 
                 } else {
-                    currentShip.setCoordinates(xParam, yParam);
+                    currentShip.setCoordinate(xParam, yParam);
                     button.setDisable(true);
                     Game.updatingMiddleLabel();
                 }
@@ -97,7 +104,7 @@ public class GridPaneButtonMethods {
     }
 
 
-    private static boolean shipPlacementCheck(int xToCheck, int yToCheck) {
+    private boolean shipPlacementCheck(int xToCheck, int yToCheck) {
         if (Game.getCurrentShip().getShipFieldCount() == 1) {
             //second placement
             String firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
@@ -158,17 +165,44 @@ public class GridPaneButtonMethods {
     }
 
 
-    public static void fireButtonHandler(ActionEvent event) {
+    public void fireButtonHandler(ActionEvent event) {
         Button button = (Button) event.getSource();
 
-        Integer xParam = GridPane.getColumnIndex(button);
-        Integer yParam = GridPane.getRowIndex(button);
+        Integer xParam = GridPane.getColumnIndex(button.getParent());
+        Integer yParam = GridPane.getRowIndex(button.getParent());
+        String coordinate = xParam.toString() + yParam.toString();
+        
+        boolean hit = game.getCpu().getShipsList().stream()
+                .flatMap(ship -> ship.getCoordinates().stream())
+                .anyMatch(s -> s.equals(coordinate));
 
+        if(hit){
+            sunkMethod(button, xParam, yParam);
+        } else {
+            button.setId("miss");
+        }
         button.setDisable(true);
-        //TODO
-        //changing color accordingly to cpu ship placement for now red
-        button.setStyle("-fx-background-color: red");
 
+
+    }
+
+    private void sunkMethod(Button button, Integer xParam, Integer yParam) {
+        gridButtonsHit.add(button);
+        Ship shipHit = shipFromGridButton(game.getFireButtonListTop(), game.getCpu().getShipsList(), button);
+        shipHit.deleteCoordinate(xParam, yParam);
+
+        if(shipHit.getShipFieldCount() > 0){
+            button.setId("hit");
+            
+        } else {
+            gridButtonsHit.forEach(button1 -> button1.setId("sunk"));
+            game.getCpu().getShipsList().remove(shipHit);
+            
+            //win condition
+            if(game.getCpu().getShipsList().isEmpty()){
+                AlertBox.display("Result", "You won");
+            }
+        }
     }
 
 
@@ -179,13 +213,46 @@ public class GridPaneButtonMethods {
      * @param coordinate Which coordinate extract (x or y)
      * @return chosen int coordinate
      */
-    public static int extractCoordinateFromString(String toExtract, String coordinate) {
+    public int extractCoordinateFromString(String toExtract, String coordinate) {
 
         if (coordinate.toLowerCase().equals("x")) {
             return Character.getNumericValue(toExtract.charAt(0));
         } else {
             return Character.getNumericValue(toExtract.charAt(1));
         }
+    }
+
+
+    public void mouseEnteredEH(MouseEvent event) {
+
+        Pane paneEntered = (Pane) event.getSource();
+        Button buttonEntered = (Button) paneEntered.getChildren().get(0);
+
+        if (buttonEntered.isDisable() && !game.getPlayerShips().isEmpty()) {
+            Ship shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), game.getPlayerShips(), buttonEntered);
+            Game.setMiddleLabel(shipHovered.getName().toString());
+        }
+    }
+
+    public void mouseExitedEH(MouseEvent event) {
+        Pane paneEntered = (Pane) event.getSource();
+        Button buttonEntered = (Button) paneEntered.getChildren().get(0);
+
+        if (buttonEntered.isDisable()) {
+            Game.updatingMiddleLabel();
+        }
+    }
+    
+    private Ship shipFromGridButton(List<Button> gridButtons, List<Ship> shipList, Button buttonEntered){
+        int index = gridButtons.indexOf(buttonEntered);
+        String toFind;
+
+        if(index >= 0 && index <= 10){
+            toFind = "0" + index;
+        } else {
+            toFind = "" + index;
+        }
+        return shipList.stream().filter(ship -> ship.getCoordinates().contains(toFind)).findAny().get();
     }
 }
     

@@ -117,9 +117,7 @@ public class GameHandlers {
                 .mapToInt(ship -> ship.getCoordinates().size())
                 .sum();
 
-        int allShipsParts = Ship.getAllShipsMaxSize().values().stream()
-                .mapToInt(l -> l)
-                .sum();
+        int allShipsParts = Ship.getAllShipsParts();
         
         if (shipPartsPlaced == allShipsParts) {
             game.getFireButtonListTop().forEach(button -> button.setDisable(false));
@@ -136,7 +134,7 @@ public class GameHandlers {
 
     public void randomPlacementButtonEH(ActionEvent event) {
         if (!game.getPlayerShips().isEmpty()) {
-            if(ConfirmBox.display("Warning!", "This action will reset all ships you have already placed. Continue?")){
+            if(ConfirmBox.display("Warning!", "This action will reset all ships that have been already placed. Continue?")){
                 Game.setCurrentShip(null);
                 Game.updatingMiddleLabel();
                 game.getPlayerShips().stream().forEach(this::resetPlacementBoard);
@@ -150,26 +148,6 @@ public class GameHandlers {
     }
 
 
-    public void mouseEntered(MouseEvent event) {
-
-        Pane paneEntered = (Pane) event.getSource();
-        Button buttonEntered = (Button) paneEntered.getChildren().get(0);
-
-        if (buttonEntered.isDisable() && !game.getPlayerShips().isEmpty()) {
-            //checks if mouse Entered is placement board or cpu board
-            String index = "" + game.getSeaButtonsListBottom().indexOf(buttonEntered);
-            Ship shipHovered = game.getPlayerShips().stream().filter(ship -> ship.getCoordinates().contains(index)).findAny().get();
-            Game.setMiddleLabel(shipHovered.getName().toString());
-        }
-    }
-
-    public void mouseExited(MouseEvent event) {
-        Pane paneEntered = (Pane) event.getSource();
-        Button buttonEntered = (Button) paneEntered.getChildren().get(0);
-
-        if (buttonEntered.isDisable()) {
-            Game.updatingMiddleLabel();
-        }
-    }
+    
 
 }

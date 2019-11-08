@@ -12,7 +12,7 @@ public class RandomPlacement {
     public static List<Ship> randomShipPlacement(List<Button> buttonListToDisable) {
         result = new ArrayList<>();
         
-        for (ShipName s : Ship.getAllShipsMaxSize().keySet()) {
+        for (ShipName s : Ship.getAllShips().keySet()) {
             Ship ship = new Ship(s);
             horizontalCheck(ship);
             result.add(ship);
@@ -47,7 +47,7 @@ public class RandomPlacement {
 
     private static void placeShipPart(Integer x, Integer y, Ship ship) {
         if (!coordinateIsOccupied(x, y)) {
-            ship.setCoordinates(x, y);
+            ship.setCoordinate(x, y);
 
             if (ship.getShipFieldCount() < ship.getShipMaxSize()) {
                 if (ship.isHorizontalPlacement()) {

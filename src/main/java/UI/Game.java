@@ -28,14 +28,15 @@ public class Game {
     private static Label middleLabel;
 
     private final GameHandlers gameHandler = new GameHandlers(this);
+    private final GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(this);
 
     //center top - human firing board
     private final GridPane playerFireBoardTop = new GridPane();
-    private final List<Button> fireButtonListTop = GridPaneButtonMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, event -> GridPaneButtonMethods.fireButtonHandler(event));
+    private final List<Button> fireButtonListTop;
 
     //center bottom - human ships location
     private final GridPane playerLocationBoardBottom = new GridPane();
-    private final List<Button> seaButtonsListBottom = GridPaneButtonMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, event -> GridPaneButtonMethods.placementButtonHandler(event, this));
+    private final List<Button> seaButtonsListBottom;
 
     //left pane and buttons - name of the ships
     private final VBox leftPane = new VBox(10);
@@ -63,12 +64,16 @@ public class Game {
             AfterClick.closeProgram(window);
         });
         
-        cpuVisual = new CpuVisual();
+        cpuVisual = new CpuVisual(this);
+
+        fireButtonListTop = gridMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, gridMethods::fireButtonHandler);
+        seaButtonsListBottom = gridMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, gridMethods::placementButtonHandler);
+        
         playerLocationBoardBottom.getChildren().forEach(node -> {
             Pane pane = (Pane) node;
-            pane.setOnMouseEntered(event -> gameHandler.mouseEntered(event));
-            pane.setOnMouseExited(event -> gameHandler.mouseExited(event));
-            
+            pane.setOnMouseEntered(gridMethods::mouseEnteredEH);
+            pane.setOnMouseExited(gridMethods::mouseExitedEH);
+
         });
 
 //      root pane for all other panes
@@ -268,5 +273,9 @@ public class Game {
 
     public void setCpuShips() {
         cpu.setPlayerShips(RandomPlacement.randomShipPlacement(cpuVisual.getButtonList()));
+    }
+
+    public Player getCpu() {
+        return cpu;
     }
 }

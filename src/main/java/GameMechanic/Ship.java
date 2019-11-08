@@ -1,7 +1,5 @@
 package GameMechanic;
 
-import UI.Game;
-
 import java.util.*;
 
 public class Ship {
@@ -13,14 +11,15 @@ public class Ship {
      *  	Submarine 	3
      *  	Destroyer 	2 
      */
-    private final static Map<ShipName, Integer> allShipsMaxSize = new LinkedHashMap<>();
+    private final static Map<ShipName, Integer> allShips = new LinkedHashMap<>();
     static {
-        allShipsMaxSize.put(ShipName.CARRIER, 5);
-        allShipsMaxSize.put(ShipName.BATTLESHIP, 4);
-        allShipsMaxSize.put(ShipName.CRUISER, 3);
-        allShipsMaxSize.put(ShipName.SUBMARINE, 3);
-        allShipsMaxSize.put(ShipName.DESTROYER, 2);
+        allShips.put(ShipName.CARRIER, 5);
+        allShips.put(ShipName.BATTLESHIP, 4);
+        allShips.put(ShipName.CRUISER, 3);
+        allShips.put(ShipName.SUBMARINE, 3);
+        allShips.put(ShipName.DESTROYER, 2);
     }
+    private static int allShipsParts = allShips.values().stream().mapToInt(i -> i).sum(); 
     
     private final int shipMaxSize;
     private int shipFieldCount = 0;
@@ -31,13 +30,18 @@ public class Ship {
 
     public Ship(ShipName name) {
         this.name = name;
-        this.shipMaxSize = allShipsMaxSize.get(name);
+        this.shipMaxSize = allShips.get(name);
         this.coordinates = new ArrayList<>();
     }
 
-    public void setCoordinates(int x, int y) {
-        coordinates.add(("" + x) + ("" + y));
+    public void setCoordinate(Integer x, Integer y) {
+        coordinates.add(x.toString() + y.toString());
         shipFieldCount++;
+    }
+    
+    public void deleteCoordinate(Integer x, Integer y){
+        coordinates.remove(x.toString() + y.toString());
+        shipFieldCount--;
     }
 
     public int getShipMaxSize() {
@@ -64,8 +68,8 @@ public class Ship {
         return name;
     }
 
-    public static Map<ShipName, Integer> getAllShipsMaxSize() {
-        return allShipsMaxSize;
+    public static Map<ShipName, Integer> getAllShips() {
+        return allShips;
     }
     
     @Override
@@ -78,5 +82,9 @@ public class Ship {
 
     public void setShipFieldCount(int shipFieldCount) {
         this.shipFieldCount = shipFieldCount;
+    }
+
+    public static int getAllShipsParts() {
+        return allShipsParts;
     }
 }
