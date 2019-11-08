@@ -2,10 +2,7 @@ package GameMechanic;
 
 import UI.Game;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Ship {
     /**
@@ -16,7 +13,7 @@ public class Ship {
      *  	Submarine 	3
      *  	Destroyer 	2 
      */
-    private final static Map<ShipName, Integer> allShipsMaxSize = new HashMap<>();
+    private final static Map<ShipName, Integer> allShipsMaxSize = new LinkedHashMap<>();
     static {
         allShipsMaxSize.put(ShipName.CARRIER, 5);
         allShipsMaxSize.put(ShipName.BATTLESHIP, 4);

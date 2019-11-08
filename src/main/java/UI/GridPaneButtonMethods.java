@@ -64,23 +64,16 @@ public class GridPaneButtonMethods {
                 Integer xParam = GridPane.getColumnIndex(button);
                 Integer yParam = GridPane.getRowIndex(button);
 
-
-                if (Game.debug) {
-                    System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
-                }
-
                 //placement validation
                 //check is needed with any other than first placement
                 if (currentShip.getShipFieldCount() > 0) {
                     if (shipPlacementCheck(xParam, yParam)) {
                         currentShip.setCoordinates(xParam, yParam);
-                        button.setId("boardButtonOccupy");
                         button.setDisable(true);
                         Game.updatingShipPartLabel();
                     } else {
                         AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
                     }
-
 
                     if (currentShip.getShipMaxSize() == currentShip.getShipFieldCount()) {
                         //if all ship parts are set current ship must be set to null, disable ship button placement
@@ -89,11 +82,9 @@ public class GridPaneButtonMethods {
                         Game.setCurrentShip(null);
                         Game.updatingShipPartLabel();
                     }
-
-
+                    
                 } else {
                     currentShip.setCoordinates(xParam, yParam);
-                    button.setId("boardButtonOccupy");
                     button.setDisable(true);
                     Game.updatingShipPartLabel();
                 }
@@ -168,10 +159,7 @@ public class GridPaneButtonMethods {
 
         Integer xParam = GridPane.getColumnIndex(button);
         Integer yParam = GridPane.getRowIndex(button);
-        if (Game.debug) {
-            System.out.println("X " + xParam + " Y " + yParam + " button " + event.getSource());
-        }
-
+        
         button.setDisable(true);
         //TODO
         //changing color accordingly to cpu ship placement for now red
@@ -187,7 +175,7 @@ public class GridPaneButtonMethods {
      * @param coordinate Which coordinate extract (x or y)
      * @return chosen int coordinate
      */
-    private static int extractCoordinateFromString(String toExtract, String coordinate) {
+    public static int extractCoordinateFromString(String toExtract, String coordinate) {
 
         if (coordinate.toLowerCase().equals("x")) {
             return Character.getNumericValue(toExtract.charAt(0));

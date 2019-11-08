@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Map;
 
 public class GameHandlers {
@@ -16,13 +17,6 @@ public class GameHandlers {
     }
 
     public void shipPlacementButtonEH(ActionEvent event, ShipName shipToHandleName) {
-        if (Game.debug) {
-            System.out.println(event.getSource());
-            if (Game.getCurrentShip() != null) {
-                System.out.println(Game.getCurrentShip().getName());
-            }
-        }
-
         Ship shipToHandle;
 
         if (!shipPlacementCheck(shipToHandleName)) {
@@ -37,10 +31,7 @@ public class GameHandlers {
     }
 
     public void resetPlacementButtonEH(ActionEvent event, ShipName shipToHandleName) {
-        if (Game.debug) {
-            System.out.println(event.getSource());
-        }
-        
+
         if (shipPlacementCheck(shipToHandleName)) {
             // set current ship to null
             // activate all cells with coordinates and change their colors
@@ -55,29 +46,43 @@ public class GameHandlers {
                     .findFirst()
                     .get();
 
-            shipToReset.getCoordinates().stream()
-                    .forEach(s -> {
-                        Button toReset = game.getLocationButtonList().get(Integer.parseInt(s));
-                        toReset.setDisable(false);
-                        toReset.setId("boardButton");
-                    });
-            
+            resetPlacementBoard(shipToReset);
+
             changeShipPlacementButtonState(game, shipToReset, false);
 
             game.getPlayerShips().remove(shipToReset);
         }
     }
-    
 
+    /**
+     * Resets all board buttons to default state equals to parameters of given ship
+     *
+     * @param shipToReset ship which parameters must be reset
+     */
+    private void resetPlacementBoard(Ship shipToReset) {
+        shipToReset.getCoordinates().stream()
+                .forEach(s -> {
+                    Button toReset = game.getLocationButtonList().get(Integer.parseInt(s));
+                    toReset.setDisable(false);
+                });
+    }
+
+
+    /**
+     * Checks if given ship was already placed
+     *
+     * @param shipToHandleName ship to check
+     * @return boolean true if placed, false if it wasn't placed
+     */
     private boolean shipPlacementCheck(ShipName shipToHandleName) {
         return game.getPlayerShips().stream()
                 .map(Ship::getName)
                 .anyMatch(shipName -> shipName.equals(shipToHandleName));
     }
-    
-    public static void changeShipPlacementButtonState(Game game, Ship shipToReset, boolean setDisable){
+
+    public static void changeShipPlacementButtonState(Game game, Ship shipToReset, boolean setDisable) {
         switch (shipToReset.getName()) {
-            case CARRIER: 
+            case CARRIER:
                 game.getShipPlacementButtonList().get(0).setDisable(setDisable);
                 break;
             case BATTLESHIP:
@@ -97,45 +102,53 @@ public class GameHandlers {
 
 
     public void resetAllButtonEH(ActionEvent event) {
-        if (Game.debug) {
-            System.out.println(event.getSource());
-        }
 
         if (!game.getPlayerShips().isEmpty()) {
             Game.setCurrentShip(null);
             Game.updatingShipPartLabel();
 
-            game.getPlayerShips().stream()
-                    .flatMap(ship -> ship.getCoordinates().stream())
-                    .forEach(s -> {
-                        Button toReset = game.getLocationButtonList().get(Integer.parseInt(s));
-                        toReset.setId("boardButton");
-                        toReset.setDisable(false);
-                    });
+            game.getPlayerShips().forEach(s -> resetPlacementBoard(s));
 
             game.getPlayerShips().clear();
             game.getShipPlacementButtonList().stream().forEach(button -> button.setDisable(false));
         }
     }
-    
+
     public void newGameButtonEH(ActionEvent event) {
-        long shipPartsPlaced = game.getPlayerShips().stream()
-                .flatMap(ship -> ship.getCoordinates().stream())
-                .count();
+        int shipPartsPlaced = game.getPlayerShips().stream()
+                .mapToInt(ship -> ship.getCoordinates().size())
+                .sum();
 
-        long allShipsParts = 0;
-
-        for (Map.Entry<ShipName, Integer> entry : Ship.getAllShipsMaxSize().entrySet()) {
-            allShipsParts += entry.getValue();
-        }
-
+        int allShipsParts = Ship.getAllShipsMaxSize().values().stream()
+                .mapToInt(l -> l)
+                .sum();
+        
         if (shipPartsPlaced == allShipsParts) {
             game.getFireButtonList().forEach(button -> button.setDisable(false));
-            game.getLocationButtonList().forEach(button -> button.setDisable(true));
+            game.getShipPlacementButtonList().forEach(button -> button.setDisable(true));
             game.getResetShipButtonList().forEach(button -> button.setDisable(true));
-            new Stage();
+            Button source = (Button) event.getSource();
+            source.setDisable(true);
+            game.setCpuShips();
+
         } else {
             AlertBox.display("Place all ships", "Before starting a game you must place all your ships!");
         }
     }
+
+    public void randomPlacementButtonEH(ActionEvent event) {
+        if (!game.getPlayerShips().isEmpty()) {
+            if(ConfirmBox.display("Warning!", "This action will reset all ships you have already placed. Continue?")){
+                Game.setCurrentShip(null);
+                Game.updatingShipPartLabel();
+                game.getPlayerShips().stream().forEach(this::resetPlacementBoard);
+                game.getShipPlacementButtonList().forEach(button -> button.setDisable(false));
+                game.getPlayerShips().clear();
+            } else {
+                return;
+            }
+        }
+        game.setHumanShips();
+    }
+
 }

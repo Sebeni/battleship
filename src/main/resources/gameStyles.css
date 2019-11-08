@@ -9,14 +9,14 @@ ship buttons for placement
     -fx-text-align: center;
     -fx-outline: none;
     -fx-color: #fff;
-    -fx-background-color: #4CAF50;
+    -fx-background-color: #3e8e41;
     -fx-border: none;
     -fx-border-radius: 15px;
     -fx-min-width: 200px;
     -fx-min-height: 50px;
 }
 
-#shipButtonsPlacement:hover {-fx-background-color: #3e8e41}
+#shipButtonsPlacement:hover {-fx-background-color: #4CAF50 }
 
 /*
 Right
@@ -54,7 +54,7 @@ ship placement board
     -fx-border-width: 2px;
 }
 
-#boardButtonOccupy {
+#boardButton:disabled {
     -fx-background-color: #585858;
     -fx-border-color: black;
     -fx-border-width: 1;

@@ -1,5 +1,6 @@
 package UI;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -25,6 +26,8 @@ public class AlertBox {
         
         pane.getChildren().addAll(label, button);
         pane.setAlignment(Pos.CENTER);
+        pane.setPadding(new Insets(20));
+        pane.setSpacing(20);
         button.setOnAction(e -> window.close());
 
         Scene layout = new Scene(pane);
