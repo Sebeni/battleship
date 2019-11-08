@@ -4,10 +4,8 @@ import GameMechanic.Ship;
 import GameMechanic.ShipName;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
-
-import java.util.List;
-import java.util.Map;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 
 public class GameHandlers {
     private final Game game;
@@ -27,7 +25,7 @@ public class GameHandlers {
         }
 
         Game.setCurrentShip(shipToHandle);
-        Game.updatingShipPartLabel();
+        Game.updatingMiddleLabel();
     }
 
     public void resetPlacementButtonEH(ActionEvent event, ShipName shipToHandleName) {
@@ -38,7 +36,7 @@ public class GameHandlers {
             // activate ship button list
             // delete from list given ship
             Game.setCurrentShip(null);
-            Game.updatingShipPartLabel();
+            Game.updatingMiddleLabel();
 
 
             Ship shipToReset = game.getPlayerShips().stream()
@@ -62,7 +60,7 @@ public class GameHandlers {
     private void resetPlacementBoard(Ship shipToReset) {
         shipToReset.getCoordinates().stream()
                 .forEach(s -> {
-                    Button toReset = game.getLocationButtonList().get(Integer.parseInt(s));
+                    Button toReset = game.getSeaButtonsListBottom().get(Integer.parseInt(s));
                     toReset.setDisable(false);
                 });
     }
@@ -83,19 +81,19 @@ public class GameHandlers {
     public static void changeShipPlacementButtonState(Game game, Ship shipToReset, boolean setDisable) {
         switch (shipToReset.getName()) {
             case CARRIER:
-                game.getShipPlacementButtonList().get(0).setDisable(setDisable);
+                game.getPlacementShipButtonListLeft().get(0).setDisable(setDisable);
                 break;
             case BATTLESHIP:
-                game.getShipPlacementButtonList().get(1).setDisable(setDisable);
+                game.getPlacementShipButtonListLeft().get(1).setDisable(setDisable);
                 break;
             case CRUISER:
-                game.getShipPlacementButtonList().get(2).setDisable(setDisable);
+                game.getPlacementShipButtonListLeft().get(2).setDisable(setDisable);
                 break;
             case SUBMARINE:
-                game.getShipPlacementButtonList().get(3).setDisable(setDisable);
+                game.getPlacementShipButtonListLeft().get(3).setDisable(setDisable);
                 break;
             case DESTROYER:
-                game.getShipPlacementButtonList().get(4).setDisable(setDisable);
+                game.getPlacementShipButtonListLeft().get(4).setDisable(setDisable);
                 break;
         }
     }
@@ -105,12 +103,12 @@ public class GameHandlers {
 
         if (!game.getPlayerShips().isEmpty()) {
             Game.setCurrentShip(null);
-            Game.updatingShipPartLabel();
+            Game.updatingMiddleLabel();
 
             game.getPlayerShips().forEach(s -> resetPlacementBoard(s));
 
             game.getPlayerShips().clear();
-            game.getShipPlacementButtonList().stream().forEach(button -> button.setDisable(false));
+            game.getPlacementShipButtonListLeft().stream().forEach(button -> button.setDisable(false));
         }
     }
 
@@ -124,9 +122,9 @@ public class GameHandlers {
                 .sum();
         
         if (shipPartsPlaced == allShipsParts) {
-            game.getFireButtonList().forEach(button -> button.setDisable(false));
-            game.getShipPlacementButtonList().forEach(button -> button.setDisable(true));
-            game.getResetShipButtonList().forEach(button -> button.setDisable(true));
+            game.getFireButtonListTop().forEach(button -> button.setDisable(false));
+            game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
+            game.getResetShipButtonListRight().forEach(button -> button.setDisable(true));
             Button source = (Button) event.getSource();
             source.setDisable(true);
             game.setCpuShips();
@@ -140,15 +138,38 @@ public class GameHandlers {
         if (!game.getPlayerShips().isEmpty()) {
             if(ConfirmBox.display("Warning!", "This action will reset all ships you have already placed. Continue?")){
                 Game.setCurrentShip(null);
-                Game.updatingShipPartLabel();
+                Game.updatingMiddleLabel();
                 game.getPlayerShips().stream().forEach(this::resetPlacementBoard);
-                game.getShipPlacementButtonList().forEach(button -> button.setDisable(false));
+                game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(false));
                 game.getPlayerShips().clear();
             } else {
                 return;
             }
         }
         game.setHumanShips();
+    }
+
+
+    public void mouseEntered(MouseEvent event) {
+
+        Pane paneEntered = (Pane) event.getSource();
+        Button buttonEntered = (Button) paneEntered.getChildren().get(0);
+
+        if (buttonEntered.isDisable() && !game.getPlayerShips().isEmpty()) {
+            //checks if mouse Entered is placement board or cpu board
+            String index = "" + game.getSeaButtonsListBottom().indexOf(buttonEntered);
+            Ship shipHovered = game.getPlayerShips().stream().filter(ship -> ship.getCoordinates().contains(index)).findAny().get();
+            Game.setMiddleLabel(shipHovered.getName().toString());
+        }
+    }
+
+    public void mouseExited(MouseEvent event) {
+        Pane paneEntered = (Pane) event.getSource();
+        Button buttonEntered = (Button) paneEntered.getChildren().get(0);
+
+        if (buttonEntered.isDisable()) {
+            Game.updatingMiddleLabel();
+        }
     }
 
 }

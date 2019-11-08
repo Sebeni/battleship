@@ -5,12 +5,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 
 import java.util.*;
 
 public class GridPaneButtonMethods {
-
-
+    
     /**
      * Create 100 buttons, place them in grid and return them in order
      *
@@ -41,7 +41,11 @@ public class GridPaneButtonMethods {
 
                 button.setMinSize(30, 30);
                 button.setPrefSize(40, 40);
-                gridPane.add(button, column, row);
+
+//                panes are parents for buttons so when they are disabled (ship part is placed) can shown ship name
+                Pane pane = new Pane(button);
+                
+                gridPane.add(pane, column, row);
                 resultButtonList.add(button);
 
                 //reading X and Y coordinates
@@ -61,8 +65,8 @@ public class GridPaneButtonMethods {
 
             //check if all spaces were used
             if (currentShip.getShipMaxSize() > currentShip.getShipFieldCount()) {
-                Integer xParam = GridPane.getColumnIndex(button);
-                Integer yParam = GridPane.getRowIndex(button);
+                Integer xParam = GridPane.getColumnIndex(button.getParent());
+                Integer yParam = GridPane.getRowIndex(button.getParent());
 
                 //placement validation
                 //check is needed with any other than first placement
@@ -70,7 +74,7 @@ public class GridPaneButtonMethods {
                     if (shipPlacementCheck(xParam, yParam)) {
                         currentShip.setCoordinates(xParam, yParam);
                         button.setDisable(true);
-                        Game.updatingShipPartLabel();
+                        Game.updatingMiddleLabel();
                     } else {
                         AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
                     }
@@ -80,13 +84,13 @@ public class GridPaneButtonMethods {
 
                         GameHandlers.changeShipPlacementButtonState(game, currentShip, true);
                         Game.setCurrentShip(null);
-                        Game.updatingShipPartLabel();
+                        Game.updatingMiddleLabel();
                     }
-                    
+
                 } else {
                     currentShip.setCoordinates(xParam, yParam);
                     button.setDisable(true);
-                    Game.updatingShipPartLabel();
+                    Game.updatingMiddleLabel();
                 }
             }
         }
@@ -159,14 +163,14 @@ public class GridPaneButtonMethods {
 
         Integer xParam = GridPane.getColumnIndex(button);
         Integer yParam = GridPane.getRowIndex(button);
-        
+
         button.setDisable(true);
         //TODO
         //changing color accordingly to cpu ship placement for now red
         button.setStyle("-fx-background-color: red");
 
     }
-    
+
 
     /**
      * Extracting and parsing parameters from two "digit" String to one digit int;
@@ -183,6 +187,5 @@ public class GridPaneButtonMethods {
             return Character.getNumericValue(toExtract.charAt(1));
         }
     }
-
 }
     

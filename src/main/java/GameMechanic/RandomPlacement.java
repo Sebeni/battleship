@@ -15,7 +15,6 @@ public class RandomPlacement {
         for (ShipName s : Ship.getAllShipsMaxSize().keySet()) {
             Ship ship = new Ship(s);
             horizontalCheck(ship);
-            
             result.add(ship);
         }
         
