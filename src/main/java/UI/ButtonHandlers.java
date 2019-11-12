@@ -55,7 +55,7 @@ public class ButtonHandlers {
     private void resetPlacementBoard(Ship shipToReset) {
         shipToReset.getCoordinates().stream()
                 .forEach(s -> {
-                    Button toReset = game.getSeaButtonsListBottom().get(Integer.parseInt(s));
+                    Button toReset = game.getSeaButtonsListBottom().get(s);
                     toReset.setDisable(false);
                 });
     }

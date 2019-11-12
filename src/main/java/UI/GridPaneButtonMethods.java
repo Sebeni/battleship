@@ -18,7 +18,7 @@ public class GridPaneButtonMethods {
     
     
     //only for debug
-    private List<String> allCoordinates = new ArrayList<>();
+    private List<Integer> allCoordinates = new ArrayList<>();
     private int counter = 0;
 
     public GridPaneButtonMethods(Game game) {
@@ -27,7 +27,6 @@ public class GridPaneButtonMethods {
     
     public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
         List<Button> resultButtonList = new ArrayList<>();
-        GridPane gridPane = toPopulate;
 
         int buttonCounter = 0;
 
@@ -49,7 +48,7 @@ public class GridPaneButtonMethods {
 
 //                panes are parents for buttons so when they are disabled (ship part is placed) can shown ship name
                 Pane pane = new Pane(button);
-                gridPane.add(pane, column, row);
+                toPopulate.add(pane, column, row);
                 resultButtonList.add(button);
 
                 //reading X and Y coordinates
@@ -75,7 +74,7 @@ public class GridPaneButtonMethods {
                 //placement validation
                 //check is needed with any other than first placement
                 if (currentShip.getShipPartsInGameCount() > 0) {
-                    if (shipPlacementCheck(xParam, yParam)) {
+                    if (shipPlacementAdjacentCheck(xParam, yParam)) {
                         currentShip.setCoordinate(xParam, yParam);
                         button.setDisable(true);
                         Game.updatingMiddleLabel();
@@ -85,12 +84,10 @@ public class GridPaneButtonMethods {
 
                     if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
                         //if all ship parts are set current ship must be set to null, disable ship button placement
-
                         ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
                         Game.setCurrentShip(null);
                         Game.updatingMiddleLabel();
                     }
-
                 } else {
                     currentShip.setCoordinate(xParam, yParam);
                     button.setDisable(true);
@@ -101,14 +98,14 @@ public class GridPaneButtonMethods {
     }
 
 
-    private boolean shipPlacementCheck(int xToCheck, int yToCheck) {
+    private boolean shipPlacementAdjacentCheck(int xToCheck, int yToCheck) {
         if (Game.getCurrentShip().getShipPartsInGameCount() == 1) {
             //second placement
-            String firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
+            Integer firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
 
             //possible choices: +- 1 
-            int xFirstShipPart = extractCoordinateFromString(firstPlacementCoordinate, "x");
-            int yFirstShipPart = extractCoordinateFromString(firstPlacementCoordinate, "y");
+            int xFirstShipPart = firstPlacementCoordinate/10;
+            int yFirstShipPart = firstPlacementCoordinate%10;
 
             int xDiff = xFirstShipPart - xToCheck;
             int yDiff = yFirstShipPart - yToCheck;
@@ -125,34 +122,34 @@ public class GridPaneButtonMethods {
             return possibleXChoice || possibleYChoice;
         } else {
             //third and subsequent placement
-            List<String> currentCoordinates = Game.getCurrentShip().getCoordinates();
+            List<Integer> currentCoordinates = Game.getCurrentShip().getCoordinates();
             Collections.sort(currentCoordinates);
 
-            String startBorder = currentCoordinates.get(0);
+            Integer startBorder = currentCoordinates.get(0);
 
-            String endBorder = currentCoordinates.get(currentCoordinates.size() - 1);
+            Integer endBorder = currentCoordinates.get(currentCoordinates.size() - 1);
 
             //horizontal check
             if (Game.getCurrentShip().isHorizontalPlacement()) {
                 // x +- 1
-                int startBorderX = extractCoordinateFromString(startBorder, "x");
-                int endBorderX = extractCoordinateFromString(endBorder, "x");
+                int startBorderX = startBorder / 10;
+                int endBorderX = endBorder / 10;
 
                 boolean possibleXBeforeStart = (startBorderX - 1) == xToCheck;
                 boolean possibleXAfterEnd = (endBorderX + 1) == xToCheck;
                 //no matter form where (start or end) extracted;
-                boolean possibleY = extractCoordinateFromString(startBorder, "y") == yToCheck;
+                boolean possibleY = startBorder % 10 == yToCheck;
 
                 return (possibleXBeforeStart || possibleXAfterEnd) && possibleY;
             } else { //vertical check
                 // y +- 1
-                int startBorderY = extractCoordinateFromString(startBorder, "y");
-                int endBorderY = extractCoordinateFromString(endBorder, "y");
+                int startBorderY = startBorder % 10;
+                int endBorderY = endBorder % 10;
 
                 boolean possibleYBeforeStart = (startBorderY - 1) == yToCheck;
                 boolean possibleYAfterEnd = (endBorderY + 1) == yToCheck;
                 //no matter form where (start or end) extracted;
-                boolean possibleX = extractCoordinateFromString(startBorder, "x") == xToCheck;
+                boolean possibleX = startBorder/10 == xToCheck;
 
                 return (possibleYBeforeStart || possibleYAfterEnd) && possibleX;
             }
@@ -165,7 +162,7 @@ public class GridPaneButtonMethods {
 
         Integer xParam = GridPane.getColumnIndex(button.getParent());
         Integer yParam = GridPane.getRowIndex(button.getParent());
-        String coordinate = xParam.toString() + yParam.toString();
+        Integer coordinate = xParam * 10 + yParam;
 
         if (hitCheck(game.getCpu(), coordinate)) {
             shipHitMethod(button, true);
@@ -178,7 +175,7 @@ public class GridPaneButtonMethods {
         checkWin();
     }
 
-    private boolean hitCheck(Player player, String coordinate) {
+    private boolean hitCheck(Player player, Integer coordinate) {
         return player.getShipsList().stream()
                 .flatMap(ship -> ship.getCoordinates().stream())
                 .anyMatch(s -> s.equals(coordinate));
@@ -203,9 +200,9 @@ public class GridPaneButtonMethods {
 
     private void changeAllButtonsToSunk(boolean humanFires, Ship shipHit) {
         if (humanFires) {
-            shipHit.getCoordinates().forEach(s -> game.getFireButtonListTop().get(Integer.parseInt(s)).setId("sunk"));
+            shipHit.getCoordinates().forEach(s -> game.getFireButtonListTop().get(s).setId("sunk"));
         } else {
-            shipHit.getCoordinates().forEach(s -> game.getSeaButtonsListBottom().get(Integer.parseInt(s)).setId("sunk"));
+            shipHit.getCoordinates().forEach(s -> game.getSeaButtonsListBottom().get(s).setId("sunk"));
         }
     }
 
@@ -213,10 +210,13 @@ public class GridPaneButtonMethods {
         Random random = new Random();
 
         Integer choice = random.nextInt(100);
+        System.out.println(choice);
 
         while (cpuChoices.contains(choice)) {
             choice = random.nextInt(100);
+            
         }
+        cpuChoices.add(choice);
         
 //        for debug
 //        game.getHuman().getShipsList().stream().flatMap(ship -> ship.getCoordinates().stream()).forEach(s -> allCoordinates.add(s));
@@ -224,33 +224,16 @@ public class GridPaneButtonMethods {
 //        Integer choice = Integer.parseInt(allCoordinates.get(counter));
 //        counter++;
         
-        String coordinate;
-        if (choice >= 0 && choice < 10) {
-            coordinate = "0" + choice;
-        } else {
-            coordinate = "" + choice;
-        }
 
         Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
-
-
-        if (hitCheck(game.getHuman(), coordinate)) {
+        
+        if (hitCheck(game.getHuman(), choice)) {
             shipHitMethod(buttonToChange, false);
         } else {
             buttonToChange.setId("miss");
         }
-
     }
     
-    public int extractCoordinateFromString(String toExtract, String coordinate) {
-
-        if (coordinate.toLowerCase().equals("x")) {
-            return Character.getNumericValue(toExtract.charAt(0));
-        } else {
-            return Character.getNumericValue(toExtract.charAt(1));
-        }
-    }
-
 
     public void mouseEnteredEH(MouseEvent event) {
 
@@ -271,21 +254,14 @@ public class GridPaneButtonMethods {
             Game.updatingMiddleLabel();
         }
     }
-
-    //    for player
+    
     private Ship shipFromGridButton(List<Button> gridButtons, List<Ship> shipList, Button buttonEntered) {
         int index = gridButtons.indexOf(buttonEntered);
-        String toFind;
-
-        if (index >= 0 && index < 10) {
-            toFind = "0" + index;
-        } else {
-            toFind = "" + index;
-        }
-        return shipList.stream().filter(ship -> ship.getCoordinates().contains(toFind)).findAny().get();
+        return shipList.stream()
+                .filter(ship -> ship.getCoordinates().contains(index))
+                .findAny().get();
     }
-
-
+    
     private void checkWin() {
         //win condition
         if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {

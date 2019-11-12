@@ -1,6 +1,7 @@
 package GameMechanic;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Ship {
     private final static Map<ShipName, Integer> allShips = new LinkedHashMap<>();
@@ -18,7 +19,7 @@ public class Ship {
     private boolean horizontalPlacement;
     
     private ShipName name;
-    private List<String> coordinates;
+    private List<Integer> coordinates;
 
     public Ship(ShipName name) {
         this.name = name;
@@ -27,7 +28,7 @@ public class Ship {
     }
     
     public void setCoordinate(Integer x, Integer y) {
-        coordinates.add(x.toString() + y.toString());
+        coordinates.add(x*10 + y);
         shipPartsInGameCount++;
     }
     
@@ -47,7 +48,7 @@ public class Ship {
         this.horizontalPlacement = horizontalPlacement;
     }
 
-    public List<String> getCoordinates() {
+    public List<Integer> getCoordinates() {
         return coordinates;
     }
 
@@ -58,12 +59,15 @@ public class Ship {
     public static Map<ShipName, Integer> getAllShips() {
         return allShips;
     }
-    
+
     @Override
     public String toString() {
         return "Ship{" +
-                "name=" + name +
-                ", coordinates=" + coordinates.stream().reduce((s, s2) -> s += " " + s2) +
+                "shipMaxSize=" + shipMaxSize +
+                ", shipPartsInGameCount=" + shipPartsInGameCount +
+                ", horizontalPlacement=" + horizontalPlacement +
+                ", name=" + name +
+                ", coordinates= " + coordinates.stream().map(integer -> integer.toString()).collect(Collectors.joining(", ")) +
                 '}';
     }
 

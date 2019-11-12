@@ -20,7 +20,7 @@ public class RandomPlacement {
         
         result.stream()
                 .flatMap(ship -> ship.getCoordinates().stream())
-                .forEach(s -> buttonListToDisable.get(Integer.parseInt(s)).setDisable(true));
+                .forEach(s -> buttonListToDisable.get(s).setDisable(true));
 
         return result;
     }
@@ -65,10 +65,9 @@ public class RandomPlacement {
     }
 
     private static boolean coordinateIsOccupied(Integer x, Integer y) {
-        String coordinateToCheck = x.toString() + y.toString();
         boolean coordinateOccupied = false;
         if (!result.isEmpty()) {
-            coordinateOccupied = result.stream().flatMap(ship -> ship.getCoordinates().stream()).anyMatch(s -> s.equals(coordinateToCheck));
+            coordinateOccupied = result.stream().flatMap(ship -> ship.getCoordinates().stream()).anyMatch(s -> s.equals(x*10+y));
         }
         return coordinateOccupied;
     }
