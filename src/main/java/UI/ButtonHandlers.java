@@ -51,12 +51,7 @@ public class ButtonHandlers {
             game.getHuman().getShipsList().remove(shipToReset);
         }
     }
-
-    /**
-     * Resets all board buttons to default state equals to parameters of given ship
-     *
-     * @param shipToReset ship which parameters must be reset
-     */
+    
     private void resetPlacementBoard(Ship shipToReset) {
         shipToReset.getCoordinates().stream()
                 .forEach(s -> {
@@ -65,13 +60,7 @@ public class ButtonHandlers {
                 });
     }
 
-
-    /**
-     * Checks if given ship was already placed
-     *
-     * @param shipToHandleName ship to check
-     * @return boolean true if placed, false if it wasn't placed
-     */
+    
     private boolean shipPlacementCheck(ShipName shipToHandleName) {
         return game.getHuman().getShipsList().stream()
                 .map(Ship::getName)

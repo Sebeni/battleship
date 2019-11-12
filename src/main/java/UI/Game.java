@@ -250,11 +250,7 @@ public class Game {
         scene = new Scene(layout, width, height);
         scene.getStylesheets().add("gameStyles.css");
     }
-
-
-    /**
-     * Changing label above playerLocationBoardBottom
-     */
+    
     public static void updatingMiddleLabel() {
         if (currentShip != null) {
             middleLabel.setText("Current ship: " + currentShip.getName() +

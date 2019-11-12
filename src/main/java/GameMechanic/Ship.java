@@ -3,14 +3,6 @@ package GameMechanic;
 import java.util.*;
 
 public class Ship {
-    /**
-     * Ships sizes:
-     *  	Carrier 	5
-     *  	Battleship 	4
-     *  	Cruiser 	3
-     *  	Submarine 	3
-     *  	Destroyer 	2 
-     */
     private final static Map<ShipName, Integer> allShips = new LinkedHashMap<>();
     static {
         allShips.put(ShipName.CARRIER, 5);
@@ -34,13 +26,6 @@ public class Ship {
         this.coordinates = new ArrayList<>();
     }
     
-//    for deep clone for mouse handler
-    public Ship(Ship shipToClone){
-        this.name = shipToClone.getName();
-        this.shipMaxSize = allShips.get(name);
-        this.coordinates = new ArrayList<>(shipToClone.getCoordinates());
-    }
-
     public void setCoordinate(Integer x, Integer y) {
         coordinates.add(x.toString() + y.toString());
         shipPartsInGameCount++;

@@ -16,6 +16,8 @@ public class GridPaneButtonMethods {
  
     private List<Integer> cpuChoices = new ArrayList<>();
     
+    
+    //only for debug
     private List<String> allCoordinates = new ArrayList<>();
     private int counter = 0;
 
@@ -119,7 +121,7 @@ public class GridPaneButtonMethods {
             if (yDiff == 0) {
                 Game.getCurrentShip().setHorizontalPlacement(true);
             }
-
+            
             return possibleXChoice || possibleYChoice;
         } else {
             //third and subsequent placement
@@ -286,9 +288,9 @@ public class GridPaneButtonMethods {
 
     private void checkWin() {
         //win condition
-        if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == 5) {
+        if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
             AlertBox.display("Result", "You win!");
-        } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == 5) {
+        } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
             AlertBox.display("Result", "You loose!");
         }
     }
