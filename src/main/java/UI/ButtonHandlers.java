@@ -7,10 +7,10 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
-public class GameHandlers {
+public class ButtonHandlers {
     private final Game game;
 
-    public GameHandlers(Game game) {
+    public ButtonHandlers(Game game) {
         this.game = game;
     }
 
@@ -19,9 +19,9 @@ public class GameHandlers {
 
         if (!shipPlacementCheck(shipToHandleName)) {
             shipToHandle = new Ship(shipToHandleName);
-            game.getPlayerShips().add(shipToHandle);
+            game.getHuman().getShipsList().add(shipToHandle);
         } else {
-            shipToHandle = game.getPlayerShips().stream().filter(ship -> ship.getName().equals(shipToHandleName)).findFirst().get();
+            shipToHandle = game.getHuman().getShipsList().stream().filter(ship -> ship.getName().equals(shipToHandleName)).findFirst().get();
         }
 
         Game.setCurrentShip(shipToHandle);
@@ -39,7 +39,7 @@ public class GameHandlers {
             Game.updatingMiddleLabel();
 
 
-            Ship shipToReset = game.getPlayerShips().stream()
+            Ship shipToReset = game.getHuman().getShipsList().stream()
                     .filter(ship -> ship.getName().equals(shipToHandleName))
                     .findFirst()
                     .get();
@@ -48,7 +48,7 @@ public class GameHandlers {
 
             changeShipPlacementButtonState(game, shipToReset, false);
 
-            game.getPlayerShips().remove(shipToReset);
+            game.getHuman().getShipsList().remove(shipToReset);
         }
     }
 
@@ -73,7 +73,7 @@ public class GameHandlers {
      * @return boolean true if placed, false if it wasn't placed
      */
     private boolean shipPlacementCheck(ShipName shipToHandleName) {
-        return game.getPlayerShips().stream()
+        return game.getHuman().getShipsList().stream()
                 .map(Ship::getName)
                 .anyMatch(shipName -> shipName.equals(shipToHandleName));
     }
@@ -101,19 +101,19 @@ public class GameHandlers {
 
     public void resetAllButtonEH(ActionEvent event) {
 
-        if (!game.getPlayerShips().isEmpty()) {
+        if (!game.getHuman().getShipsList().isEmpty()) {
             Game.setCurrentShip(null);
             Game.updatingMiddleLabel();
 
-            game.getPlayerShips().forEach(s -> resetPlacementBoard(s));
+            game.getHuman().getShipsList().forEach(s -> resetPlacementBoard(s));
 
-            game.getPlayerShips().clear();
+            game.getHuman().getShipsList().clear();
             game.getPlacementShipButtonListLeft().stream().forEach(button -> button.setDisable(false));
         }
     }
 
     public void newGameButtonEH(ActionEvent event) {
-        int shipPartsPlaced = game.getPlayerShips().stream()
+        int shipPartsPlaced = game.getHuman().getShipsList().stream()
                 .mapToInt(ship -> ship.getCoordinates().size())
                 .sum();
 
@@ -133,13 +133,13 @@ public class GameHandlers {
     }
 
     public void randomPlacementButtonEH(ActionEvent event) {
-        if (!game.getPlayerShips().isEmpty()) {
+        if (!game.getHuman().getShipsList().isEmpty()) {
             if(ConfirmBox.display("Warning!", "This action will reset all ships that have been already placed. Continue?")){
                 Game.setCurrentShip(null);
                 Game.updatingMiddleLabel();
-                game.getPlayerShips().stream().forEach(this::resetPlacementBoard);
+                game.getHuman().getShipsList().stream().forEach(this::resetPlacementBoard);
                 game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(false));
-                game.getPlayerShips().clear();
+                game.getHuman().getShipsList().clear();
             } else {
                 return;
             }

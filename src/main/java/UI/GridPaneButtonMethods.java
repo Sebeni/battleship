@@ -15,23 +15,15 @@ public class GridPaneButtonMethods {
     private Game game;
  
     private List<Integer> cpuChoices = new ArrayList<>();
-
-    private List<Ship> copyOfHumanShipList;
+    
+    private List<String> allCoordinates = new ArrayList<>();
+    private int counter = 0;
 
     public GridPaneButtonMethods(Game game) {
         this.game = game;
     }
-
-    /**
-     * Create 100 buttons, place them in grid and return them in order
-     *
-     * @param toPopulate   grid pane in which buttons should be placed
-     * @param cssId        buttons Id specified in CSS
-     * @param disable      whether buttons should be disable (true)
-     * @param eventHandler for each button
-     * @return populated list of buttons - buttons are added in order; for example #35 button equals to coordinates (3, 5)
-     */
-    public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disable, EventHandler<ActionEvent> eventHandler) {
+    
+    public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
         List<Button> resultButtonList = new ArrayList<>();
         GridPane gridPane = toPopulate;
 
@@ -47,7 +39,7 @@ public class GridPaneButtonMethods {
                 }
 
                 button.setId(cssId);
-                button.setDisable(disable);
+                button.setDisable(disableGridButtons);
 
 
                 button.setMinSize(30, 30);
@@ -55,12 +47,11 @@ public class GridPaneButtonMethods {
 
 //                panes are parents for buttons so when they are disabled (ship part is placed) can shown ship name
                 Pane pane = new Pane(button);
-
                 gridPane.add(pane, column, row);
                 resultButtonList.add(button);
 
                 //reading X and Y coordinates
-                button.setOnAction(eventHandler);
+                button.setOnAction(eventHandlerGridButtons);
             }
         }
         return resultButtonList;
@@ -75,13 +66,13 @@ public class GridPaneButtonMethods {
             Ship currentShip = Game.getCurrentShip();
 
             //check if all spaces were used
-            if (currentShip.getShipMaxSize() > currentShip.getShipFieldCount()) {
+            if (currentShip.getShipMaxSize() > currentShip.getShipPartsInGameCount()) {
                 Integer xParam = GridPane.getColumnIndex(button.getParent());
                 Integer yParam = GridPane.getRowIndex(button.getParent());
 
                 //placement validation
                 //check is needed with any other than first placement
-                if (currentShip.getShipFieldCount() > 0) {
+                if (currentShip.getShipPartsInGameCount() > 0) {
                     if (shipPlacementCheck(xParam, yParam)) {
                         currentShip.setCoordinate(xParam, yParam);
                         button.setDisable(true);
@@ -90,10 +81,10 @@ public class GridPaneButtonMethods {
                         AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
                     }
 
-                    if (currentShip.getShipMaxSize() == currentShip.getShipFieldCount()) {
+                    if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
                         //if all ship parts are set current ship must be set to null, disable ship button placement
 
-                        GameHandlers.changeShipPlacementButtonState(game, currentShip, true);
+                        ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
                         Game.setCurrentShip(null);
                         Game.updatingMiddleLabel();
                     }
@@ -109,7 +100,7 @@ public class GridPaneButtonMethods {
 
 
     private boolean shipPlacementCheck(int xToCheck, int yToCheck) {
-        if (Game.getCurrentShip().getShipFieldCount() == 1) {
+        if (Game.getCurrentShip().getShipPartsInGameCount() == 1) {
             //second placement
             String firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
 
@@ -163,9 +154,7 @@ public class GridPaneButtonMethods {
 
                 return (possibleYBeforeStart || possibleYAfterEnd) && possibleX;
             }
-
         }
-
     }
 
 
@@ -177,7 +166,7 @@ public class GridPaneButtonMethods {
         String coordinate = xParam.toString() + yParam.toString();
 
         if (hitCheck(game.getCpu(), coordinate)) {
-            sunkMethod(button, xParam, yParam, true);
+            shipHitMethod(button, true);
         } else {
             button.setId("miss");
         }
@@ -193,19 +182,17 @@ public class GridPaneButtonMethods {
                 .anyMatch(s -> s.equals(coordinate));
     }
 
-    private void sunkMethod(Button button, Integer xParam, Integer yParam, boolean humanFires) {
+    private void shipHitMethod(Button button, boolean humanFires) {
         Ship shipHit;
-
         if (humanFires) {
             shipHit = shipFromGridButton(game.getFireButtonListTop(), game.getCpu().getShipsList(), button);
-
         } else {
             shipHit = shipFromGridButton(game.getSeaButtonsListBottom(), game.getHuman().getShipsList(), button);
         }
+        
+        shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
 
-        shipHit.deleteCoordinate(xParam, yParam);
-
-        if (shipHit.getShipFieldCount() > 0) {
+        if (shipHit.getShipPartsInGameCount() > 0) {
             button.setId("hit");
         } else {
             changeAllButtonsToSunk(humanFires, shipHit);
@@ -214,66 +201,45 @@ public class GridPaneButtonMethods {
 
     private void changeAllButtonsToSunk(boolean humanFires, Ship shipHit) {
         if (humanFires) {
-           
-            game.getCpu().getShipsList().remove(shipHit);
+            shipHit.getCoordinates().forEach(s -> game.getFireButtonListTop().get(Integer.parseInt(s)).setId("sunk"));
         } else {
-            
-            game.getPlayerShips().remove(shipHit);
+            shipHit.getCoordinates().forEach(s -> game.getSeaButtonsListBottom().get(Integer.parseInt(s)).setId("sunk"));
         }
     }
 
     private void cpuTurn() {
         Random random = new Random();
-        
-        Integer choice = random.nextInt(100);
-   
-//        if(choice % 2 != 0){
-//        }
 
-//        if cell has been already hit
+        Integer choice = random.nextInt(100);
+
         while (cpuChoices.contains(choice)) {
             choice = random.nextInt(100);
         }
-
-//        cpu is shooting only placed 
-//        Integer choice = Integer.parseInt(game.getPlayerShips().get(0).getCoordinates().get(0));
-//        cpuChoices.add(choice);
-
-
-        Integer x;
-        Integer y;
-
+        
+//        for debug
+//        game.getHuman().getShipsList().stream().flatMap(ship -> ship.getCoordinates().stream()).forEach(s -> allCoordinates.add(s));
+//        
+//        Integer choice = Integer.parseInt(allCoordinates.get(counter));
+//        counter++;
+        
         String coordinate;
-
         if (choice >= 0 && choice < 10) {
             coordinate = "0" + choice;
-            x = 0;
-            y = choice;
         } else {
             coordinate = "" + choice;
-            x = choice / 10;
-            y = choice % 10;
         }
 
         Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
 
 
         if (hitCheck(game.getHuman(), coordinate)) {
-            sunkMethod(buttonToChange, x, y, false);
+            shipHitMethod(buttonToChange, false);
         } else {
             buttonToChange.setId("miss");
         }
 
     }
-
-
-    /**
-     * Extracting and parsing parameters from two "digit" String to one digit int;
-     *
-     * @param toExtract  String with parameters (two "digit" String);
-     * @param coordinate Which coordinate extract (x or y)
-     * @return chosen int coordinate
-     */
+    
     public int extractCoordinateFromString(String toExtract, String coordinate) {
 
         if (coordinate.toLowerCase().equals("x")) {
@@ -289,13 +255,8 @@ public class GridPaneButtonMethods {
         Pane paneEntered = (Pane) event.getSource();
         Button buttonEntered = (Button) paneEntered.getChildren().get(0);
 
-        if (buttonEntered.isDisable() && !game.getPlayerShips().isEmpty()) {
-            Ship shipHovered;
-            if (!game.isFirePhase()) {
-                shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), game.getPlayerShips(), buttonEntered);
-            } else {
-                shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), copyOfHumanShipList, buttonEntered);
-            }
+        if (buttonEntered.isDisable() && !game.getHuman().getShipsList().isEmpty()) {
+            Ship shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), game.getHuman().getShipsList(), buttonEntered);
             Game.setMiddleLabel(shipHovered.getName().toString());
         }
     }
@@ -325,17 +286,11 @@ public class GridPaneButtonMethods {
 
     private void checkWin() {
         //win condition
-        if (game.getCpu().getShipsList().isEmpty()) {
+        if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == 5) {
             AlertBox.display("Result", "You win!");
-        } else if (game.getPlayerShips().isEmpty()) {
+        } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == 5) {
             AlertBox.display("Result", "You loose!");
         }
-    }
-
-//    to avoid nullpointer after removing ship parts from human player when hit by cpu
-
-    public void setCopyOfHumanShipList(List<Ship> copyOfHumanShipList) {
-        this.copyOfHumanShipList = copyOfHumanShipList;
     }
 }
     

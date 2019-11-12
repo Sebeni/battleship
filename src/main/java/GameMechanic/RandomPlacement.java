@@ -49,7 +49,7 @@ public class RandomPlacement {
         if (!coordinateIsOccupied(x, y)) {
             ship.setCoordinate(x, y);
 
-            if (ship.getShipFieldCount() < ship.getShipMaxSize()) {
+            if (ship.getShipPartsInGameCount() < ship.getShipMaxSize()) {
                 if (ship.isHorizontalPlacement()) {
                     placeShipPart(x + 1, y, ship);
                 } else {
@@ -58,7 +58,7 @@ public class RandomPlacement {
             }
         } else {
             ship.getCoordinates().clear();
-            ship.setShipFieldCount(0);
+            ship.setShipPartsInGameCount(0);
 
             horizontalCheck(ship);
         }

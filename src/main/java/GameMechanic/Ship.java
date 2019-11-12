@@ -22,7 +22,7 @@ public class Ship {
     private static int allShipsParts = allShips.values().stream().mapToInt(i -> i).sum(); 
     
     private final int shipMaxSize;
-    private int shipFieldCount = 0;
+    private int shipPartsInGameCount = 0;
     private boolean horizontalPlacement;
     
     private ShipName name;
@@ -43,20 +43,15 @@ public class Ship {
 
     public void setCoordinate(Integer x, Integer y) {
         coordinates.add(x.toString() + y.toString());
-        shipFieldCount++;
+        shipPartsInGameCount++;
     }
     
-    public void deleteCoordinate(Integer x, Integer y){
-        coordinates.remove(x.toString() + y.toString());
-        shipFieldCount--;
-    }
-
     public int getShipMaxSize() {
         return shipMaxSize;
     }
 
-    public int getShipFieldCount() {
-        return shipFieldCount;
+    public int getShipPartsInGameCount() {
+        return shipPartsInGameCount;
     }
 
     public boolean isHorizontalPlacement() {
@@ -87,8 +82,8 @@ public class Ship {
                 '}';
     }
 
-    public void setShipFieldCount(int shipFieldCount) {
-        this.shipFieldCount = shipFieldCount;
+    public void setShipPartsInGameCount(int shipPartsInGameCount) {
+        this.shipPartsInGameCount = shipPartsInGameCount;
     }
 
     public static int getAllShipsParts() {

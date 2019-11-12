@@ -30,7 +30,7 @@ public class Game {
     private static Ship currentShip;
     private static Label middleLabel;
 
-    private final GameHandlers gameHandler = new GameHandlers(this);
+    private final ButtonHandlers gameHandler = new ButtonHandlers(this);
     private final GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(this);
 
     //center top - human firing board
@@ -176,7 +176,6 @@ public class Game {
         updateStatus.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         
 //        bottom right
-        
         VBox bottomRight = new VBox(10);
         Button resetCarrierButton = new Button("Reset Carrier");
         resetCarrierButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CARRIER));
@@ -222,10 +221,6 @@ public class Game {
         newGame.setOnAction(event1 -> {
             gameHandler.newGameButtonEH(event1);
             firePhase = true;
-//            clone the ship lists
-            List<Ship> copyOfShipList = new ArrayList<>();
-            human.getShipsList().forEach(ship -> copyOfShipList.add(new Ship(ship)));
-            gridMethods.setCopyOfHumanShipList(copyOfShipList);
         });
         bottomPaneButtonList.add(newGame);
 
@@ -263,7 +258,7 @@ public class Game {
     public static void updatingMiddleLabel() {
         if (currentShip != null) {
             middleLabel.setText("Current ship: " + currentShip.getName() +
-                    ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipFieldCount()));
+                    ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipPartsInGameCount()));
             middleLabel.setTextAlignment(TextAlignment.CENTER);
         } else {
             middleLabel.setText("No ship is selected");
@@ -293,11 +288,7 @@ public class Game {
     public static Label getMiddleLabel() {
         return middleLabel;
     }
-
-    public List<Ship> getPlayerShips() {
-        return human.getShipsList();
-    }
-
+    
     public List<Button> getPlacementShipButtonListLeft() {
         return placementShipButtonListLeft;
     }
