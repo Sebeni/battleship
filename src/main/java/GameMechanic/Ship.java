@@ -33,6 +33,13 @@ public class Ship {
         this.shipMaxSize = allShips.get(name);
         this.coordinates = new ArrayList<>();
     }
+    
+//    for deep clone for mouse handler
+    public Ship(Ship shipToClone){
+        this.name = shipToClone.getName();
+        this.shipMaxSize = allShips.get(name);
+        this.coordinates = new ArrayList<>(shipToClone.getCoordinates());
+    }
 
     public void setCoordinate(Integer x, Integer y) {
         coordinates.add(x.toString() + y.toString());
@@ -86,5 +93,18 @@ public class Ship {
 
     public static int getAllShipsParts() {
         return allShipsParts;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ship)) return false;
+        Ship ship = (Ship) o;
+        return name == ship.name;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

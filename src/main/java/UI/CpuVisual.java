@@ -19,7 +19,7 @@ public class CpuVisual {
     public CpuVisual(Game game) {
         GridPane cpuShipPlacement = new GridPane();
         GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(game);
-        buttonList = gridMethods.create100ButtonList(cpuShipPlacement, "cpuPlacement", false, Event::consume);
+        buttonList = gridMethods.create100ButtonList(cpuShipPlacement, "boardButton", false, Event::consume);
         
         if(Game.debug){
             window.setTitle("Debug visualisation of cpu ship placement");

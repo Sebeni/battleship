@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -21,8 +22,10 @@ public class Game {
     
     private Stage window;
     private Scene scene;
-    private final double width = 1000;
+    private final double width = 1200;
     private final double height = 1000;
+    
+    private boolean firePhase = false;
 
     private static Ship currentShip;
     private static Label middleLabel;
@@ -39,11 +42,13 @@ public class Game {
     private final List<Button> seaButtonsListBottom;
 
     //left pane and buttons - name of the ships
-    private final VBox leftPane = new VBox(10);
+    private final VBox leftPane = new VBox(150);
+    private final ScrollPane instructionPane = new ScrollPane();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
 
     //right pane and buttons - reset ships
-    private final VBox rightPane = new VBox(10);
+    private final VBox rightPane = new VBox(150);
+    private final ScrollPane updateStatus = new ScrollPane();
     private final List<Button> resetShipButtonListRight = new ArrayList<>();
 
     //bottom pane
@@ -101,6 +106,30 @@ public class Game {
 
 //      left pane
         leftPane.setPadding(new Insets(10));
+        instructionPane.setPrefWidth(250);
+        instructionPane.setPrefHeight(600);
+        instructionPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+//        upper left
+        VBox upperLeft = new VBox(10);
+
+        Label instructionLabel = new Label();
+        instructionLabel.setText("Before play begins, you must arranges all your ships on your bottom grid." +
+                "\nEach ship occupies a number of consecutive squares on the grid, arranged either horizontally or vertically." +
+                "\nThe number of squares for each ship is determined by the type of the ship. " +
+                "\nThe ships cannot overlap (i.e., only one ship can occupy any given square in the grid). " +
+                "Ships however can touch each other.");
+        instructionLabel.setWrapText(true);
+        instructionLabel.setTextAlignment(TextAlignment.JUSTIFY);
+        instructionLabel.setMaxWidth(250);
+        instructionLabel.setPadding(new Insets(10));
+
+        instructionPane.setContent(instructionLabel);
+        
+        upperLeft.getChildren().add(instructionPane);
+        
+//        bottom left
+        VBox bottomLeft = new VBox(10);
 
 
         Button carrierButton = new Button("Carrier - 5 spaces");
@@ -130,16 +159,25 @@ public class Game {
         for (Button b : placementShipButtonListLeft) {
             b.setId("shipButtonsPlacement");
         }
-
-        leftPane.getChildren().addAll(randomPlacement, carrierButton, battleshipButton, cruiserButton, submarineButton, destroyerButton);
-        leftPane.setAlignment(Pos.BOTTOM_CENTER);
+        
+        bottomLeft.getChildren().addAll(randomPlacement, carrierButton, battleshipButton, cruiserButton, submarineButton, destroyerButton);
+        bottomLeft.setAlignment(Pos.CENTER);
+        
+        leftPane.getChildren().addAll(upperLeft, bottomLeft);
         layout.setLeft(leftPane);
+        
 
 
 //        right pane
         rightPane.setPadding(new Insets(10));
 
-
+        updateStatus.setPrefWidth(250);
+        updateStatus.setPrefHeight(600);
+        updateStatus.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        
+//        bottom right
+        
+        VBox bottomRight = new VBox(10);
         Button resetCarrierButton = new Button("Reset Carrier");
         resetCarrierButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CARRIER));
         resetShipButtonListRight.add(resetCarrierButton);
@@ -168,8 +206,10 @@ public class Game {
             b.setId("shipButtonsReset");
         }
 
-        rightPane.getChildren().addAll(resetAll, resetCarrierButton, resetBattleshipButton, resetCruiserButton, resetSubmarineButton, resetDestroyerButton);
-        rightPane.setAlignment(Pos.BOTTOM_CENTER);
+        bottomRight.getChildren().addAll(resetAll, resetCarrierButton, resetBattleshipButton, resetCruiserButton, resetSubmarineButton, resetDestroyerButton);
+        bottomRight.setAlignment(Pos.CENTER);
+        
+        rightPane.getChildren().addAll(updateStatus, bottomRight);
         layout.setRight(rightPane);
 
 
@@ -178,8 +218,15 @@ public class Game {
         exit.setOnAction(event -> AfterClick.closeProgram(window));
         bottomPaneButtonList.add(exit);
 
-        Button newGame = new Button("New Game");
-        newGame.setOnAction(gameHandler::newGameButtonEH);
+        Button newGame = new Button("Start game");
+        newGame.setOnAction(event1 -> {
+            gameHandler.newGameButtonEH(event1);
+            firePhase = true;
+//            clone the ship lists
+            List<Ship> copyOfShipList = new ArrayList<>();
+            human.getShipsList().forEach(ship -> copyOfShipList.add(new Ship(ship)));
+            gridMethods.setCopyOfHumanShipList(copyOfShipList);
+        });
         bottomPaneButtonList.add(newGame);
 
         for (Button b : bottomPaneButtonList) {
@@ -277,5 +324,13 @@ public class Game {
 
     public Player getCpu() {
         return cpu;
+    }
+
+    public Player getHuman() {
+        return human;
+    }
+
+    public boolean isFirePhase() {
+        return firePhase;
     }
 }

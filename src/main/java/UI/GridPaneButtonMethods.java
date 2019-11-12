@@ -1,5 +1,6 @@
 package UI;
 
+import GameMechanic.Player;
 import GameMechanic.Ship;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,7 +13,10 @@ import java.util.*;
 
 public class GridPaneButtonMethods {
     private Game game;
-    private List<Button> gridButtonsHit = new ArrayList<>();
+ 
+    private List<Integer> cpuChoices = new ArrayList<>();
+
+    private List<Ship> copyOfHumanShipList;
 
     public GridPaneButtonMethods(Game game) {
         this.game = game;
@@ -51,7 +55,7 @@ public class GridPaneButtonMethods {
 
 //                panes are parents for buttons so when they are disabled (ship part is placed) can shown ship name
                 Pane pane = new Pane(button);
-                
+
                 gridPane.add(pane, column, row);
                 resultButtonList.add(button);
 
@@ -171,38 +175,95 @@ public class GridPaneButtonMethods {
         Integer xParam = GridPane.getColumnIndex(button.getParent());
         Integer yParam = GridPane.getRowIndex(button.getParent());
         String coordinate = xParam.toString() + yParam.toString();
-        
-        boolean hit = game.getCpu().getShipsList().stream()
-                .flatMap(ship -> ship.getCoordinates().stream())
-                .anyMatch(s -> s.equals(coordinate));
 
-        if(hit){
-            sunkMethod(button, xParam, yParam);
+        if (hitCheck(game.getCpu(), coordinate)) {
+            sunkMethod(button, xParam, yParam, true);
         } else {
             button.setId("miss");
         }
         button.setDisable(true);
-
-
+        checkWin();
+        cpuTurn();
+        checkWin();
     }
 
-    private void sunkMethod(Button button, Integer xParam, Integer yParam) {
-        gridButtonsHit.add(button);
-        Ship shipHit = shipFromGridButton(game.getFireButtonListTop(), game.getCpu().getShipsList(), button);
+    private boolean hitCheck(Player player, String coordinate) {
+        return player.getShipsList().stream()
+                .flatMap(ship -> ship.getCoordinates().stream())
+                .anyMatch(s -> s.equals(coordinate));
+    }
+
+    private void sunkMethod(Button button, Integer xParam, Integer yParam, boolean humanFires) {
+        Ship shipHit;
+
+        if (humanFires) {
+            shipHit = shipFromGridButton(game.getFireButtonListTop(), game.getCpu().getShipsList(), button);
+
+        } else {
+            shipHit = shipFromGridButton(game.getSeaButtonsListBottom(), game.getHuman().getShipsList(), button);
+        }
+
         shipHit.deleteCoordinate(xParam, yParam);
 
-        if(shipHit.getShipFieldCount() > 0){
+        if (shipHit.getShipFieldCount() > 0) {
             button.setId("hit");
-            
         } else {
-            gridButtonsHit.forEach(button1 -> button1.setId("sunk"));
-            game.getCpu().getShipsList().remove(shipHit);
-            
-            //win condition
-            if(game.getCpu().getShipsList().isEmpty()){
-                AlertBox.display("Result", "You won");
-            }
+            changeAllButtonsToSunk(humanFires, shipHit);
         }
+    }
+
+    private void changeAllButtonsToSunk(boolean humanFires, Ship shipHit) {
+        if (humanFires) {
+           
+            game.getCpu().getShipsList().remove(shipHit);
+        } else {
+            
+            game.getPlayerShips().remove(shipHit);
+        }
+    }
+
+    private void cpuTurn() {
+        Random random = new Random();
+        
+        Integer choice = random.nextInt(100);
+   
+//        if(choice % 2 != 0){
+//        }
+
+//        if cell has been already hit
+        while (cpuChoices.contains(choice)) {
+            choice = random.nextInt(100);
+        }
+
+//        cpu is shooting only placed 
+//        Integer choice = Integer.parseInt(game.getPlayerShips().get(0).getCoordinates().get(0));
+//        cpuChoices.add(choice);
+
+
+        Integer x;
+        Integer y;
+
+        String coordinate;
+
+        if (choice >= 0 && choice < 10) {
+            coordinate = "0" + choice;
+            x = 0;
+            y = choice;
+        } else {
+            coordinate = "" + choice;
+            x = choice / 10;
+            y = choice % 10;
+        }
+
+        Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
+
+
+        if (hitCheck(game.getHuman(), coordinate)) {
+            sunkMethod(buttonToChange, x, y, false);
+        } else {
+            buttonToChange.setId("miss");
+        }
+
     }
 
 
@@ -229,7 +290,12 @@ public class GridPaneButtonMethods {
         Button buttonEntered = (Button) paneEntered.getChildren().get(0);
 
         if (buttonEntered.isDisable() && !game.getPlayerShips().isEmpty()) {
-            Ship shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), game.getPlayerShips(), buttonEntered);
+            Ship shipHovered;
+            if (!game.isFirePhase()) {
+                shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), game.getPlayerShips(), buttonEntered);
+            } else {
+                shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), copyOfHumanShipList, buttonEntered);
+            }
             Game.setMiddleLabel(shipHovered.getName().toString());
         }
     }
@@ -242,17 +308,34 @@ public class GridPaneButtonMethods {
             Game.updatingMiddleLabel();
         }
     }
-    
-    private Ship shipFromGridButton(List<Button> gridButtons, List<Ship> shipList, Button buttonEntered){
+
+    //    for player
+    private Ship shipFromGridButton(List<Button> gridButtons, List<Ship> shipList, Button buttonEntered) {
         int index = gridButtons.indexOf(buttonEntered);
         String toFind;
 
-        if(index >= 0 && index <= 10){
+        if (index >= 0 && index < 10) {
             toFind = "0" + index;
         } else {
             toFind = "" + index;
         }
         return shipList.stream().filter(ship -> ship.getCoordinates().contains(toFind)).findAny().get();
+    }
+
+
+    private void checkWin() {
+        //win condition
+        if (game.getCpu().getShipsList().isEmpty()) {
+            AlertBox.display("Result", "You win!");
+        } else if (game.getPlayerShips().isEmpty()) {
+            AlertBox.display("Result", "You loose!");
+        }
+    }
+
+//    to avoid nullpointer after removing ship parts from human player when hit by cpu
+
+    public void setCopyOfHumanShipList(List<Ship> copyOfHumanShipList) {
+        this.copyOfHumanShipList = copyOfHumanShipList;
     }
 }
     
