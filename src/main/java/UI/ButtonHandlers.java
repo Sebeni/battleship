@@ -9,6 +9,7 @@ import javafx.scene.layout.Pane;
 
 public class ButtonHandlers {
     private final Game game;
+    
 
     public ButtonHandlers(Game game) {
         this.game = game;
@@ -25,7 +26,7 @@ public class ButtonHandlers {
         }
 
         Game.setCurrentShip(shipToHandle);
-        Game.updatingMiddleLabel();
+        game.updatingMiddleLabel();
     }
 
     public void resetPlacementButtonEH(ActionEvent event, ShipName shipToHandleName) {
@@ -36,7 +37,7 @@ public class ButtonHandlers {
             // activate ship button list
             // delete from list given ship
             Game.setCurrentShip(null);
-            Game.updatingMiddleLabel();
+            game.updatingMiddleLabel();
 
 
             Ship shipToReset = game.getHuman().getShipsList().stream()
@@ -92,7 +93,7 @@ public class ButtonHandlers {
 
         if (!game.getHuman().getShipsList().isEmpty()) {
             Game.setCurrentShip(null);
-            Game.updatingMiddleLabel();
+            game.updatingMiddleLabel();
 
             game.getHuman().getShipsList().forEach(s -> resetPlacementBoard(s));
 
@@ -123,9 +124,9 @@ public class ButtonHandlers {
 
     public void randomPlacementButtonEH(ActionEvent event) {
         if (!game.getHuman().getShipsList().isEmpty()) {
-            if(ConfirmBox.display("Warning!", "This action will reset all ships that have been already placed. Continue?")){
+            if(ConfirmBox.display("Warning!", "This action will reset all ships that might have been already placed. Continue?")){
                 Game.setCurrentShip(null);
-                Game.updatingMiddleLabel();
+                game.updatingMiddleLabel();
                 game.getHuman().getShipsList().stream().forEach(this::resetPlacementBoard);
                 game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(false));
                 game.getHuman().getShipsList().clear();

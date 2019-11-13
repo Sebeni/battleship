@@ -4,19 +4,23 @@ import GameMechanic.Player;
 import GameMechanic.Ship;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.TextAlignment;
 
 import java.util.*;
 
 public class GridPaneButtonMethods {
     private Game game;
- 
+    private double minButtonSize = 39;
+
     private List<Integer> cpuChoices = new ArrayList<>();
-    
-    
+
+
     //only for debug
     private List<Integer> allCoordinates = new ArrayList<>();
     private int counter = 0;
@@ -24,7 +28,7 @@ public class GridPaneButtonMethods {
     public GridPaneButtonMethods(Game game) {
         this.game = game;
     }
-    
+
     public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
         List<Button> resultButtonList = new ArrayList<>();
 
@@ -41,10 +45,8 @@ public class GridPaneButtonMethods {
 
                 button.setId(cssId);
                 button.setDisable(disableGridButtons);
+                button.setMinSize(minButtonSize, minButtonSize);
 
-
-                button.setMinSize(30, 30);
-                button.setPrefSize(40, 40);
 
 //                panes are parents for buttons so when they are disabled (ship part is placed) can shown ship name
                 Pane pane = new Pane(button);
@@ -61,8 +63,7 @@ public class GridPaneButtonMethods {
 
     public void placementButtonHandler(ActionEvent event) {
         Button button = (Button) event.getSource();
-
-        //only working when player selected ship
+        
         if (Game.getCurrentShip() != null) {
             Ship currentShip = Game.getCurrentShip();
 
@@ -72,26 +73,24 @@ public class GridPaneButtonMethods {
                 Integer yParam = GridPane.getRowIndex(button.getParent());
 
                 //placement validation
-                //check is needed with any other than first placement
                 if (currentShip.getShipPartsInGameCount() > 0) {
                     if (shipPlacementAdjacentCheck(xParam, yParam)) {
                         currentShip.setCoordinate(xParam, yParam);
                         button.setDisable(true);
-                        Game.updatingMiddleLabel();
+                        game.updatingMiddleLabel();
                     } else {
                         AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
                     }
 
                     if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
-                        //if all ship parts are set current ship must be set to null, disable ship button placement
                         ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
                         Game.setCurrentShip(null);
-                        Game.updatingMiddleLabel();
+                        game.updatingMiddleLabel();
                     }
                 } else {
                     currentShip.setCoordinate(xParam, yParam);
                     button.setDisable(true);
-                    Game.updatingMiddleLabel();
+                    game.updatingMiddleLabel();
                 }
             }
         }
@@ -100,60 +99,68 @@ public class GridPaneButtonMethods {
 
     private boolean shipPlacementAdjacentCheck(int xToCheck, int yToCheck) {
         if (Game.getCurrentShip().getShipPartsInGameCount() == 1) {
-            //second placement
-            Integer firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
+            return secondPlacementCheck(xToCheck, yToCheck);
 
-            //possible choices: +- 1 
-            int xFirstShipPart = firstPlacementCoordinate/10;
-            int yFirstShipPart = firstPlacementCoordinate%10;
-
-            int xDiff = xFirstShipPart - xToCheck;
-            int yDiff = yFirstShipPart - yToCheck;
-
-            //check if in boundary +- 
-            boolean possibleXChoice = (xDiff == 1 || xDiff == -1) && yDiff == 0;
-            boolean possibleYChoice = (yDiff == 1 || yDiff == -1) && xDiff == 0;
-
-            //checking for further placement if player is placing horizontally(true) or vertically (false - default)
-            if (yDiff == 0) {
-                Game.getCurrentShip().setHorizontalPlacement(true);
-            }
-            
-            return possibleXChoice || possibleYChoice;
         } else {
-            //third and subsequent placement
-            List<Integer> currentCoordinates = Game.getCurrentShip().getCoordinates();
-            Collections.sort(currentCoordinates);
-
-            Integer startBorder = currentCoordinates.get(0);
-
-            Integer endBorder = currentCoordinates.get(currentCoordinates.size() - 1);
-
-            //horizontal check
-            if (Game.getCurrentShip().isHorizontalPlacement()) {
-                // x +- 1
-                int startBorderX = startBorder / 10;
-                int endBorderX = endBorder / 10;
-
-                boolean possibleXBeforeStart = (startBorderX - 1) == xToCheck;
-                boolean possibleXAfterEnd = (endBorderX + 1) == xToCheck;
-                //no matter form where (start or end) extracted;
-                boolean possibleY = startBorder % 10 == yToCheck;
-
-                return (possibleXBeforeStart || possibleXAfterEnd) && possibleY;
-            } else { //vertical check
-                // y +- 1
-                int startBorderY = startBorder % 10;
-                int endBorderY = endBorder % 10;
-
-                boolean possibleYBeforeStart = (startBorderY - 1) == yToCheck;
-                boolean possibleYAfterEnd = (endBorderY + 1) == yToCheck;
-                //no matter form where (start or end) extracted;
-                boolean possibleX = startBorder/10 == xToCheck;
-
-                return (possibleYBeforeStart || possibleYAfterEnd) && possibleX;
-            }
+            return thirdAndMorePlacementCheck(xToCheck, yToCheck);
         }
+    }
+
+    private boolean thirdAndMorePlacementCheck(int xToCheck, int yToCheck) {
+        //third and subsequent placement
+        List<Integer> currentCoordinates = Game.getCurrentShip().getCoordinates();
+        Collections.sort(currentCoordinates);
+
+        Integer startBorder = currentCoordinates.get(0);
+
+        Integer endBorder = currentCoordinates.get(currentCoordinates.size() - 1);
+
+        if (Game.getCurrentShip().isHorizontalPlacement()) {
+            // x +- 1
+            int startBorderX = startBorder / 10;
+            int endBorderX = endBorder / 10;
+
+            boolean possibleXBeforeStart = (startBorderX - 1) == xToCheck;
+            boolean possibleXAfterEnd = (endBorderX + 1) == xToCheck;
+         
+            boolean possibleY = startBorder % 10 == yToCheck;
+
+            return (possibleXBeforeStart || possibleXAfterEnd) && possibleY;
+
+        } else {
+            // y +- 1
+            int startBorderY = startBorder % 10;
+            int endBorderY = endBorder % 10;
+
+            boolean possibleYBeforeStart = (startBorderY - 1) == yToCheck;
+            boolean possibleYAfterEnd = (endBorderY + 1) == yToCheck;
+
+            boolean possibleX = startBorder / 10 == xToCheck;
+
+            return (possibleYBeforeStart || possibleYAfterEnd) && possibleX;
+        }
+    }
+
+    private boolean secondPlacementCheck(int xToCheck, int yToCheck) {
+        Integer firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
+
+        //possible choices: +- 1 
+        int xFirstShipPart = firstPlacementCoordinate / 10;
+        int yFirstShipPart = firstPlacementCoordinate % 10;
+
+        int xDiff = xFirstShipPart - xToCheck;
+        int yDiff = yFirstShipPart - yToCheck;
+
+        //check if in boundary +- 
+        boolean possibleXChoice = (xDiff == 1 || xDiff == -1) && yDiff == 0;
+        boolean possibleYChoice = (yDiff == 1 || yDiff == -1) && xDiff == 0;
+
+        //checking for further placement if player is placing horizontally(true) or vertically (false - default)
+        if (yDiff == 0) {
+            Game.getCurrentShip().setHorizontalPlacement(true);
+        }
+
+        return possibleXChoice || possibleYChoice;
     }
 
 
@@ -165,7 +172,7 @@ public class GridPaneButtonMethods {
         Integer coordinate = xParam * 10 + yParam;
 
         if (hitCheck(game.getCpu(), coordinate)) {
-            shipHitMethod(button, true);
+            shipHitByHumanMethod(button);
         } else {
             button.setId("miss");
         }
@@ -173,6 +180,8 @@ public class GridPaneButtonMethods {
         checkWin();
         cpuTurn();
         checkWin();
+        game.setRoundCounter(game.getRoundCounter() + 1);
+        game.updatingMiddleLabel();
     }
 
     private boolean hitCheck(Player player, Integer coordinate) {
@@ -181,29 +190,37 @@ public class GridPaneButtonMethods {
                 .anyMatch(s -> s.equals(coordinate));
     }
 
-    private void shipHitMethod(Button button, boolean humanFires) {
-        Ship shipHit;
-        if (humanFires) {
-            shipHit = shipFromGridButton(game.getFireButtonListTop(), game.getCpu().getShipsList(), button);
-        } else {
-            shipHit = shipFromGridButton(game.getSeaButtonsListBottom(), game.getHuman().getShipsList(), button);
-        }
+    private void shipHitByHumanMethod(Button buttonToChangeColor) {
+        List<Button> listWithButtonToChange = game.getFireButtonListTop();
         
+        Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getCpu().getShipsList(), buttonToChangeColor);
+
         shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
 
         if (shipHit.getShipPartsInGameCount() > 0) {
-            button.setId("hit");
+            buttonToChangeColor.setId("hit");
         } else {
-            changeAllButtonsToSunk(humanFires, shipHit);
+            changeAllButtonsToSunk(listWithButtonToChange, shipHit);
         }
     }
 
-    private void changeAllButtonsToSunk(boolean humanFires, Ship shipHit) {
-        if (humanFires) {
-            shipHit.getCoordinates().forEach(s -> game.getFireButtonListTop().get(s).setId("sunk"));
+    private void shipHitByCpu(Button buttonToChangeColor) {
+        List<Button> listWithButtonToChange = game.getSeaButtonsListBottom();
+        
+        Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getHuman().getShipsList(), buttonToChangeColor);
+
+        shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
+
+        if (shipHit.getShipPartsInGameCount() > 0) {
+            buttonToChangeColor.setId("hit");
         } else {
-            shipHit.getCoordinates().forEach(s -> game.getSeaButtonsListBottom().get(s).setId("sunk"));
+            changeAllButtonsToSunk(listWithButtonToChange, shipHit);
         }
+    }
+
+
+    private void changeAllButtonsToSunk(List<Button> listWithButtonToChange, Ship shipHit) {
+        shipHit.getCoordinates().forEach(s -> listWithButtonToChange.get(s).setId("sunk"));
     }
 
     private void cpuTurn() {
@@ -214,26 +231,24 @@ public class GridPaneButtonMethods {
 
         while (cpuChoices.contains(choice)) {
             choice = random.nextInt(100);
-            
         }
         cpuChoices.add(choice);
-        
+
 //        for debug
 //        game.getHuman().getShipsList().stream().flatMap(ship -> ship.getCoordinates().stream()).forEach(s -> allCoordinates.add(s));
 //        
 //        Integer choice = Integer.parseInt(allCoordinates.get(counter));
 //        counter++;
-        
+
 
         Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
-        
         if (hitCheck(game.getHuman(), choice)) {
-            shipHitMethod(buttonToChange, false);
+            shipHitByCpu(buttonToChange);
         } else {
             buttonToChange.setId("miss");
         }
     }
-    
+
 
     public void mouseEnteredEH(MouseEvent event) {
 
@@ -251,17 +266,17 @@ public class GridPaneButtonMethods {
         Button buttonEntered = (Button) paneEntered.getChildren().get(0);
 
         if (buttonEntered.isDisable()) {
-            Game.updatingMiddleLabel();
+            game.updatingMiddleLabel();
         }
     }
-    
+
     private Ship shipFromGridButton(List<Button> gridButtons, List<Ship> shipList, Button buttonEntered) {
         int index = gridButtons.indexOf(buttonEntered);
         return shipList.stream()
                 .filter(ship -> ship.getCoordinates().contains(index))
                 .findAny().get();
     }
-    
+
     private void checkWin() {
         //win condition
         if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
@@ -269,6 +284,40 @@ public class GridPaneButtonMethods {
         } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
             AlertBox.display("Result", "You loose!");
         }
+    }
+    
+    public void columnRowMarkers(GridPane topRootForGrid, GridPane bottomRootForGrid) {
+        List<Label> markerLabels = new ArrayList<>();
+        for(int i = 1; i <= 10; i++){
+            Label topMarkerLetters = new Label(numberToLetter(i));
+            Label topMarkerNumbers = new Label(""+i);
+            Label bottomMarkerLetters = new Label(numberToLetter(i));
+            Label bottomMarkerNumbers = new Label(""+i);
+
+            markerLabels.add(topMarkerLetters);
+            markerLabels.add(topMarkerNumbers);
+            markerLabels.add(bottomMarkerLetters);
+            markerLabels.add(bottomMarkerNumbers);
+
+            topRootForGrid.add(topMarkerLetters, i, 0);
+            topRootForGrid.add(topMarkerNumbers, 0, i);
+            bottomRootForGrid.add(bottomMarkerLetters, i, 0);
+            bottomRootForGrid.add(bottomMarkerNumbers, 0, i);
+
+        }
+
+        markerLabels.forEach(label -> {
+            label.setMinHeight(minButtonSize);
+            label.setMinWidth(minButtonSize);
+            label.setTextAlignment(TextAlignment.CENTER);
+            label.setAlignment(Pos.CENTER);
+            label.setId("boardMarkers");
+        });
+    }
+
+    private String numberToLetter(int number){
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        return Character.toString(alphabet.charAt(number-1));
     }
 }
     

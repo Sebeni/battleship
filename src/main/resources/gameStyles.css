@@ -3,8 +3,12 @@ Left
 ship buttons for placement
  */
 
+.root{
+    -fx-font-family: "Courier New";
+}
+
 #shipButtonsPlacement {
-    -fx-padding: 15px 25px;
+    -fx-padding: 5px 15px;
     -fx-font-size: 14px;
     -fx-text-align: center;
     -fx-outline: none;
@@ -12,11 +16,14 @@ ship buttons for placement
     -fx-background-color: #3e8e41;
     -fx-border: none;
     -fx-border-radius: 15px;
-    -fx-min-width: 200px;
+    -fx-min-width: 205px;
     -fx-min-height: 50px;
+
 }
 
-#shipButtonsPlacement:hover {-fx-background-color: #4CAF50 }
+#shipButtonsPlacement:hover {
+    -fx-background-color: #4CAF50
+}
 
 /*
 Right
@@ -24,7 +31,7 @@ reset ship settings
  */
 
 #shipButtonsReset {
-    -fx-padding: 15px 25px;
+    -fx-padding: 5px 15px;
     -fx-font-size: 14px;
     -fx-text-align: center;
     -fx-outline: none;
@@ -32,20 +39,28 @@ reset ship settings
     -fx-background-color: #b9151b;
     -fx-border: none;
     -fx-border-radius: 15px;
-    -fx-min-width: 200px;
+    -fx-min-width: 205px;
     -fx-min-height: 50px;
+    
 }
 
-#shipButtonsReset:hover {-fx-background-color: #fe010b}
+#shipButtonsReset:hover {
+    -fx-background-color: #fe010b
+}
 
 /*
 Center - bottom
 ship placement board
  */
 
+#boardMarkers {
+ 
+}
+
 #boardButton {
     -fx-focus-traversable: false;
     -fx-background-color: #3ca7b3;
+    -fx-font-size: 12;
 }
 
 #boardButton:hover {
@@ -58,6 +73,7 @@ ship placement board
     -fx-background-color: #585858;
     -fx-border-color: black;
     -fx-border-width: 1;
+    -fx-font-size: 12;
 }
 
 /*
@@ -70,10 +86,11 @@ fire area
     -fx-background-color: black;
     -fx-border-color: #04ff08;
     -fx-border-width: 1;
+    -fx-font-size: 12;
 }
 
 #fireButton:hover {
-    -fx-background-color:#04ff08;
+    -fx-background-color: #04ff08;
     -fx-cursor: crosshair;
 }
 
@@ -84,33 +101,31 @@ exit new game
 #bottomButtons {
     -fx-min-width: 130px;
     -fx-min-height: 20px;
+   
 }
-
-/*
-For debug
- */
-#cpuPlacement {
-    -fx-background-color: purple;
-    -fx-border-color: black;
-    -fx-color: white;
-}
-
-#cpuPlacement:disabled {
-    -fx-background-color: white;
-}
-
+/*hit, sunk and miss colors*/
 #hit:disabled {
     -fx-color: orange;
     -fx-border-color: yellow;
     -fx-border-width: 2;
+    -fx-font-size: 12;
 }
 
 #sunk:disabled {
     -fx-color: red;
     -fx-border-color: orange;
     -fx-border-width: 2;
+    -fx-font-size: 12;
 }
 
 #miss:disabled {
     -fx-color: white;
+    -fx-font-size: 12;
 }
+
+
+/*left and right top labels (instruction and updating status)*/
+#labels {
+    -fx-font-size: 18;
+}
+

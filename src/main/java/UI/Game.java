@@ -18,18 +18,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
+    //game elements
     public static boolean debug;
-    
-    private Stage window;
-    private Scene scene;
-    private final double width = 1200;
-    private final double height = 1000;
-    
+    private int roundCounter = 1;
     private boolean firePhase = false;
 
     private static Ship currentShip;
     private static Label middleLabel;
 
+    private final Player human = new Player(true);
+    private final Player cpu = new Player(false);
+    private CpuVisual cpuVisual;
+    
+    //javaFX elements
+    private Stage window;
+    private Scene scene;
+    
+    // parameters of elements
+    private final double windowWidth = 1400;
+    private final double windowHeight = 1000;
+    private final double scrollPaneWidth = 350;
+    private final double scrollPaneHeight = 500;
+    private final double labelWidth = scrollPaneWidth - 20;
+    
+
+    //handlers for javaFX elemnts
     private final ButtonHandlers gameHandler = new ButtonHandlers(this);
     private final GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(this);
 
@@ -55,11 +68,7 @@ public class Game {
     private final HBox bottomPane = new HBox(10);
     private final List<Button> bottomPaneButtonList = new ArrayList<>();
 
-    private final Player human = new Player(true);
-
-    private CpuVisual cpuVisual;
-
-    private final Player cpu = new Player(false);
+    
 
     public Game(Stage primaryStage) {
         window = primaryStage;
@@ -73,18 +82,10 @@ public class Game {
 
         fireButtonListTop = gridMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, gridMethods::fireButtonHandler);
         seaButtonsListBottom = gridMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, gridMethods::placementButtonHandler);
-        
-        playerLocationBoardBottom.getChildren().forEach(node -> {
-            Pane pane = (Pane) node;
-            pane.setOnMouseEntered(gridMethods::mouseEnteredEH);
-            pane.setOnMouseExited(gridMethods::mouseExitedEH);
-
-        });
 
 //      root pane for all other panes
         BorderPane layout = new BorderPane();
-        layout.setPadding(new Insets(50, 50, 50, 50));
-
+        layout.setPadding(new Insets(20, 50, 20, 50));
 
 //      center pane
         VBox centerPane = new VBox(20);
@@ -92,37 +93,63 @@ public class Game {
         middleLabel = new Label();
         updatingMiddleLabel();
 
-        centerPane.getChildren().addAll(playerFireBoardTop, middleLabel, playerLocationBoardBottom);
+        playerLocationBoardBottom.getChildren().forEach(node -> {
+            Pane pane = (Pane) node;
+            pane.setOnMouseEntered(gridMethods::mouseEnteredEH);
+            pane.setOnMouseExited(gridMethods::mouseExitedEH);
+
+        });
+        
+        GridPane topRootForGrid = new GridPane();
+        topRootForGrid.add(playerFireBoardTop, 1, 1, 10, 10);
+        topRootForGrid.setAlignment(Pos.CENTER);
+        
+        GridPane bottomRootForGrid = new GridPane();
+        bottomRootForGrid.add(playerLocationBoardBottom, 1, 1, 10, 10);
+        bottomRootForGrid.setAlignment(Pos.CENTER);
+        
+        gridMethods.columnRowMarkers(topRootForGrid, bottomRootForGrid);
+
+//        topRootForGrid.setGridLinesVisible(true);
+//        bottomRootForGrid.setGridLinesVisible(true);
+
+        centerPane.getChildren().addAll(topRootForGrid, middleLabel, bottomRootForGrid);
         centerPane.setAlignment(Pos.CENTER);
+        
+        
         playerFireBoardTop.setAlignment(Pos.CENTER);
         playerFireBoardTop.setStyle("-fx-cursor: crosshair;");
         playerLocationBoardBottom.setAlignment(Pos.CENTER);
         centerPane.setPadding(new Insets(10));
-
-
+        
         layout.setCenter(centerPane);
         BorderPane.setAlignment(centerPane, Pos.CENTER);
-
-
+        
 //      left pane
         leftPane.setPadding(new Insets(10));
-        instructionPane.setPrefWidth(250);
-        instructionPane.setPrefHeight(600);
+        instructionPane.setPrefWidth(scrollPaneWidth);
+        instructionPane.setPrefHeight(scrollPaneHeight);
         instructionPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
 //        upper left
         VBox upperLeft = new VBox(10);
 
         Label instructionLabel = new Label();
-        instructionLabel.setText("Before play begins, you must arranges all your ships on your bottom grid." +
+        instructionLabel.setText("PHASE ONE - SHIP PLACEMENT" +
+                "\nInstructions:" +
+                "\nBefore play begins, you must arranges all your ships on your bottom grid." +
                 "\nEach ship occupies a number of consecutive squares on the grid, arranged either horizontally or vertically." +
                 "\nThe number of squares for each ship is determined by the type of the ship. " +
                 "\nThe ships cannot overlap (i.e., only one ship can occupy any given square in the grid). " +
-                "Ships however can touch each other.");
+                "but they can touch each other." +
+                "\nTo start placing your ships click on one of the green buttons and then start placing ship parts on " +
+                "the blue grid by clicking on chosen cell." +
+                "\nYou can also click on Random Placement button to randomly place all your ships.");
         instructionLabel.setWrapText(true);
         instructionLabel.setTextAlignment(TextAlignment.JUSTIFY);
-        instructionLabel.setMaxWidth(250);
+        instructionLabel.setMaxWidth(labelWidth);
         instructionLabel.setPadding(new Insets(10));
+        instructionLabel.setId("labels");
 
         instructionPane.setContent(instructionLabel);
         
@@ -171,9 +198,10 @@ public class Game {
 //        right pane
         rightPane.setPadding(new Insets(10));
 
-        updateStatus.setPrefWidth(250);
-        updateStatus.setPrefHeight(600);
+        updateStatus.setPrefWidth(scrollPaneWidth);
+        updateStatus.setPrefHeight(scrollPaneHeight);
         updateStatus.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        updateStatus.setId("labels");
         
 //        bottom right
         VBox bottomRight = new VBox(10);
@@ -221,6 +249,7 @@ public class Game {
         newGame.setOnAction(event1 -> {
             gameHandler.newGameButtonEH(event1);
             firePhase = true;
+            updatingMiddleLabel();
         });
         bottomPaneButtonList.add(newGame);
 
@@ -247,17 +276,23 @@ public class Game {
 
 
 //        setting scene
-        scene = new Scene(layout, width, height);
+        scene = new Scene(layout, windowWidth, windowHeight);
+        window.setMinHeight(windowHeight);
+        window.setMinWidth(windowWidth);
         scene.getStylesheets().add("gameStyles.css");
     }
     
-    public static void updatingMiddleLabel() {
-        if (currentShip != null) {
-            middleLabel.setText("Current ship: " + currentShip.getName() +
-                    ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipPartsInGameCount()));
-            middleLabel.setTextAlignment(TextAlignment.CENTER);
+    public void updatingMiddleLabel() {
+        if(!firePhase){
+            if (currentShip != null) {
+                middleLabel.setText("Current ship: " + currentShip.getName() +
+                        ". Remaining ship parts: " + (currentShip.getShipMaxSize() - currentShip.getShipPartsInGameCount()));
+                middleLabel.setTextAlignment(TextAlignment.CENTER);
+            } else {
+                middleLabel.setText("No ship is selected");
+            }
         } else {
-            middleLabel.setText("No ship is selected");
+            middleLabel.setText("Turn " + roundCounter);
         }
     }
     
@@ -320,4 +355,18 @@ public class Game {
     public boolean isFirePhase() {
         return firePhase;
     }
+
+    public int getRoundCounter() {
+        return roundCounter;
+    }
+
+    public void setRoundCounter(int roundCounter) {
+        this.roundCounter = roundCounter;
+    }
+    
+    public void addUpdateLabel(String textToAdd){
+        
+    }
+    
+   
 }
