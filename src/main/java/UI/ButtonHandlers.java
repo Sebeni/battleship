@@ -4,6 +4,7 @@ import GameMechanic.Ship;
 import GameMechanic.ShipName;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+import javafx.scene.text.TextAlignment;
 
 public class ButtonHandlers {
     private final Game game;

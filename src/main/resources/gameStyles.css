@@ -18,7 +18,7 @@ ship buttons for placement
     -fx-border: none;
     -fx-border-radius: 15px;
     -fx-min-width: 205px;
-    -fx-min-height: 50px;
+    -fx-min-height: 40px;
 
 }
 
@@ -41,7 +41,7 @@ reset ship settings
     -fx-border: none;
     -fx-border-radius: 15px;
     -fx-min-width: 205px;
-    -fx-min-height: 50px;
+    -fx-min-height: 40px;
     
 }
 
@@ -96,12 +96,12 @@ fire area
 }
 
 /*
-Bottom
+Left upper
 exit new game
  */
-#bottomButtons {
-    -fx-min-width: 130px;
-    -fx-min-height: 20px;
+#newGameButtons {
+    -fx-min-width: 205px;
+    -fx-min-height: 30px;
    
 }
 /*hit, sunk and miss colors*/

@@ -1,5 +1,6 @@
 package UI;
 
+import GameMechanic.CpuChoiceMaker;
 import GameMechanic.Player;
 import GameMechanic.Ship;
 import javafx.event.ActionEvent;
@@ -20,6 +21,7 @@ public class GridPaneButtonMethods {
 
     private List<Integer> cpuChoices = new ArrayList<>();
     
+    private CpuChoiceMaker cpuChoiceMaker;
     private String playerFires = "You fire at: ";
     private String cpuFires = "Cpu fires at: ";
 
@@ -30,6 +32,7 @@ public class GridPaneButtonMethods {
 
     public GridPaneButtonMethods(Game game) {
         this.game = game;
+        this.cpuChoiceMaker = new CpuChoiceMaker(game);
     }
 
     public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
@@ -218,10 +221,12 @@ public class GridPaneButtonMethods {
 
         if (shipHit.getShipPartsInGameCount() > 0) {
             buttonToChangeColor.setId("hit");
+           
             game.setBattleLog(whoFires + numberToLetter(xParam) + yParamFix + " hit");
         } else {
             changeAllButtonsToSunk(listWithButtonToChange, shipHit);
             game.setBattleLog(whoFires + numberToLetter(xParam) + yParamFix + " sunk");
+           
         }
     }
 
@@ -231,21 +236,8 @@ public class GridPaneButtonMethods {
     }
 
     private void cpuTurn() {
-        Random random = new Random();
+        Integer choice = cpuChoiceMaker.getCpuChoice();
 
-        Integer choice = random.nextInt(100);
-        System.out.println(choice);
-
-        while (cpuChoices.contains(choice)) {
-            choice = random.nextInt(100);
-        }
-        cpuChoices.add(choice);
-
-//        for debug
-//        game.getHuman().getShipsList().stream().flatMap(ship -> ship.getCoordinates().stream()).forEach(s -> allCoordinates.add(s));
-//        
-//        Integer choice = Integer.parseInt(allCoordinates.get(counter));
-//        counter++;
         Integer xParam = choice / 10;
         Integer yParam = choice % 10;
 
@@ -313,7 +305,7 @@ public class GridPaneButtonMethods {
         }
     }
     
-    public void columnRowMarkers(GridPane topRootForGrid, GridPane bottomRootForGrid) {
+    public void gridMarkers(GridPane topRootForGrid, GridPane bottomRootForGrid) {
         List<Label> markerLabels = new ArrayList<>();
         for(int i = 1; i <= 10; i++){
             Label topMarkerLetters = new Label(numberToLetter(i - 1));
@@ -330,7 +322,6 @@ public class GridPaneButtonMethods {
             topRootForGrid.add(topMarkerNumbers, 0, i);
             bottomRootForGrid.add(bottomMarkerLetters, i, 0);
             bottomRootForGrid.add(bottomMarkerNumbers, 0, i);
-
         }
 
         markerLabels.forEach(label -> {

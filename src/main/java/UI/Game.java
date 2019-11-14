@@ -7,9 +7,7 @@ import GameMechanic.ShipName;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -54,9 +52,9 @@ public class Game {
     private final GridPane playerLocationBoardBottom = new GridPane();
     private final List<Button> seaButtonsListBottom;
 
-    //left pane and buttons - name of the ships
-    private final VBox leftPane = new VBox(150);
-    private final ScrollPane instructionPane = new ScrollPane();
+    //left pane and buttons - name of the ships and new game buttons
+    private final VBox leftPane = new VBox(425);
+    private final List<Button> newGameButtons = new ArrayList<>();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
 
     //right pane and buttons bottom - reset ships
@@ -69,8 +67,6 @@ public class Game {
 
     //bottom pane
     private final HBox bottomPane = new HBox(10);
-    private final List<Button> bottomPaneButtonList = new ArrayList<>();
-
     
 
     public Game(Stage primaryStage) {
@@ -89,7 +85,7 @@ public class Game {
 //      root pane for all other panes
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(20, 50, 20, 50));
-
+        
 //      center pane
         VBox centerPane = new VBox(20);
 
@@ -116,10 +112,9 @@ public class Game {
         bottomRootForGrid.add(playerLocationBoardBottom, 1, 1, 10, 10);
         bottomRootForGrid.setAlignment(Pos.CENTER);
         
-        gridMethods.columnRowMarkers(topRootForGrid, bottomRootForGrid);
+        gridMethods.gridMarkers(topRootForGrid, bottomRootForGrid);
 
-//        topRootForGrid.setGridLinesVisible(true);
-//        bottomRootForGrid.setGridLinesVisible(true);
+
 
         centerPane.getChildren().addAll(topRootForGrid, middleLabel, bottomRootForGrid);
         centerPane.setAlignment(Pos.CENTER);
@@ -135,33 +130,38 @@ public class Game {
         
 //      left pane
         leftPane.setPadding(new Insets(10));
-        instructionPane.setPrefWidth(scrollPaneWidth);
-        instructionPane.setPrefHeight(scrollPaneHeight);
-        instructionPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+
+
 
 //        upper left
         VBox upperLeft = new VBox(10);
+        upperLeft.setPadding(new Insets(100, 10, 10, 10));
 
-        Label instructionLabel = new Label();
-        instructionLabel.setText("PHASE ONE - SHIP PLACEMENT" +
-                "\nInstructions:" +
-                "\nBefore play begins, you must arranges all your ships on your bottom grid." +
-                "\nEach ship occupies a number of consecutive squares on the grid, arranged either horizontally or vertically." +
-                "\nThe number of squares for each ship is determined by the type of the ship. " +
-                "\nThe ships cannot overlap (i.e., only one ship can occupy any given square in the grid). " +
-                "but they can touch each other." +
-                "\nTo start placing your ships click on one of the green buttons and then start placing ship parts on " +
-                "the blue grid by clicking on chosen cell." +
-                "\nYou can also click on Random Placement button to randomly place all your ships.");
-        instructionLabel.setWrapText(true);
-        instructionLabel.setTextAlignment(TextAlignment.JUSTIFY);
-        instructionLabel.setMaxWidth(labelWidth);
-        instructionLabel.setPadding(new Insets(10));
-        instructionLabel.setId("labels");
+        Button exit = new Button("Exit");
+        exit.setOnAction(event -> AfterClick.closeProgram(window));
+        newGameButtons.add(exit);
 
-        instructionPane.setContent(instructionLabel);
+        Button newGame = new Button("Start game");
+        newGame.setOnAction(gameHandler::newGameButtonEH);
+        newGameButtons.add(newGame);
         
-        upperLeft.getChildren().add(instructionPane);
+        
+      
+
+        Button helpButton = new Button("Help");
+        helpButton.setOnAction(event -> {
+            InstructionBox.display(firePhase);
+        });
+        newGameButtons.add(helpButton);
+
+
+        for (Button b : newGameButtons) {
+            b.setId("newGameButtons");
+        }
+        
+        upperLeft.getChildren().addAll(newGame, helpButton, exit);
+        upperLeft.setAlignment(Pos.CENTER);
         
 //        bottom left
         VBox bottomLeft = new VBox(10);
@@ -254,20 +254,7 @@ public class Game {
         layout.setRight(rightPane);
 
 
-//        down pane
-        Button exit = new Button("Exit");
-        exit.setOnAction(event -> AfterClick.closeProgram(window));
-        bottomPaneButtonList.add(exit);
-
-        Button newGame = new Button("Start game");
-        newGame.setOnAction(gameHandler::newGameButtonEH);
-        bottomPaneButtonList.add(newGame);
-
-        for (Button b : bottomPaneButtonList) {
-            b.setId("bottomButtons");
-        }
-
-        bottomPane.getChildren().addAll(exit, newGame);
+//        debug
 
         if (debug) {
             Button showShips = new Button("show ship lists");
@@ -278,13 +265,9 @@ public class Game {
                 cpu.getShipsList().forEach(System.out::println);
             });
             
-            bottomPane.getChildren().addAll(showShips);
+//            upperLeft.getChildren().addAll(showShips);
         }
-        bottomPane.setAlignment(Pos.CENTER);
-
-        layout.setBottom(bottomPane);
-
-
+        
 //        setting scene
         scene = new Scene(layout, windowWidth, windowHeight);
         window.setMinHeight(windowHeight);
