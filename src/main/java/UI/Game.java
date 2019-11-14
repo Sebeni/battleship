@@ -42,7 +42,7 @@ public class Game {
     private final double labelWidth = scrollPaneWidth - 20;
     
 
-    //handlers for javaFX elemnts
+    //handlers for javaFX elements
     private final ButtonHandlers gameHandler = new ButtonHandlers(this);
     private final GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(this);
 
@@ -59,10 +59,13 @@ public class Game {
     private final ScrollPane instructionPane = new ScrollPane();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
 
-    //right pane and buttons - reset ships
+    //right pane and buttons bottom - reset ships
     private final VBox rightPane = new VBox(150);
     private final ScrollPane updateStatus = new ScrollPane();
     private final List<Button> resetShipButtonListRight = new ArrayList<>();
+    
+    //right pane top - battleLog
+    private final Label battleLog = new Label();
 
     //bottom pane
     private final HBox bottomPane = new HBox(10);
@@ -91,7 +94,7 @@ public class Game {
         VBox centerPane = new VBox(20);
 
         middleLabel = new Label();
-        updatingMiddleLabel();
+        middleLabelUpdateText();
 
         playerLocationBoardBottom.getChildren().forEach(node -> {
             Pane pane = (Pane) node;
@@ -192,8 +195,6 @@ public class Game {
         
         leftPane.getChildren().addAll(upperLeft, bottomLeft);
         layout.setLeft(leftPane);
-        
-
 
 //        right pane
         rightPane.setPadding(new Insets(10));
@@ -202,6 +203,14 @@ public class Game {
         updateStatus.setPrefHeight(scrollPaneHeight);
         updateStatus.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         updateStatus.setId("labels");
+        
+        battleLog.setWrapText(true);
+        battleLog.setTextAlignment(TextAlignment.JUSTIFY);
+        battleLog.setMaxWidth(labelWidth);
+        battleLog.setPadding(new Insets(10));
+        battleLog.setId("labels");
+        
+        updateStatus.setContent(battleLog);
         
 //        bottom right
         VBox bottomRight = new VBox(10);
@@ -249,7 +258,8 @@ public class Game {
         newGame.setOnAction(event1 -> {
             gameHandler.newGameButtonEH(event1);
             firePhase = true;
-            updatingMiddleLabel();
+            middleLabelUpdateText();
+            battleLog.setText("Turn " + roundCounter);
         });
         bottomPaneButtonList.add(newGame);
 
@@ -282,7 +292,7 @@ public class Game {
         scene.getStylesheets().add("gameStyles.css");
     }
     
-    public void updatingMiddleLabel() {
+    public void middleLabelUpdateText() {
         if(!firePhase){
             if (currentShip != null) {
                 middleLabel.setText("Current ship: " + currentShip.getName() +
@@ -314,10 +324,6 @@ public class Game {
 
     public static void setCurrentShip(Ship currentShip) {
         Game.currentShip = currentShip;
-    }
-
-    public static Label getMiddleLabel() {
-        return middleLabel;
     }
     
     public List<Button> getPlacementShipButtonListLeft() {
@@ -364,9 +370,13 @@ public class Game {
         this.roundCounter = roundCounter;
     }
     
-    public void addUpdateLabel(String textToAdd){
-        
+    public void setBattleLog(String messageToSet){
+        battleLog.setText(battleLog.getText() + messageToSet + "\n");
     }
     
-   
+    public void increaseRoundCounter() {
+        roundCounter = roundCounter + 1;
+        middleLabelUpdateText();
+        setBattleLog("Turn " + roundCounter);
+    }
 }

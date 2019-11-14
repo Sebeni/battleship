@@ -19,6 +19,9 @@ public class GridPaneButtonMethods {
     private double minButtonSize = 39;
 
     private List<Integer> cpuChoices = new ArrayList<>();
+    
+    private String playerFires = "Player fires at: ";
+    private String cpuFires = "Cpu fires at: ";
 
 
     //only for debug
@@ -77,7 +80,7 @@ public class GridPaneButtonMethods {
                     if (shipPlacementAdjacentCheck(xParam, yParam)) {
                         currentShip.setCoordinate(xParam, yParam);
                         button.setDisable(true);
-                        game.updatingMiddleLabel();
+                        game.middleLabelUpdateText();
                     } else {
                         AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
                     }
@@ -85,12 +88,12 @@ public class GridPaneButtonMethods {
                     if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
                         ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
                         Game.setCurrentShip(null);
-                        game.updatingMiddleLabel();
+                        game.middleLabelUpdateText();
                     }
                 } else {
                     currentShip.setCoordinate(xParam, yParam);
                     button.setDisable(true);
-                    game.updatingMiddleLabel();
+                    game.middleLabelUpdateText();
                 }
             }
         }
@@ -169,19 +172,20 @@ public class GridPaneButtonMethods {
 
         Integer xParam = GridPane.getColumnIndex(button.getParent());
         Integer yParam = GridPane.getRowIndex(button.getParent());
+        
         Integer coordinate = xParam * 10 + yParam;
 
         if (hitCheck(game.getCpu(), coordinate)) {
-            shipHitByHumanMethod(button);
+            shipHitByHumanMethod(button, xParam, yParam);
         } else {
+            game.setBattleLog(playerFires + numberToLetter(xParam) + (yParam + 1) + " miss");
             button.setId("miss");
         }
         button.setDisable(true);
         checkWin();
         cpuTurn();
         checkWin();
-        game.setRoundCounter(game.getRoundCounter() + 1);
-        game.updatingMiddleLabel();
+        game.increaseRoundCounter();
     }
 
     private boolean hitCheck(Player player, Integer coordinate) {
@@ -190,31 +194,31 @@ public class GridPaneButtonMethods {
                 .anyMatch(s -> s.equals(coordinate));
     }
 
-    private void shipHitByHumanMethod(Button buttonToChangeColor) {
+    private void shipHitByHumanMethod(Button buttonToChangeColor, Integer xParam, Integer yParam) {
         List<Button> listWithButtonToChange = game.getFireButtonListTop();
-        
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getCpu().getShipsList(), buttonToChangeColor);
 
-        shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
-
-        if (shipHit.getShipPartsInGameCount() > 0) {
-            buttonToChangeColor.setId("hit");
-        } else {
-            changeAllButtonsToSunk(listWithButtonToChange, shipHit);
-        }
+        changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
     }
 
-    private void shipHitByCpu(Button buttonToChangeColor) {
+    private void shipHitByCpu(Button buttonToChangeColor, Integer xParam, Integer yParam) {
         List<Button> listWithButtonToChange = game.getSeaButtonsListBottom();
-        
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getHuman().getShipsList(), buttonToChangeColor);
 
+        changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, cpuFires);
+    }
+
+    private void changingBoardAndLog(Button buttonToChangeColor, Integer xParam, Integer yParam, List<Button> listWithButtonToChange, Ship shipHit, String cpuFires) {
         shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
+        
+        Integer yParamFix = yParam + 1;
 
         if (shipHit.getShipPartsInGameCount() > 0) {
             buttonToChangeColor.setId("hit");
+            game.setBattleLog(cpuFires + numberToLetter(xParam) + yParamFix + " hit");
         } else {
             changeAllButtonsToSunk(listWithButtonToChange, shipHit);
+            game.setBattleLog(cpuFires + numberToLetter(xParam) + yParamFix + " sunk");
         }
     }
 
@@ -239,13 +243,15 @@ public class GridPaneButtonMethods {
 //        
 //        Integer choice = Integer.parseInt(allCoordinates.get(counter));
 //        counter++;
-
+        Integer xParam = choice / 10;
+        Integer yParam = choice % 10;
 
         Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
         if (hitCheck(game.getHuman(), choice)) {
-            shipHitByCpu(buttonToChange);
+            shipHitByCpu(buttonToChange, xParam, yParam);
         } else {
             buttonToChange.setId("miss");
+            game.setBattleLog(cpuFires + numberToLetter(xParam) + (yParam + 1) + " miss");
         }
     }
 
@@ -266,7 +272,7 @@ public class GridPaneButtonMethods {
         Button buttonEntered = (Button) paneEntered.getChildren().get(0);
 
         if (buttonEntered.isDisable()) {
-            game.updatingMiddleLabel();
+            game.middleLabelUpdateText();
         }
     }
 
@@ -289,9 +295,9 @@ public class GridPaneButtonMethods {
     public void columnRowMarkers(GridPane topRootForGrid, GridPane bottomRootForGrid) {
         List<Label> markerLabels = new ArrayList<>();
         for(int i = 1; i <= 10; i++){
-            Label topMarkerLetters = new Label(numberToLetter(i));
+            Label topMarkerLetters = new Label(numberToLetter(i - 1));
             Label topMarkerNumbers = new Label(""+i);
-            Label bottomMarkerLetters = new Label(numberToLetter(i));
+            Label bottomMarkerLetters = new Label(numberToLetter(i - 1));
             Label bottomMarkerNumbers = new Label(""+i);
 
             markerLabels.add(topMarkerLetters);
@@ -317,7 +323,7 @@ public class GridPaneButtonMethods {
 
     private String numberToLetter(int number){
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        return Character.toString(alphabet.charAt(number-1));
+        return Character.toString(alphabet.charAt(number));
     }
 }
     
