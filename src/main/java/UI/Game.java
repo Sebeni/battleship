@@ -98,9 +98,14 @@ public class Game {
 
         playerLocationBoardBottom.getChildren().forEach(node -> {
             Pane pane = (Pane) node;
-            pane.setOnMouseEntered(gridMethods::mouseEnteredEH);
-            pane.setOnMouseExited(gridMethods::mouseExitedEH);
+            pane.setOnMouseEntered(gridMethods::mouseShipNameEH);
+            pane.setOnMouseExited(gridMethods::mouseExitShipNameEH);
 
+        });
+        
+        fireButtonListTop.forEach(button -> {
+            button.setOnMouseEntered(gridMethods::mouseFireFieldName);
+            button.setOnMouseExited(gridMethods::mouseExitFireFieldName);
         });
         
         GridPane topRootForGrid = new GridPane();
@@ -255,12 +260,7 @@ public class Game {
         bottomPaneButtonList.add(exit);
 
         Button newGame = new Button("Start game");
-        newGame.setOnAction(event1 -> {
-            gameHandler.newGameButtonEH(event1);
-            firePhase = true;
-            middleLabelUpdateText();
-            battleLog.setText("Turn " + roundCounter);
-        });
+        newGame.setOnAction(gameHandler::newGameButtonEH);
         bottomPaneButtonList.add(newGame);
 
         for (Button b : bottomPaneButtonList) {
@@ -277,7 +277,7 @@ public class Game {
                 System.out.println("***CPU***");
                 cpu.getShipsList().forEach(System.out::println);
             });
-
+            
             bottomPane.getChildren().addAll(showShips);
         }
         bottomPane.setAlignment(Pos.CENTER);
@@ -372,11 +372,17 @@ public class Game {
     
     public void setBattleLog(String messageToSet){
         battleLog.setText(battleLog.getText() + messageToSet + "\n");
+        updateStatus.vvalueProperty().bind(battleLog.heightProperty());
     }
-    
+
+    public void setFirePhase(boolean firePhase) {
+        this.firePhase = firePhase;
+    }
+
     public void increaseRoundCounter() {
         roundCounter = roundCounter + 1;
         middleLabelUpdateText();
         setBattleLog("Turn " + roundCounter);
     }
+    
 }

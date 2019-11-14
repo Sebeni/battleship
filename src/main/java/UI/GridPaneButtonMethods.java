@@ -20,7 +20,7 @@ public class GridPaneButtonMethods {
 
     private List<Integer> cpuChoices = new ArrayList<>();
     
-    private String playerFires = "Player fires at: ";
+    private String playerFires = "You fire at: ";
     private String cpuFires = "Cpu fires at: ";
 
 
@@ -177,6 +177,7 @@ public class GridPaneButtonMethods {
 
         if (hitCheck(game.getCpu(), coordinate)) {
             shipHitByHumanMethod(button, xParam, yParam);
+            
         } else {
             game.setBattleLog(playerFires + numberToLetter(xParam) + (yParam + 1) + " miss");
             button.setId("miss");
@@ -199,6 +200,8 @@ public class GridPaneButtonMethods {
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getCpu().getShipsList(), buttonToChangeColor);
 
         changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
+        
+        
     }
 
     private void shipHitByCpu(Button buttonToChangeColor, Integer xParam, Integer yParam) {
@@ -208,17 +211,17 @@ public class GridPaneButtonMethods {
         changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, cpuFires);
     }
 
-    private void changingBoardAndLog(Button buttonToChangeColor, Integer xParam, Integer yParam, List<Button> listWithButtonToChange, Ship shipHit, String cpuFires) {
+    private void changingBoardAndLog(Button buttonToChangeColor, Integer xParam, Integer yParam, List<Button> listWithButtonToChange, Ship shipHit, String whoFires) {
         shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
         
         Integer yParamFix = yParam + 1;
 
         if (shipHit.getShipPartsInGameCount() > 0) {
             buttonToChangeColor.setId("hit");
-            game.setBattleLog(cpuFires + numberToLetter(xParam) + yParamFix + " hit");
+            game.setBattleLog(whoFires + numberToLetter(xParam) + yParamFix + " hit");
         } else {
             changeAllButtonsToSunk(listWithButtonToChange, shipHit);
-            game.setBattleLog(cpuFires + numberToLetter(xParam) + yParamFix + " sunk");
+            game.setBattleLog(whoFires + numberToLetter(xParam) + yParamFix + " sunk");
         }
     }
 
@@ -256,7 +259,7 @@ public class GridPaneButtonMethods {
     }
 
 
-    public void mouseEnteredEH(MouseEvent event) {
+    public void mouseShipNameEH(MouseEvent event) {
 
         Pane paneEntered = (Pane) event.getSource();
         Button buttonEntered = (Button) paneEntered.getChildren().get(0);
@@ -267,7 +270,7 @@ public class GridPaneButtonMethods {
         }
     }
 
-    public void mouseExitedEH(MouseEvent event) {
+    public void mouseExitShipNameEH(MouseEvent event) {
         Pane paneEntered = (Pane) event.getSource();
         Button buttonEntered = (Button) paneEntered.getChildren().get(0);
 
@@ -275,6 +278,22 @@ public class GridPaneButtonMethods {
             game.middleLabelUpdateText();
         }
     }
+    
+    public void mouseFireFieldName(MouseEvent mouseEvent){
+        Button button = (Button) mouseEvent.getSource();
+        int index = game.getFireButtonListTop().indexOf(button);
+        
+        String letter = numberToLetter(index/10);
+        String y = (index%10 + 1) + "";
+        
+        Game.setMiddleLabel(letter+y);
+        
+    }
+    
+    public void mouseExitFireFieldName(MouseEvent event){
+        game.middleLabelUpdateText();
+    }
+    
 
     private Ship shipFromGridButton(List<Button> gridButtons, List<Ship> shipList, Button buttonEntered) {
         int index = gridButtons.indexOf(buttonEntered);
@@ -287,8 +306,10 @@ public class GridPaneButtonMethods {
         //win condition
         if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
             AlertBox.display("Result", "You win!");
+            game.setBattleLog("GAME OVER! YOU WON!");
         } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
             AlertBox.display("Result", "You loose!");
+            game.setBattleLog("GAME OVER! YOU LOOSE!");
         }
     }
     

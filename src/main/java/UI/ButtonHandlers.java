@@ -108,6 +108,11 @@ public class ButtonHandlers {
         int allShipsParts = Ship.getAllShipsParts();
         
         if (shipPartsPlaced == allShipsParts) {
+            game.setFirePhase(true);
+            game.middleLabelUpdateText();
+            game.setBattleLog("Turn 1");
+            
+            
             game.getFireButtonListTop().forEach(button -> button.setDisable(false));
             game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
             game.getResetShipButtonListRight().forEach(button -> button.setDisable(true));
@@ -125,13 +130,14 @@ public class ButtonHandlers {
             if(ConfirmBox.display("Warning!", "This action will reset all ships that might have been already placed. Continue?")){
                 Game.setCurrentShip(null);
                 game.middleLabelUpdateText();
-                game.getHuman().getShipsList().stream().forEach(this::resetPlacementBoard);
-                game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(false));
+                game.getHuman().getShipsList().stream().forEach(shipToReset -> resetPlacementBoard(shipToReset));
+                game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
                 game.getHuman().getShipsList().clear();
             } else {
                 return;
             }
         }
+        game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
         game.setHumanShips();
     }
 }
