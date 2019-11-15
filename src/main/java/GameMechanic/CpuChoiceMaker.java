@@ -7,15 +7,14 @@ import java.util.*;
 
 public class CpuChoiceMaker {
 
-    //    private int firstHit;
-    private boolean shootHorizontal;
-
     private Game game;
     private GridPaneButtonMethods gridMethods;
-
-
+    private HitFireDirection currentFireDirection = HitFireDirection.NONE;
+    
+    private int outOfOptionsSafetyCounter = 0;
+    
     private Map<Integer, HitState> cpuAllShots = new LinkedHashMap<>();
-
+    
 
     private Random random = new Random();
 
@@ -23,11 +22,14 @@ public class CpuChoiceMaker {
     public CpuChoiceMaker(Game game, GridPaneButtonMethods gridMethods) {
         this.game = game;
         this.gridMethods = gridMethods;
+        
+        
     }
 
     public int getCpuChoice() {
         if (!cpuAllShots.containsValue(HitState.HIT)) {
             System.out.println("SEARCH MODE");
+            currentFireDirection = HitFireDirection.NONE;
             return searchMode();
 
         } else {
@@ -40,11 +42,16 @@ public class CpuChoiceMaker {
         Integer choice = checkerboardAlgorithm();
         while (cpuAllShots.containsKey(choice)) {
             choice = checkerboardAlgorithm();
+            outOfOptionsSafetyCounter++;
+            if(outOfOptionsSafetyCounter > 1000){
+//                probably never reached but just in case
+                choice = random.nextInt(100);
+            }
         }
+        outOfOptionsSafetyCounter = 0;
 
         if (hitCheckDelegate(choice)) {
             cpuAllShots.put(choice, HitState.HIT);
-//            firstHit = choice;
         } else {
             cpuAllShots.put(choice, HitState.MISS);
         }
@@ -66,58 +73,145 @@ public class CpuChoiceMaker {
     }
 
     private int fireMode() {
-        return fourDirections(getEntryByValue(HitState.HIT));
+        if (currentFireDirection.equals(HitFireDirection.NONE)) {
+            return fourDirections(getHitEntry());
+        } else if (currentFireDirection.equals(HitFireDirection.HORIZONTAL)) {
+            return onlyHorizontal(getHitEntry());
+        } else {
+            return onlyVertical(getHitEntry());
+        }
     }
 
     private int fourDirections(Map.Entry<Integer, HitState> entryWithHit) {
+        boolean goingUpFirst = random.nextBoolean();
+        int cellHit = entryWithHit.getKey();
+        int nextShot;
+
+        if (goingUpFirst) {
+            if (canShootUp(cellHit)) {
+                nextShot = cellHit - 1;
+                checkAndPutNextShot(nextShot, false);
+                return nextShot;
+            } else if (canShootDown(cellHit)) {
+                nextShot = cellHit + 1;
+                checkAndPutNextShot(nextShot, false);
+                return nextShot;
+            } else if (canShootLeft(cellHit)) {
+                nextShot = cellHit - 10;
+                checkAndPutNextShot(nextShot, true);
+                return nextShot;
+            } else if (canShootRight(cellHit)) {
+                nextShot = cellHit + 10;
+                checkAndPutNextShot(nextShot, true);
+                return nextShot;
+            } else {
+                entryWithHit.setValue(HitState.MISS);
+                if (cpuAllShots.containsValue(HitState.HIT)) {
+                    return fourDirections(getHitEntry());
+                } else {
+                    System.out.println("REACHED FOUR DIRECTIONS SAFE SEARCH MODE!");
+                    return searchMode();
+                }
+            }
+
+        } else {
+            if (canShootLeft(cellHit)) {
+                nextShot = cellHit - 10;
+                checkAndPutNextShot(nextShot, true);
+                return nextShot;
+            } else if (canShootRight(cellHit)) {
+                nextShot = cellHit + 10;
+                checkAndPutNextShot(nextShot, true);
+                return nextShot;
+            } else if (canShootUp(cellHit)) {
+                nextShot = cellHit - 1;
+                checkAndPutNextShot(nextShot, false);
+                return nextShot;
+            } else if (canShootDown(cellHit)) {
+                nextShot = cellHit + 1;
+                checkAndPutNextShot(nextShot, false);
+                return nextShot;
+            } else {
+                entryWithHit.setValue(HitState.MISS);
+                if (cpuAllShots.containsValue(HitState.HIT)) {
+                    return fourDirections(getHitEntry());
+                } else {
+                    System.out.println("REACHED FOUR DIRECTIONS SAFE SEARCH MODE!");
+                    return searchMode();
+                }
+            }
+        }
+
+    }
+
+    private int onlyHorizontal(Map.Entry<Integer, HitState> entryWithHit) {
+        
+        
+        int cellHit = entryWithHit.getKey();
+
+        int nextShot;
+
+        if (canShootLeft(cellHit)) {
+            nextShot = cellHit - 10;
+            checkAndPutNextShot(nextShot, true);
+            return nextShot;
+        } else if (canShootRight(cellHit)) {
+            nextShot = cellHit + 10;
+            checkAndPutNextShot(nextShot, true);
+            return nextShot;
+        } else {
+            entryWithHit.setValue(HitState.DEPLETED);
+            if (cpuAllShots.containsValue(HitState.HIT)) {
+                return onlyHorizontal(getHitEntry());
+                
+            } else if (cpuAllShots.containsValue(HitState.DEPLETED)){
+                System.out.println("HORIZONTAL DEPLETED");
+                cpuAllShots.entrySet().stream()
+                        .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
+                        .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
+                currentFireDirection = HitFireDirection.NONE;
+                
+                return fourDirections(getHitEntry());
+            } else {
+                System.out.println("REACHED HORIZONTAL SAFETY");
+                //                just in case
+                return searchMode();
+            }
+        }
+    }
+
+    private int onlyVertical(Map.Entry<Integer, HitState> entryWithHit) {
+        
+        
         int cellHit = entryWithHit.getKey();
 
         int nextShot;
         if (canShootUp(cellHit)) {
             nextShot = cellHit - 1;
-            checkAndPutNextShot(nextShot);
+            checkAndPutNextShot(nextShot, false);
             return nextShot;
         } else if (canShootDown(cellHit)) {
             nextShot = cellHit + 1;
-            checkAndPutNextShot(nextShot);
-            return nextShot;
-        } else if (canShootLeft(cellHit)) {
-            nextShot = cellHit - 10;
-            checkAndPutNextShot(nextShot);
-            return nextShot;
-        } else if (canShootRight(cellHit)) {
-            nextShot = cellHit + 10;
-            checkAndPutNextShot(nextShot);
+            checkAndPutNextShot(nextShot, false);
             return nextShot;
         } else {
-            entryWithHit.setValue(HitState.MISS);
+            entryWithHit.setValue(HitState.DEPLETED);
             if (cpuAllShots.containsValue(HitState.HIT)) {
-                return fourDirections(getEntryByValue(HitState.HIT));
+                return onlyVertical(getHitEntry());
+            } else if (cpuAllShots.containsValue(HitState.DEPLETED)){
+                System.out.println("VERTICAL DEPLETED");
+                cpuAllShots.entrySet().stream()
+                        .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
+                        .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
+                currentFireDirection = HitFireDirection.NONE;
+                
+                
+                return fourDirections(getHitEntry());
             } else {
-                System.out.println("REACHED SAFE SEARCH MODE!");
+                System.out.println("REACHED VERTICAL SAFETY");
+                //                just in case
                 return searchMode();
             }
-            
-        }
-    }
-
-    private int onlyHorizontal(int cellHit) {
-        if (canShootUp(cellHit)) {
-            return cellHit - 1;
-        } else if (canShootDown(cellHit)) {
-            return cellHit + 1;
-        } else {
-            return searchMode();
-        }
-    }
-
-    private int onlyVertical(int cellHit) {
-        if (canShootLeft(cellHit)) {
-            return cellHit - 10;
-        } else if (canShootRight(cellHit)) {
-            return cellHit + 10;
-        } else {
-            return searchMode();
         }
     }
 
@@ -146,18 +240,23 @@ public class CpuChoiceMaker {
     }
 
 
-    private Map.Entry<Integer, HitState> getEntryByValue(HitState hitStateToGet) {
+    private Map.Entry<Integer, HitState> getHitEntry() {
         return cpuAllShots.entrySet().stream()
                 .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.HIT))
                 .findAny()
                 .get();
     }
 
-    private void checkAndPutNextShot(int nextShot) {
+    private void checkAndPutNextShot(int nextShot, boolean horizontal) {
         System.out.println("NEXT SHOT " + nextShot);
 
         if (hitCheckDelegate(nextShot)) {
             System.out.println("HIT!");
+            if (horizontal) {
+                currentFireDirection = HitFireDirection.HORIZONTAL;
+            } else {
+                currentFireDirection = HitFireDirection.VERTICAL;
+            }
             cpuAllShots.put(nextShot, HitState.HIT);
         } else {
             System.out.println("MISS!");
@@ -171,5 +270,12 @@ public class CpuChoiceMaker {
 
     public Map<Integer, HitState> getCpuAllShots() {
         return cpuAllShots;
+    }
+
+
+    private enum HitFireDirection {
+        NONE,
+        HORIZONTAL,
+        VERTICAL;
     }
 }

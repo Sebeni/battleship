@@ -213,6 +213,9 @@ public class GridPaneButtonMethods {
         
         if(shipHit.getShipPartsInGameCount() == 0){
             shipHit.getCoordinates().forEach(integer -> cpuChoiceMaker.getCpuAllShots().replace(integer, HitState.SUNK));
+            cpuChoiceMaker.getCpuAllShots().entrySet().stream()
+                    .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
+                    .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
         }
     }
 
