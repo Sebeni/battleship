@@ -84,11 +84,13 @@ public class Ship {
         if (this == o) return true;
         if (!(o instanceof Ship)) return false;
         Ship ship = (Ship) o;
-        return name == ship.name;
+        return horizontalPlacement == ship.horizontalPlacement &&
+                name == ship.name &&
+                coordinates.equals(ship.coordinates);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(horizontalPlacement, name, coordinates);
     }
 }

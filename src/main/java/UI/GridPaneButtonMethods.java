@@ -1,6 +1,7 @@
 package UI;
 
 import GameMechanic.CpuChoiceMaker;
+import GameMechanic.HitState;
 import GameMechanic.Player;
 import GameMechanic.Ship;
 import javafx.event.ActionEvent;
@@ -18,8 +19,6 @@ import java.util.*;
 public class GridPaneButtonMethods {
     private Game game;
     private double minButtonSize = 39;
-
-    private List<Integer> cpuChoices = new ArrayList<>();
     
     private CpuChoiceMaker cpuChoiceMaker;
     private String playerFires = "You fire at: ";
@@ -32,7 +31,7 @@ public class GridPaneButtonMethods {
 
     public GridPaneButtonMethods(Game game) {
         this.game = game;
-        this.cpuChoiceMaker = new CpuChoiceMaker(game);
+        this.cpuChoiceMaker = new CpuChoiceMaker(game, this);
     }
 
     public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
@@ -192,7 +191,7 @@ public class GridPaneButtonMethods {
         game.increaseRoundCounter();
     }
 
-    private boolean hitCheck(Player player, Integer coordinate) {
+    public boolean hitCheck(Player player, Integer coordinate) {
         return player.getShipsList().stream()
                 .flatMap(ship -> ship.getCoordinates().stream())
                 .anyMatch(s -> s.equals(coordinate));
@@ -201,17 +200,20 @@ public class GridPaneButtonMethods {
     private void shipHitByHumanMethod(Button buttonToChangeColor, Integer xParam, Integer yParam) {
         List<Button> listWithButtonToChange = game.getFireButtonListTop();
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getCpu().getShipsList(), buttonToChangeColor);
-
-        changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
         
+        changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
         
     }
 
     private void shipHitByCpu(Button buttonToChangeColor, Integer xParam, Integer yParam) {
         List<Button> listWithButtonToChange = game.getSeaButtonsListBottom();
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getHuman().getShipsList(), buttonToChangeColor);
-
+        
         changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, cpuFires);
+        
+        if(shipHit.getShipPartsInGameCount() == 0){
+            shipHit.getCoordinates().forEach(integer -> cpuChoiceMaker.getCpuAllShots().replace(integer, HitState.SUNK));
+        }
     }
 
     private void changingBoardAndLog(Button buttonToChangeColor, Integer xParam, Integer yParam, List<Button> listWithButtonToChange, Ship shipHit, String whoFires) {
