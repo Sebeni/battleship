@@ -1,14 +1,12 @@
 package UI;
 
-import GameMechanic.CpuChoiceMaker;
-import GameMechanic.HitState;
-import GameMechanic.Player;
-import GameMechanic.Ship;
+import GameMechanic.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -24,10 +22,26 @@ public class GridPaneButtonMethods {
     private String playerFires = "You fire at: ";
     private String cpuFires = "Cpu fires at: ";
     
+    private Map<ShipName, ImageView> shipPics = new HashMap<>();
+    
 
     public GridPaneButtonMethods(Game game) {
         this.game = game;
         this.cpuChoiceMaker = new CpuChoiceMaker(game, this);
+
+
+        shipPics.put(ShipName.BATTLESHIP, new ImageView("battleship.png"));
+        shipPics.put(ShipName.CARRIER, new ImageView("carrier.png"));
+        shipPics.put(ShipName.CRUISER, new ImageView("cruiser.png"));
+        shipPics.put(ShipName.DESTROYER, new ImageView("destroyer.png"));
+        shipPics.put(ShipName.SUBMARINE, new ImageView("submarine.png"));
+
+        shipPics.entrySet().stream().forEach(shipNameImageViewEntry -> {
+            ImageView iv = shipNameImageViewEntry.getValue();
+            iv.setFitWidth(240);
+            iv.setFitHeight(60);
+        });
+        
     }
 
     public List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
@@ -47,14 +61,11 @@ public class GridPaneButtonMethods {
                 button.setId(cssId);
                 button.setDisable(disableGridButtons);
                 button.setMinSize(minButtonSize, minButtonSize);
-
-
-//                panes are parents for buttons so when they are disabled (ship part is placed) can shown ship name
+                
                 Pane pane = new Pane(button);
                 toPopulate.add(pane, column, row);
                 resultButtonList.add(button);
-
-                //reading X and Y coordinates
+                
                 button.setOnAction(eventHandlerGridButtons);
             }
         }
@@ -101,7 +112,6 @@ public class GridPaneButtonMethods {
     private boolean shipPlacementAdjacentCheck(int xToCheck, int yToCheck) {
         if (game.getCurrentShip().getShipPartsInGameCount() == 1) {
             return secondPlacementCheck(xToCheck, yToCheck);
-
         } else {
             return thirdAndMorePlacementCheck(xToCheck, yToCheck);
         }
@@ -184,10 +194,11 @@ public class GridPaneButtonMethods {
             button.setId("miss");
         }
         button.setDisable(true);
-        checkWin();
-        cpuTurn();
-        checkWin();
-        game.increaseRoundCounter();
+        if(!gameIsFinished()){
+            cpuTurn();
+            gameIsFinished();
+            game.increaseRoundCounter();
+        }
     }
 
     public boolean hitCheck(Player player, Integer coordinate) {
@@ -206,6 +217,7 @@ public class GridPaneButtonMethods {
             game.getCpuVisual().getButtonList().get(xParam*10 + yParam).setId("hit");
         } else {
             changeAllButtonsToSunk(game.getCpuVisual().getButtonList(), shipHit);
+            addSunkShipPic(shipHit);
         }
     }
 
@@ -302,14 +314,18 @@ public class GridPaneButtonMethods {
                 .findAny().get();
     }
 
-    private void checkWin() {
+    private boolean gameIsFinished() {
         //win condition
         if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
-            AlertBox.display("Result", "You win!");
             game.setBattleLog("GAME OVER! YOU WON!");
+            ResultBox.display(true, game);
+            return true;
         } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
-            AlertBox.display("Result", "You loose!");
             game.setBattleLog("GAME OVER! YOU LOOSE!");
+            ResultBox.display(false, game);
+            return true;
+        } else {
+            return false;
         }
     }
     
@@ -339,6 +355,10 @@ public class GridPaneButtonMethods {
     private String numberToLetter(int number){
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         return Character.toString(alphabet.charAt(number));
+    }
+    
+    private void addSunkShipPic(Ship sunkShip){
+        game.getSunkEnemyShips().getChildren().add(shipPics.get(sunkShip.getName()));
     }
 }
     

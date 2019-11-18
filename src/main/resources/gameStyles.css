@@ -91,10 +91,7 @@ fire area
     -fx-cursor: crosshair;
 }
 
-/*
-Left upper
-exit new game
- */
+
 #newGameButtons {
     -fx-min-width: 205px;
     -fx-min-height: 30px;
@@ -125,4 +122,6 @@ exit new game
 #labels {
     -fx-font-size: 18;
 }
+
+
 

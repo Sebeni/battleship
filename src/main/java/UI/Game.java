@@ -35,9 +35,9 @@ public class Game {
     
     // parameters of elements
     private final double windowWidth = 1400;
-    private final double windowHeight = 1000;
+    private final double windowHeight = 990;
     private final double scrollPaneWidth = 350;
-    private final double scrollPaneHeight = 500;
+    private final double scrollPaneHeight = 425;
     private final double labelWidth = scrollPaneWidth - 20;
     
 
@@ -53,15 +53,16 @@ public class Game {
     private final GridPane playerLocationBoardBottom = new GridPane();
     private final List<Button> seaButtonsListBottom;
 
-    //left pane and buttons - name of the ships and new game buttons
-    private final VBox leftPane = new VBox(200);
+    //left pane
+    private final VBox leftPane = new VBox(350);
     private final List<Button> newGameButtons = new ArrayList<>();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
-
-    //right pane and buttons bottom - reset ships
-    private final VBox rightPane = new VBox(150);
-    private final ScrollPane updateStatus = new ScrollPane();
     private final List<Button> resetShipButtonListRight = new ArrayList<>();
+
+    //right pane 
+    private final VBox rightPane = new VBox(50);
+    private final ScrollPane updateStatus = new ScrollPane();
+    private final VBox sunkEnemyShips;
     
     //right pane top - battleLog
     private final Label battleLog = new Label();
@@ -191,25 +192,23 @@ public class Game {
         HBox randomLine = new HBox(hBoxSpacing);
         randomLine.setAlignment(Pos.CENTER);
         
-        Button carrierButton = new Button("Carrier - 5 spaces");
+        Button carrierButton = new Button("Carrier - 5 decker");
         carrierButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.CARRIER));
         placementShipButtonListLeft.add(carrierButton);
-      
-
         
-        Button battleshipButton = new Button("Battleship - 4 spaces");
+        Button battleshipButton = new Button("Battleship - 4 decker");
         battleshipButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.BATTLESHIP));
         placementShipButtonListLeft.add(battleshipButton);
 
-        Button cruiserButton = new Button("Cruiser - 3 spaces");
+        Button cruiserButton = new Button("Cruiser - 3 decker");
         cruiserButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.CRUISER));
         placementShipButtonListLeft.add(cruiserButton);
 
-        Button submarineButton = new Button("Submarine - 3 spaces");
+        Button submarineButton = new Button("Submarine - 3 decker");
         submarineButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.SUBMARINE));
         placementShipButtonListLeft.add(submarineButton);
 
-        Button destroyerButton = new Button("Destroyer - 2 spaces");
+        Button destroyerButton = new Button("Destroyer - 2 decker");
         destroyerButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.DESTROYER));
         placementShipButtonListLeft.add(destroyerButton);
 
@@ -282,31 +281,13 @@ public class Game {
         updateStatus.setContent(battleLog);
         
 //        bottom right
-        VBox bottomRight = new VBox(10);
-        
-        
-        
+        sunkEnemyShips = new VBox(10);
 
-        bottomRight.getChildren().addAll();
-        bottomRight.setAlignment(Pos.CENTER);
+        sunkEnemyShips.setAlignment(Pos.CENTER);
         
-        rightPane.getChildren().addAll(updateStatus, bottomRight);
+        
+        rightPane.getChildren().addAll(updateStatus, sunkEnemyShips);
         layout.setRight(rightPane);
-
-
-//        debug
-
-        if (debug) {
-            Button showShips = new Button("show ship lists");
-            showShips.setOnAction(event -> {
-                System.out.println("***HUMAN***");
-                human.getShipsList().forEach(System.out::println);
-                System.out.println("***CPU***");
-                cpu.getShipsList().forEach(System.out::println);
-            });
-            
-//            upperLeft.getChildren().addAll(showShips);
-        }
         
 //        setting scene
         scene = new Scene(layout, windowWidth, windowHeight);
@@ -414,5 +395,9 @@ public class Game {
 
     public Stage getWindow() {
         return window;
+    }
+
+    public VBox getSunkEnemyShips() {
+        return sunkEnemyShips;
     }
 }

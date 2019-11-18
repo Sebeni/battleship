@@ -3,6 +3,7 @@ package UI;
 
 import javafx.event.Event;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
@@ -14,8 +15,8 @@ import java.util.List;
 
 public class CpuVisual {
     private final Stage window = new Stage();
-    private final int width = 400;
-    private final int height = 400;
+    private final int width = 500;
+    private final int height = 500;
     private final List<Button> buttonList;
 
     public CpuVisual(Game game) {
@@ -34,15 +35,15 @@ public class CpuVisual {
         root.add(cpuShipPlacement, 1, 1, 10, 10);
         gridMethods.gridMarkers(root);
         
-        BorderPane layout = new BorderPane(cpuShipPlacement);
+        BorderPane layout = new BorderPane(root);
         layout.setPadding(new Insets(10));
+       
 
 
         Scene scene = new Scene(layout);
         scene.getStylesheets().add("gameStyles.css");
 
         window.setScene(scene);
-        window.show();
 
     }
 

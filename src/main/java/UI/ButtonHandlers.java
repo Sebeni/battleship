@@ -4,6 +4,7 @@ import GameMechanic.Ship;
 import GameMechanic.ShipName;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
@@ -114,6 +115,7 @@ public class ButtonHandlers {
             game.middleLabelUpdateText();
             game.setBattleLog("Turn 1");
             
+            game.getSunkEnemyShips().getChildren().add(new Label("You have already sunk:"));
             
             game.getFireButtonListTop().forEach(button -> button.setDisable(false));
             game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));

@@ -255,10 +255,8 @@ public class CpuChoiceMaker {
     }
 
     private void checkAndPutNextShot(int nextShot, boolean horizontal) {
-   
 
         if (hitCheckDelegate(nextShot)) {
-        
             if (horizontal) {
                 currentFireDirection = HitFireDirection.HORIZONTAL;
             } else {
@@ -266,7 +264,6 @@ public class CpuChoiceMaker {
             }
             cpuAllShots.put(nextShot, HitState.HIT);
         } else {
-       
             cpuAllShots.put(nextShot, HitState.MISS);
         }
     }
@@ -289,6 +286,7 @@ public class CpuChoiceMaker {
     private List<Integer> getAnotherList(){
         return currentChoiceList == whiteFields ? blackFields : whiteFields;
     }
+    
     
     
 }
