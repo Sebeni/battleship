@@ -23,11 +23,7 @@ public class GridPaneButtonMethods {
     private CpuChoiceMaker cpuChoiceMaker;
     private String playerFires = "You fire at: ";
     private String cpuFires = "Cpu fires at: ";
-
-
-    //only for debug
-    private List<Integer> allCoordinates = new ArrayList<>();
-    private int counter = 0;
+    
 
     public GridPaneButtonMethods(Game game) {
         this.game = game;
@@ -69,8 +65,8 @@ public class GridPaneButtonMethods {
     public void placementButtonHandler(ActionEvent event) {
         Button button = (Button) event.getSource();
         
-        if (Game.getCurrentShip() != null) {
-            Ship currentShip = Game.getCurrentShip();
+        if (game.getCurrentShip() != null) {
+            Ship currentShip = game.getCurrentShip();
 
             //check if all spaces were used
             if (currentShip.getShipMaxSize() > currentShip.getShipPartsInGameCount()) {
@@ -89,7 +85,7 @@ public class GridPaneButtonMethods {
 
                     if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
                         ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
-                        Game.setCurrentShip(null);
+                        game.setCurrentShip(null);
                         game.middleLabelUpdateText();
                     }
                 } else {
@@ -103,7 +99,7 @@ public class GridPaneButtonMethods {
 
 
     private boolean shipPlacementAdjacentCheck(int xToCheck, int yToCheck) {
-        if (Game.getCurrentShip().getShipPartsInGameCount() == 1) {
+        if (game.getCurrentShip().getShipPartsInGameCount() == 1) {
             return secondPlacementCheck(xToCheck, yToCheck);
 
         } else {
@@ -113,14 +109,14 @@ public class GridPaneButtonMethods {
 
     private boolean thirdAndMorePlacementCheck(int xToCheck, int yToCheck) {
         //third and subsequent placement
-        List<Integer> currentCoordinates = Game.getCurrentShip().getCoordinates();
+        List<Integer> currentCoordinates = game.getCurrentShip().getCoordinates();
         Collections.sort(currentCoordinates);
 
         Integer startBorder = currentCoordinates.get(0);
 
         Integer endBorder = currentCoordinates.get(currentCoordinates.size() - 1);
 
-        if (Game.getCurrentShip().isHorizontalPlacement()) {
+        if (game.getCurrentShip().isHorizontalPlacement()) {
             // x +- 1
             int startBorderX = startBorder / 10;
             int endBorderX = endBorder / 10;
@@ -147,7 +143,7 @@ public class GridPaneButtonMethods {
     }
 
     private boolean secondPlacementCheck(int xToCheck, int yToCheck) {
-        Integer firstPlacementCoordinate = Game.getCurrentShip().getCoordinates().get(0);
+        Integer firstPlacementCoordinate = game.getCurrentShip().getCoordinates().get(0);
 
         //possible choices: +- 1 
         int xFirstShipPart = firstPlacementCoordinate / 10;
@@ -162,7 +158,7 @@ public class GridPaneButtonMethods {
 
         //checking for further placement if player is placing horizontally(true) or vertically (false - default)
         if (yDiff == 0) {
-            Game.getCurrentShip().setHorizontalPlacement(true);
+            game.getCurrentShip().setHorizontalPlacement(true);
         }
 
         return possibleXChoice || possibleYChoice;
@@ -182,6 +178,9 @@ public class GridPaneButtonMethods {
             
         } else {
             game.setBattleLog(playerFires + numberToLetter(xParam) + (yParam + 1) + " miss");
+
+            game.getCpuVisual().getButtonList().get(coordinate).setId("miss");
+            
             button.setId("miss");
         }
         button.setDisable(true);
@@ -201,15 +200,20 @@ public class GridPaneButtonMethods {
         List<Button> listWithButtonToChange = game.getFireButtonListTop();
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getCpu().getShipsList(), buttonToChangeColor);
         
-        changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
-        
+        changingShipPartBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
+
+        if(shipHit.getShipPartsInGameCount() > 0){
+            game.getCpuVisual().getButtonList().get(xParam*10 + yParam).setId("hit");
+        } else {
+            changeAllButtonsToSunk(game.getCpuVisual().getButtonList(), shipHit);
+        }
     }
 
-    private void shipHitByCpu(Button buttonToChangeColor, Integer xParam, Integer yParam) {
+    private void shipHitByCpuMethod(Button buttonToChangeColor, Integer xParam, Integer yParam) {
         List<Button> listWithButtonToChange = game.getSeaButtonsListBottom();
         Ship shipHit = shipFromGridButton(listWithButtonToChange, game.getHuman().getShipsList(), buttonToChangeColor);
         
-        changingBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, cpuFires);
+        changingShipPartBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, cpuFires);
         
         if(shipHit.getShipPartsInGameCount() == 0){
             shipHit.getCoordinates().forEach(integer -> cpuChoiceMaker.getCpuAllShots().replace(integer, HitState.SUNK));
@@ -219,14 +223,13 @@ public class GridPaneButtonMethods {
         }
     }
 
-    private void changingBoardAndLog(Button buttonToChangeColor, Integer xParam, Integer yParam, List<Button> listWithButtonToChange, Ship shipHit, String whoFires) {
+    private void changingShipPartBoardAndLog(Button buttonToChangeColor, Integer xParam, Integer yParam, List<Button> listWithButtonToChange, Ship shipHit, String whoFires) {
         shipHit.setShipPartsInGameCount(shipHit.getShipPartsInGameCount() - 1);
         
         Integer yParamFix = yParam + 1;
 
         if (shipHit.getShipPartsInGameCount() > 0) {
             buttonToChangeColor.setId("hit");
-           
             game.setBattleLog(whoFires + numberToLetter(xParam) + yParamFix + " hit");
         } else {
             changeAllButtonsToSunk(listWithButtonToChange, shipHit);
@@ -248,7 +251,7 @@ public class GridPaneButtonMethods {
 
         Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
         if (hitCheck(game.getHuman(), choice)) {
-            shipHitByCpu(buttonToChange, xParam, yParam);
+            shipHitByCpuMethod(buttonToChange, xParam, yParam);
         } else {
             buttonToChange.setId("miss");
             game.setBattleLog(cpuFires + numberToLetter(xParam) + (yParam + 1) + " miss");
@@ -263,7 +266,7 @@ public class GridPaneButtonMethods {
 
         if (buttonEntered.isDisable() && !game.getHuman().getShipsList().isEmpty()) {
             Ship shipHovered = shipFromGridButton(game.getSeaButtonsListBottom(), game.getHuman().getShipsList(), buttonEntered);
-            Game.setMiddleLabel(shipHovered.getName().toString());
+            game.setMiddleLabel(shipHovered.getName().toString());
         }
     }
 
@@ -281,9 +284,9 @@ public class GridPaneButtonMethods {
         int index = game.getFireButtonListTop().indexOf(button);
         
         String letter = numberToLetter(index/10);
-        String y = (index%10 + 1) + "";
+        String y = (index % 10 + 1) + "";
         
-        Game.setMiddleLabel(letter+y);
+        game.setMiddleLabel(letter+y);
         
     }
     
@@ -310,23 +313,18 @@ public class GridPaneButtonMethods {
         }
     }
     
-    public void gridMarkers(GridPane topRootForGrid, GridPane bottomRootForGrid) {
+    public void gridMarkers(GridPane gridRoot) {
         List<Label> markerLabels = new ArrayList<>();
         for(int i = 1; i <= 10; i++){
-            Label topMarkerLetters = new Label(numberToLetter(i - 1));
-            Label topMarkerNumbers = new Label(""+i);
-            Label bottomMarkerLetters = new Label(numberToLetter(i - 1));
-            Label bottomMarkerNumbers = new Label(""+i);
+            Label markerLetters = new Label(numberToLetter(i - 1));
+            Label markerNumbers = new Label(""+i);
+            
+            markerLabels.add(markerLetters);
+            markerLabels.add(markerNumbers);
 
-            markerLabels.add(topMarkerLetters);
-            markerLabels.add(topMarkerNumbers);
-            markerLabels.add(bottomMarkerLetters);
-            markerLabels.add(bottomMarkerNumbers);
-
-            topRootForGrid.add(topMarkerLetters, i, 0);
-            topRootForGrid.add(topMarkerNumbers, 0, i);
-            bottomRootForGrid.add(bottomMarkerLetters, i, 0);
-            bottomRootForGrid.add(bottomMarkerNumbers, 0, i);
+            gridRoot.add(markerLetters, i, 0);
+            gridRoot.add(markerNumbers, 0, i);
+            
         }
 
         markerLabels.forEach(label -> {

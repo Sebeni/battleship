@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
@@ -21,8 +22,8 @@ public class Game {
     private int roundCounter = 1;
     private boolean firePhase = false;
 
-    private static Ship currentShip;
-    private static Label middleLabel;
+    private Ship currentShip;
+    private Label middleLabel;
 
     private final Player human = new Player(true);
     private final Player cpu = new Player(false);
@@ -53,7 +54,7 @@ public class Game {
     private final List<Button> seaButtonsListBottom;
 
     //left pane and buttons - name of the ships and new game buttons
-    private final VBox leftPane = new VBox(425);
+    private final VBox leftPane = new VBox(200);
     private final List<Button> newGameButtons = new ArrayList<>();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
 
@@ -64,20 +65,17 @@ public class Game {
     
     //right pane top - battleLog
     private final Label battleLog = new Label();
-
-    //bottom pane
-    private final HBox bottomPane = new HBox(10);
     
 
     public Game(Stage primaryStage) {
         window = primaryStage;
+        cpuVisual = new CpuVisual(this);
 
         window.setOnCloseRequest(e -> {
             e.consume();
-            AfterClick.closeProgram(window);
+            AfterClick.closeProgram(window, cpuVisual.getWindow());
         });
         
-        cpuVisual = new CpuVisual(this);
 
         fireButtonListTop = gridMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, gridMethods::fireButtonHandler);
         seaButtonsListBottom = gridMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, gridMethods::placementButtonHandler);
@@ -112,7 +110,8 @@ public class Game {
         bottomRootForGrid.add(playerLocationBoardBottom, 1, 1, 10, 10);
         bottomRootForGrid.setAlignment(Pos.CENTER);
         
-        gridMethods.gridMarkers(topRootForGrid, bottomRootForGrid);
+        gridMethods.gridMarkers(topRootForGrid);
+        gridMethods.gridMarkers(bottomRootForGrid);
 
 
 
@@ -137,40 +136,67 @@ public class Game {
 //        upper left
         VBox upperLeft = new VBox(10);
         upperLeft.setPadding(new Insets(100, 10, 10, 10));
-
-        Button exit = new Button("Exit");
-        exit.setOnAction(event -> AfterClick.closeProgram(window));
-        newGameButtons.add(exit);
-
-        Button newGame = new Button("Start game");
-        newGame.setOnAction(gameHandler::newGameButtonEH);
-        newGameButtons.add(newGame);
         
+        Button newGameButton = new Button("Start game");
+        newGameButton.setOnAction(gameHandler::startGameButtonEH);
+        newGameButtons.add(newGameButton);
         
-      
-
+        Button resetButton = new Button("Reset game");
+        resetButton.setOnAction(event -> {
+            if(ConfirmBox.display("Warning", "Your current game will be lost. Continue?")){
+                gameHandler.resetGameButtonEH(event);
+            }
+        });
+        newGameButtons.add(resetButton);
+        
         Button helpButton = new Button("Help");
         helpButton.setOnAction(event -> {
             InstructionBox.display(firePhase);
         });
         newGameButtons.add(helpButton);
-
-
+        
+        
+        
+        Button exit = new Button("Exit");
+        exit.setOnAction(event -> AfterClick.closeProgram(window, cpuVisual.getWindow()));
+        newGameButtons.add(exit);
+        
         for (Button b : newGameButtons) {
             b.setId("newGameButtons");
         }
         
-        upperLeft.getChildren().addAll(newGame, helpButton, exit);
+        upperLeft.getChildren().addAll(newGameButton, resetButton, helpButton, exit);
         upperLeft.setAlignment(Pos.CENTER);
         
 //        bottom left
         VBox bottomLeft = new VBox(10);
 
+        double hBoxSpacing = 10;
 
+        HBox carrierLine = new HBox(hBoxSpacing);
+        carrierLine.setAlignment(Pos.CENTER);
+        
+        HBox battleShipLine = new HBox(hBoxSpacing);
+        battleShipLine.setAlignment(Pos.CENTER);
+        
+        HBox cruiserLine = new HBox(hBoxSpacing);
+        cruiserLine.setAlignment(Pos.CENTER);
+        
+        HBox submarineLine = new HBox(hBoxSpacing);
+        submarineLine.setAlignment(Pos.CENTER);
+        
+        HBox destroyerLine = new HBox(hBoxSpacing);
+        destroyerLine.setAlignment(Pos.CENTER);
+        
+        HBox randomLine = new HBox(hBoxSpacing);
+        randomLine.setAlignment(Pos.CENTER);
+        
         Button carrierButton = new Button("Carrier - 5 spaces");
         carrierButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.CARRIER));
         placementShipButtonListLeft.add(carrierButton);
+      
 
+        
         Button battleshipButton = new Button("Battleship - 4 spaces");
         battleshipButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.BATTLESHIP));
         placementShipButtonListLeft.add(battleshipButton);
@@ -194,8 +220,46 @@ public class Game {
         for (Button b : placementShipButtonListLeft) {
             b.setId("shipButtonsPlacement");
         }
+
+
+        Button resetCarrierButton = new Button("Reset");
+        resetCarrierButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CARRIER));
+        resetShipButtonListRight.add(resetCarrierButton);
+
+        Button resetBattleshipButton = new Button("Reset");
+        resetBattleshipButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.BATTLESHIP));
+        resetShipButtonListRight.add(resetBattleshipButton);
+
+        Button resetCruiserButton = new Button("Reset");
+        resetCruiserButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CRUISER));
+        resetShipButtonListRight.add(resetCruiserButton);
+
+        Button resetSubmarineButton = new Button("Reset");
+        resetSubmarineButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.SUBMARINE));
+        resetShipButtonListRight.add(resetSubmarineButton);
+
+        Button resetDestroyerButton = new Button("Reset");
+        resetDestroyerButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.DESTROYER));
+        resetShipButtonListRight.add(resetDestroyerButton);
+
+        Button resetAll = new Button("Reset all");
+        resetAll.setOnAction(gameHandler::resetAllButtonEH);
+        resetShipButtonListRight.add(resetAll);
+
+        for (Button b : resetShipButtonListRight) {
+            b.setId("shipButtonsReset");
+           
+        }
+
+        randomLine.getChildren().addAll(randomPlacement, resetAll);
+        carrierLine.getChildren().addAll(carrierButton, resetCarrierButton);
+        battleShipLine.getChildren().addAll(battleshipButton, resetBattleshipButton);
+        cruiserLine.getChildren().addAll(cruiserButton, resetCruiserButton);
+        submarineLine.getChildren().addAll(submarineButton, resetSubmarineButton);
+        destroyerLine.getChildren().addAll(destroyerButton, resetDestroyerButton);
         
-        bottomLeft.getChildren().addAll(randomPlacement, carrierButton, battleshipButton, cruiserButton, submarineButton, destroyerButton);
+        
+        bottomLeft.getChildren().addAll(randomLine, carrierLine, battleShipLine, cruiserLine, submarineLine, destroyerLine);
         bottomLeft.setAlignment(Pos.CENTER);
         
         leftPane.getChildren().addAll(upperLeft, bottomLeft);
@@ -219,35 +283,11 @@ public class Game {
         
 //        bottom right
         VBox bottomRight = new VBox(10);
-        Button resetCarrierButton = new Button("Reset Carrier");
-        resetCarrierButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CARRIER));
-        resetShipButtonListRight.add(resetCarrierButton);
-
-        Button resetBattleshipButton = new Button("Reset Battleship");
-        resetBattleshipButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.BATTLESHIP));
-        resetShipButtonListRight.add(resetBattleshipButton);
-
-        Button resetCruiserButton = new Button("Reset Cruiser");
-        resetCruiserButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CRUISER));
-        resetShipButtonListRight.add(resetCruiserButton);
         
-        Button resetSubmarineButton = new Button("Reset Submarine");
-        resetSubmarineButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.SUBMARINE));
-        resetShipButtonListRight.add(resetSubmarineButton);
+        
+        
 
-        Button resetDestroyerButton = new Button("Reset Destroyer");
-        resetDestroyerButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.DESTROYER));
-        resetShipButtonListRight.add(resetDestroyerButton);
-
-        Button resetAll = new Button("Reset all");
-        resetAll.setOnAction(gameHandler::resetAllButtonEH);
-        resetShipButtonListRight.add(resetAll);
-
-        for (Button b : resetShipButtonListRight) {
-            b.setId("shipButtonsReset");
-        }
-
-        bottomRight.getChildren().addAll(resetAll, resetCarrierButton, resetBattleshipButton, resetCruiserButton, resetSubmarineButton, resetDestroyerButton);
+        bottomRight.getChildren().addAll();
         bottomRight.setAlignment(Pos.CENTER);
         
         rightPane.getChildren().addAll(updateStatus, bottomRight);
@@ -289,7 +329,7 @@ public class Game {
         }
     }
     
-    public static void setMiddleLabel(String textToPlace){
+    public void setMiddleLabel(String textToPlace){
         middleLabel.setText(textToPlace);
     }
 
@@ -301,12 +341,12 @@ public class Game {
         Game.debug = debug;
     }
 
-    public static Ship getCurrentShip() {
+    public Ship getCurrentShip() {
         return currentShip;
     }
 
-    public static void setCurrentShip(Ship currentShip) {
-        Game.currentShip = currentShip;
+    public void setCurrentShip(Ship currentShip) {
+        this.currentShip = currentShip;
     }
     
     public List<Button> getPlacementShipButtonListLeft() {
@@ -367,5 +407,12 @@ public class Game {
         middleLabelUpdateText();
         setBattleLog("Turn " + roundCounter);
     }
-    
+
+    public CpuVisual getCpuVisual() {
+        return cpuVisual;
+    }
+
+    public Stage getWindow() {
+        return window;
+    }
 }

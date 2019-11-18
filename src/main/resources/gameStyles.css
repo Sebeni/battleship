@@ -13,7 +13,7 @@ ship buttons for placement
     -fx-font-size: 14px;
     -fx-text-align: center;
     -fx-outline: none;
-    -fx-color: #fff;
+    -fx-text-fill: #fff;
     -fx-background-color: #3e8e41;
     -fx-border: none;
     -fx-border-radius: 15px;
@@ -33,15 +33,11 @@ reset ship settings
 
 #shipButtonsReset {
     -fx-padding: 5px 15px;
-    -fx-font-size: 14px;
     -fx-text-align: center;
     -fx-outline: none;
-    -fx-color: white;
+    -fx-text-fill: white;
     -fx-background-color: #b9151b;
-    -fx-border: none;
-    -fx-border-radius: 15px;
-    -fx-min-width: 205px;
-    -fx-min-height: 40px;
+    -fx-min-width: 120;
     
 }
 

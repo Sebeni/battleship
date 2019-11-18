@@ -5,6 +5,7 @@ import GameMechanic.ShipName;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 public class ButtonHandlers {
     private final Game game;
@@ -24,7 +25,7 @@ public class ButtonHandlers {
             shipToHandle = game.getHuman().getShipsList().stream().filter(ship -> ship.getName().equals(shipToHandleName)).findFirst().get();
         }
 
-        Game.setCurrentShip(shipToHandle);
+        game.setCurrentShip(shipToHandle);
         game.middleLabelUpdateText();
     }
 
@@ -35,7 +36,7 @@ public class ButtonHandlers {
             // activate all cells with coordinates and change their colors
             // activate ship button list
             // delete from list given ship
-            Game.setCurrentShip(null);
+            game.setCurrentShip(null);
             game.middleLabelUpdateText();
 
 
@@ -91,7 +92,7 @@ public class ButtonHandlers {
     public void resetAllButtonEH(ActionEvent event) {
 
         if (!game.getHuman().getShipsList().isEmpty()) {
-            Game.setCurrentShip(null);
+            game.setCurrentShip(null);
             game.middleLabelUpdateText();
 
             game.getHuman().getShipsList().forEach(s -> resetPlacementBoard(s));
@@ -101,7 +102,7 @@ public class ButtonHandlers {
         }
     }
 
-    public void newGameButtonEH(ActionEvent event) {
+    public void startGameButtonEH(ActionEvent event) {
         int shipPartsPlaced = game.getHuman().getShipsList().stream()
                 .mapToInt(ship -> ship.getCoordinates().size())
                 .sum();
@@ -129,7 +130,7 @@ public class ButtonHandlers {
     public void randomPlacementButtonEH(ActionEvent event) {
         if (!game.getHuman().getShipsList().isEmpty()) {
             if(ConfirmBox.display("Warning!", "This action will reset all ships that might have been already placed. Continue?")){
-                Game.setCurrentShip(null);
+                game.setCurrentShip(null);
                 game.middleLabelUpdateText();
                 game.getHuman().getShipsList().stream().forEach(shipToReset -> resetPlacementBoard(shipToReset));
                 game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
@@ -140,5 +141,12 @@ public class ButtonHandlers {
         }
         game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
         game.setHumanShips();
+    }
+    
+    public void resetGameButtonEH(ActionEvent event){
+        game.getCpuVisual().getWindow().close();
+        Stage window = game.getWindow();
+        Game newGame = new Game(window);
+        window.setScene(newGame.getScene());
     }
 }

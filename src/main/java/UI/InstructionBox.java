@@ -31,7 +31,7 @@ public class InstructionBox {
                 " If you miss cell will become white." +
                 "\nHappy hunting!";
         
-        String windowTitle = firePhase ? "PHASE ONE - SHIP PLACEMENT" : "PHASE TWO - FIRING";
+        String windowTitle = firePhase ? "PHASE TWO - FIRING" : "PHASE ONE - SHIP PLACEMENT";
         
         
         Stage window = new Stage();
