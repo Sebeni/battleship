@@ -23,6 +23,7 @@ public class AlertBox {
         Label label = new Label(message);
       
         label.setTextAlignment(TextAlignment.CENTER);
+        label.setWrapText(true);
       
         
         VBox pane = new VBox(10);
