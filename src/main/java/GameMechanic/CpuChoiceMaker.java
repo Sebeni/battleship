@@ -6,7 +6,7 @@ import UI.GridPaneButtonMethods;
 import java.util.*;
 
 public class CpuChoiceMaker {
-    
+   
 
     private Game game;
     private GridPaneButtonMethods gridMethods;
@@ -119,8 +119,22 @@ public class CpuChoiceMaker {
     }
 
     private int fourDirections(Map.Entry<Integer, HitState> entryWithHit) {
-        boolean goingUpFirst = random.nextBoolean();
         int cellHit = entryWithHit.getKey();
+        boolean goingUpFirst = random.nextBoolean();
+        
+        
+        if(goingUpFirst && (!canShortestShipFit(cellHit - 1) || !canShortestShipFit(cellHit + 1))){
+            goingUpFirst = false;
+            System.out.println("changing goingUpFirst To False");
+        }
+        
+        if(!goingUpFirst && (!canShortestShipFit( cellHit - 10) || !canShortestShipFit(cellHit + 10))){
+            goingUpFirst = true;
+            System.out.println("changing goingUpFirst To True");
+
+        }
+        
+        
         int nextShot;
 
         if (goingUpFirst) {
@@ -322,9 +336,9 @@ public class CpuChoiceMaker {
     private boolean canShortestShipFit(int cellToCheck){
         int shortestLivingShip = getShortestLivingShipNum();
         
-        LinkedList<Integer> horizontal = new LinkedList<>();
+        List<Integer> horizontal = new ArrayList<>();
         horizontal.add(cellToCheck);
-        LinkedList<Integer> vertical = new LinkedList<>();
+        List<Integer> vertical = new ArrayList<>();
         vertical.add(cellToCheck);
         
         horizontalPossibilities(horizontal);
@@ -333,21 +347,27 @@ public class CpuChoiceMaker {
         boolean result = horizontal.size() >= shortestLivingShip || vertical.size() >= shortestLivingShip;
         
         if(!result){
-            System.out.println("Can't fit smallest" + shortestLivingShip + " decker in: " + cellToCheck);
+            System.out.println("Can't fit smallest " + shortestLivingShip + " decker in: " + cellToCheck);
         }
         
         return result;
         
     }
     
-    private void horizontalPossibilities(LinkedList<Integer> horizontal){
-        if(canShootLeft(horizontal.getFirst())){
-            horizontal.addFirst(horizontal.getFirst() - 10);
+    private void horizontalPossibilities(List<Integer> horizontal){
+        Collections.sort(horizontal);
+        
+        int theMostLeft = horizontal.get(0);
+        
+        if(canShootLeft(theMostLeft)){
+            horizontal.add(theMostLeft - 10);
             horizontalPossibilities(horizontal);
         }
         
-        if(canShootRight(horizontal.getLast())){
-            horizontal.addLast(horizontal.getLast() + 10);
+        int theMostRight = horizontal.get(horizontal.size() - 1);
+        
+        if(canShootRight(theMostRight)){
+            horizontal.add(theMostRight + 10);
             horizontalPossibilities(horizontal);
         }
 
@@ -355,14 +375,20 @@ public class CpuChoiceMaker {
         
     }
     
-    private void verticalPossibilities(LinkedList<Integer> vertical){
-        if(canShootUp(vertical.getFirst())){
-            vertical.addFirst(vertical.getFirst() - 1);
+    private void verticalPossibilities(List<Integer> vertical){
+        Collections.sort(vertical);
+        
+        int theMostUp = vertical.get(0);
+        
+        if(canShootUp(theMostUp)){
+            vertical.add(theMostUp - 1);
             verticalPossibilities(vertical);
         }
         
-        if(canShootDown(vertical.getLast())){
-            vertical.addLast(vertical.getLast() + 1);
+        int theMostDown = vertical.get(vertical.size() - 1);
+        
+        if(canShootDown(theMostDown)){
+            vertical.add(theMostDown + 1);
             verticalPossibilities(vertical);
         }
         
