@@ -19,8 +19,8 @@ public class GridPaneButtonMethods {
     private double minButtonSize = 39;
     
     private CpuChoiceMaker cpuChoiceMaker;
-    private String playerFires = "You fire at: ";
-    private String cpuFires = "Cpu fires at: ";
+    private String playerFires = "You fired at: ";
+    private String cpuFires = "Cpu fired at: ";
     
     private Map<ShipName, ImageView> shipPics = new HashMap<>();
     

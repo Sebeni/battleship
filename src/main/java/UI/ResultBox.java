@@ -106,7 +106,7 @@ public class ResultBox {
         });
         buttonList.add(newGameButton);
         
-        Button showCpuVisual = new Button("Show CPU's ships");
+        Button showCpuVisual = new Button("Show CPU's board");
         showCpuVisual.setOnAction(event -> {
             currentGame.getCpuVisual().getWindow().show();
         });

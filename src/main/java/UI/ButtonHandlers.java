@@ -135,13 +135,6 @@ public class ButtonHandlers {
                     .map(ship -> ship.getName().toString())
                     .collect(Collectors.joining(" "));
 
-//            String shipsNotPlacedYet = Ship.getAllShips().keySet().stream()
-//                    .filter(shipName -> game.getHuman().getShipsList().stream()
-//                            .map(ship -> ship.getName())
-//                            .anyMatch(shipName1 -> !shipName.equals(shipName1)))
-//                    .map(shipName -> shipName.toString())
-//                    .collect(Collectors.joining(" "));
-
             List<ShipName> namesOfShipsPlaced = game.getHuman().getShipsList().stream().map(ship -> ship.getName()).collect(Collectors.toList());
 
             String shipsNotPlacedYet = Ship.getAllShips().keySet().stream()

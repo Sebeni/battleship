@@ -6,6 +6,7 @@ import UI.GridPaneButtonMethods;
 import java.util.*;
 
 public class CpuChoiceMaker {
+    
 
     private Game game;
     private GridPaneButtonMethods gridMethods;
@@ -26,6 +27,12 @@ public class CpuChoiceMaker {
         this.game = game;
         this.gridMethods = gridMethods;
 
+        populateWhiteAndBlackFields();
+
+        currentChoiceList = random.nextBoolean() ? whiteFields : blackFields;
+    }
+
+    private void populateWhiteAndBlackFields() {
         for (int i = 0; i < 100; i++) {
             if ((i / 10) % 2 == 0) {
 
@@ -44,34 +51,49 @@ public class CpuChoiceMaker {
                 }
             }
         }
-        
-        currentChoiceList = random.nextBoolean() ? whiteFields : blackFields;
     }
 
     public int getCpuChoice() {
-        
         if (!cpuAllShots.containsValue(HitState.HIT)) {
             currentFireDirection = HitFireDirection.NONE;
             return searchMode();
-
         } else {
-      
             return fireMode();
         }
     }
 
     private int searchMode() {
-        Integer choice = checkerboardAlgorithm();
+        removeImpossibilitiesFromChoices();
+
+        int choice = checkerboardAlgorithm();
+        
+        
         while (cpuAllShots.containsKey(choice)) {
+            System.out.println("!While!");
             choice = checkerboardAlgorithm();
         }
 
         if (hitCheckDelegate(choice)) {
+           
             cpuAllShots.put(choice, HitState.HIT);
         } else {
+           
             cpuAllShots.put(choice, HitState.MISS);
         }
         return choice;
+    }
+
+    private void removeImpossibilitiesFromChoices() {
+        if(!cpuAllShots.isEmpty()){
+            cpuAllShots.keySet().forEach(integer -> {
+                currentChoiceList.remove(integer);
+                getAnotherList().remove(integer);
+            });
+        }
+        
+        currentChoiceList.removeIf(integer -> !canShortestShipFit(integer));
+        getAnotherList().removeIf(integer -> !canShortestShipFit(integer));
+
     }
 
     private int checkerboardAlgorithm() {
@@ -128,6 +150,7 @@ public class CpuChoiceMaker {
             }
 
         } else {
+            
             if (canShootLeft(cellHit)) {
                 nextShot = cellHit - 10;
                 checkAndPutNextShot(nextShot, true);
@@ -287,6 +310,61 @@ public class CpuChoiceMaker {
         return currentChoiceList == whiteFields ? blackFields : whiteFields;
     }
     
+    private int getShortestLivingShipNum(){
+        return game.getHuman().getShipsList().stream()
+                .filter(ship -> ship.getShipPartsInGameCount() == Ship.getAllShips().get(ship.getName()))
+                .map(ship -> ship.getShipPartsInGameCount())
+                .mapToInt(value -> value)
+                .min()
+                .orElse(2);
+    }
     
+    private boolean canShortestShipFit(int cellToCheck){
+        int shortestLivingShip = getShortestLivingShipNum();
+        
+        LinkedList<Integer> horizontal = new LinkedList<>();
+        horizontal.add(cellToCheck);
+        LinkedList<Integer> vertical = new LinkedList<>();
+        vertical.add(cellToCheck);
+        
+        horizontalPossibilities(horizontal);
+        verticalPossibilities(vertical);
+        
+        boolean result = horizontal.size() >= shortestLivingShip || vertical.size() >= shortestLivingShip;
+        
+        if(!result){
+            System.out.println("Can't fit smallest" + shortestLivingShip + " decker in: " + cellToCheck);
+        }
+        
+        return result;
+        
+    }
     
+    private void horizontalPossibilities(LinkedList<Integer> horizontal){
+        if(canShootLeft(horizontal.getFirst())){
+            horizontal.addFirst(horizontal.getFirst() - 10);
+            horizontalPossibilities(horizontal);
+        }
+        
+        if(canShootRight(horizontal.getLast())){
+            horizontal.addLast(horizontal.getLast() + 10);
+            horizontalPossibilities(horizontal);
+        }
+
+        
+        
+    }
+    
+    private void verticalPossibilities(LinkedList<Integer> vertical){
+        if(canShootUp(vertical.getFirst())){
+            vertical.addFirst(vertical.getFirst() - 1);
+            verticalPossibilities(vertical);
+        }
+        
+        if(canShootDown(vertical.getLast())){
+            vertical.addLast(vertical.getLast() + 1);
+            verticalPossibilities(vertical);
+        }
+        
+    }
 }
