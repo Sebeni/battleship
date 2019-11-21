@@ -1,4 +1,4 @@
-package UI;
+package GameUI;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,7 +14,7 @@ public class InstructionBox {
     
     public static void display(boolean firePhase){
         String instructionPhaseOne = "PHASE ONE - SHIP PLACEMENT" +
-                "\nInstructions:" +
+                "\nAbout:" +
                 "\n\nBefore play begins, you must arranges all your ships on your bottom grid." +
                 " Each ship occupies a number of consecutive squares on the grid, arranged either horizontally or vertically." +
                 " The number of squares for each ship is determined by the type of the ship. " +
@@ -24,7 +24,7 @@ public class InstructionBox {
                 " You can also click on Random Placement button to randomly place all your ships.";
 
         String instructionPhaseTwo = "PHASE TWO - FIRING" +
-                "\nInstructions:" +
+                "\nAbout:" +
                 "\n\nTo fire click on the top grid." +
                 " If you hit enemy's ship selected cell will change color to yellow." +
                 " If you sunk enemy's ship all cells, where this ship was placed will change color to red." +

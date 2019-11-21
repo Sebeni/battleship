@@ -1,4 +1,4 @@
-package UI;
+package GameUI;
 
 import GameMechanic.*;
 import javafx.event.ActionEvent;
@@ -53,10 +53,10 @@ public class GridPaneButtonMethods {
             for (int row = 0; row < 10; row++) {
                 //text on buttons only for debug
                 Button button = new Button();
-                if (Game.debug) {
-                    button.setText("" + buttonCounter);
-                    buttonCounter++;
-                }
+                
+                button.setText("" + buttonCounter);
+                buttonCounter++;
+                
 
                 button.setId(cssId);
                 button.setDisable(disableGridButtons);

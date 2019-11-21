@@ -1,5 +1,7 @@
-package UI;
+package MenuUI;
 
+import GameUI.AfterClick;
+import GameUI.Game;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -12,16 +14,11 @@ public class Main extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-        debugOn(true);
-        Game currentGame = new Game(primaryStage);
         primaryStage.setTitle("Battleship");
-        primaryStage.setScene(currentGame.getScene());
-        
+        AfterClick mainMenu = MainMenu.getInstance(primaryStage);
+        primaryStage.setScene(mainMenu.getScene());
         primaryStage.show();
     }
     
-    private void debugOn(boolean debugMode){
-        Game.setDebug(debugMode);
-    }
     
 }

@@ -1,16 +1,13 @@
-package UI;
+package GameUI;
 
 import GameMechanic.Ship;
 import GameMechanic.ShipName;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ButtonHandlers {

@@ -1,12 +1,12 @@
 package GameMechanic;
 
-import UI.Game;
-import UI.GridPaneButtonMethods;
+import GameUI.Game;
+import GameUI.GridPaneButtonMethods;
 
 import java.util.*;
 
 public class CpuChoiceMaker {
-   
+
 
     private Game game;
     private GridPaneButtonMethods gridMethods;
@@ -16,14 +16,11 @@ public class CpuChoiceMaker {
 
     private List<Integer> whiteFields = new ArrayList<>();
     private List<Integer> blackFields = new ArrayList<>();
-    
+
     private List<Integer> currentChoiceList;
-    
+
 
     private Random random = new Random();
-    
-    private int horiCounter;
-    private int vertiCounter;
 
 
     public CpuChoiceMaker(Game game, GridPaneButtonMethods gridMethods) {
@@ -58,7 +55,7 @@ public class CpuChoiceMaker {
 
     public int getCpuChoice() {
         removeImpossibilitiesFromChoices();
-        
+
         if (!cpuAllShots.containsValue(HitState.HIT)) {
             currentFireDirection = HitFireDirection.NONE;
             return searchMode();
@@ -68,42 +65,31 @@ public class CpuChoiceMaker {
     }
 
     private int searchMode() {
-        
-
         int choice = checkerboardAlgorithm();
         
-        
-        while (cpuAllShots.containsKey(choice)) {
-            System.out.println("!While!");
-            choice = checkerboardAlgorithm();
-        }
-
         if (hitCheckDelegate(choice)) {
-           
             cpuAllShots.put(choice, HitState.HIT);
         } else {
-           
             cpuAllShots.put(choice, HitState.MISS);
         }
         return choice;
     }
 
     private void removeImpossibilitiesFromChoices() {
-        if(!cpuAllShots.isEmpty()){
+        if (!cpuAllShots.isEmpty()) {
             cpuAllShots.keySet().forEach(integer -> {
                 currentChoiceList.remove(integer);
                 getAnotherList().remove(integer);
             });
         }
-        
+
         currentChoiceList.removeIf(integer -> !canShortestShipFit(integer));
         getAnotherList().removeIf(integer -> !canShortestShipFit(integer));
-        
     }
 
     private int checkerboardAlgorithm() {
-        int choice; 
-        if(!currentChoiceList.isEmpty()){
+        int choice;
+        if (!currentChoiceList.isEmpty()) {
             choice = currentChoiceList.get(random.nextInt(currentChoiceList.size()));
             currentChoiceList.remove((Integer) choice);
         } else {
@@ -117,29 +103,24 @@ public class CpuChoiceMaker {
         if (currentFireDirection.equals(HitFireDirection.NONE)) {
             return fourDirections(getHitEntry());
         } else if (currentFireDirection.equals(HitFireDirection.HORIZONTAL)) {
-            return onlyHorizontal(getHitEntry());
+            return onlyHorizontalHits(getHitEntry());
         } else {
-            return onlyVertical(getHitEntry());
+            return onlyVerticalHits(getHitEntry());
         }
     }
 
     private int fourDirections(Map.Entry<Integer, HitState> entryWithHit) {
-        
         int cellHit = entryWithHit.getKey();
         boolean goingVerticalFirst = random.nextBoolean();
         
-        
-        
-        if(goingVerticalFirst && !canFitShipUpOrDown(cellHit)){
+        if (goingVerticalFirst && !canFitShipUpOrDown(cellHit)) {
             goingVerticalFirst = false;
-            System.out.println("changing goingUpFirst To False");
         }
-        
-        if(!goingVerticalFirst && !canFitShipLeftOrRight(cellHit)){
+
+        if (!goingVerticalFirst && !canFitShipLeftOrRight(cellHit)) {
             goingVerticalFirst = true;
-            System.out.println("changing goingUpFirst To True");
         }
-        
+
         int nextShot;
 
         if (goingVerticalFirst) {
@@ -169,7 +150,7 @@ public class CpuChoiceMaker {
             }
 
         } else {
-            
+
             if (canShootLeft(cellHit)) {
                 nextShot = cellHit - 10;
                 checkAndPutNextShot(nextShot, true);
@@ -198,9 +179,7 @@ public class CpuChoiceMaker {
 
     }
 
-    private int onlyHorizontal(Map.Entry<Integer, HitState> entryWithHit) {
-
-
+    private int onlyHorizontalHits(Map.Entry<Integer, HitState> entryWithHit) {
         int cellHit = entryWithHit.getKey();
 
         int nextShot;
@@ -216,14 +195,10 @@ public class CpuChoiceMaker {
         } else {
             entryWithHit.setValue(HitState.DEPLETED);
             if (cpuAllShots.containsValue(HitState.HIT)) {
-                return onlyHorizontal(getHitEntry());
+                return onlyHorizontalHits(getHitEntry());
 
             } else if (cpuAllShots.containsValue(HitState.DEPLETED)) {
-                cpuAllShots.entrySet().stream()
-                        .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
-                        .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
-                currentFireDirection = HitFireDirection.NONE;
-
+                resetDepletedToHit();
                 return fourDirections(getHitEntry());
             } else {
                 //                just in case
@@ -232,7 +207,7 @@ public class CpuChoiceMaker {
         }
     }
 
-    private int onlyVertical(Map.Entry<Integer, HitState> entryWithHit) {
+    private int onlyVerticalHits(Map.Entry<Integer, HitState> entryWithHit) {
         int cellHit = entryWithHit.getKey();
 
         int nextShot;
@@ -247,21 +222,22 @@ public class CpuChoiceMaker {
         } else {
             entryWithHit.setValue(HitState.DEPLETED);
             if (cpuAllShots.containsValue(HitState.HIT)) {
-                return onlyVertical(getHitEntry());
+                return onlyVerticalHits(getHitEntry());
             } else if (cpuAllShots.containsValue(HitState.DEPLETED)) {
-            
-                cpuAllShots.entrySet().stream()
-                        .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
-                        .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
-                currentFireDirection = HitFireDirection.NONE;
-
-
+                resetDepletedToHit();
                 return fourDirections(getHitEntry());
             } else {
                 //                just in case
                 return searchMode();
             }
         }
+    }
+
+    private void resetDepletedToHit() {
+        cpuAllShots.entrySet().stream()
+                .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
+                .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
+        currentFireDirection = HitFireDirection.NONE;
     }
 
     private boolean canShootUp(int startingCell) {
@@ -324,12 +300,12 @@ public class CpuChoiceMaker {
         HORIZONTAL,
         VERTICAL;
     }
-    
-    private List<Integer> getAnotherList(){
+
+    private List<Integer> getAnotherList() {
         return currentChoiceList == whiteFields ? blackFields : whiteFields;
     }
-    
-    private int getShortestLivingShipNum(){
+
+    private int getShortestLivingShipNum() {
         return game.getHuman().getShipsList().stream()
                 .filter(ship -> ship.getShipPartsInGameCount() == Ship.getAllShips().get(ship.getName()))
                 .map(ship -> ship.getShipPartsInGameCount())
@@ -337,82 +313,68 @@ public class CpuChoiceMaker {
                 .min()
                 .orElse(2);
     }
-    
-    private boolean canShortestShipFit(int cellToCheck){
+
+    private boolean canShortestShipFit(int cellToCheck) {
         int shortestLivingShip = getShortestLivingShipNum();
-        
+
         List<Integer> horizontal = new ArrayList<>();
         horizontal.add(cellToCheck);
         List<Integer> vertical = new ArrayList<>();
         vertical.add(cellToCheck);
-        
+
         horizontalPossibilities(horizontal);
         verticalPossibilities(vertical);
-        
-        boolean result = horizontal.size() >= shortestLivingShip || vertical.size() >= shortestLivingShip;
-        
-        if(!result){
-            System.out.println("Can't fit smallest " + shortestLivingShip + " decker in: " + cellToCheck);
-        }
-        
-        horiCounter = 0;
-        vertiCounter = 0;
-        
-        return result;
-        
+
+        return horizontal.size() >= shortestLivingShip || vertical.size() >= shortestLivingShip;
+
     }
-    
-    private void horizontalPossibilities(List<Integer> horizontal){
-        
+
+    private void horizontalPossibilities(List<Integer> horizontal) {
+
         int theMostLeft = horizontal.get(0);
-        
-        if(canShootLeft(theMostLeft)){
-            horizontal.add(0,theMostLeft - 10);
+
+        if (canShootLeft(theMostLeft)) {
+            horizontal.add(0, theMostLeft - 10);
             horizontalPossibilities(horizontal);
         }
-        
+
         int theMostRight = horizontal.get(horizontal.size() - 1);
-        
-        if(canShootRight(theMostRight)){
+
+        if (canShootRight(theMostRight)) {
             horizontal.add(theMostRight + 10);
             horizontalPossibilities(horizontal);
         }
 
-        
-        
+
     }
-    
-    private void verticalPossibilities(List<Integer> vertical){
+
+    private void verticalPossibilities(List<Integer> vertical) {
         int theMostUp = vertical.get(0);
-        
-        if(canShootUp(theMostUp)){
+
+        if (canShootUp(theMostUp)) {
             vertical.add(0, theMostUp - 1);
             verticalPossibilities(vertical);
         }
-        
+
         int theMostDown = vertical.get(vertical.size() - 1);
-        
-        if(canShootDown(theMostDown)){
+
+        if (canShootDown(theMostDown)) {
             vertical.add(theMostDown + 1);
             verticalPossibilities(vertical);
         }
     }
-    
-    private boolean canFitShipUpOrDown(int cellHit){
-        boolean currentChoicesUpOrDown = currentChoiceList.contains(cellHit -1) || currentChoiceList.contains(cellHit + 1);
+
+    private boolean canFitShipUpOrDown(int cellHit) {
+        boolean currentChoicesUpOrDown = currentChoiceList.contains(cellHit - 1) || currentChoiceList.contains(cellHit + 1);
         boolean otherChoicesUpOrDown = getAnotherList().contains(cellHit - 1) || getAnotherList().contains(cellHit + 1);
 
-        System.out.println("current upOrDown: " + currentChoicesUpOrDown + "other: " + otherChoicesUpOrDown);
-        
         return currentChoicesUpOrDown || otherChoicesUpOrDown;
     }
-    
-    private boolean canFitShipLeftOrRight(int cellHit){
+
+    private boolean canFitShipLeftOrRight(int cellHit) {
         boolean currentChoicesLeftOrRight = currentChoiceList.contains(cellHit - 10) || currentChoiceList.contains(cellHit + 10);
         boolean otherChoicesLeftOrRight = getAnotherList().contains(cellHit - 10) || getAnotherList().contains(cellHit + 10);
 
-        System.out.println("current leftOrRight: " + currentChoicesLeftOrRight + "other: " + otherChoicesLeftOrRight);
-        
         return currentChoicesLeftOrRight || otherChoicesLeftOrRight;
     }
 }

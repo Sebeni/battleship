@@ -1,4 +1,4 @@
-package UI;
+package GameUI;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -12,13 +12,13 @@ public interface AfterClick {
     static void centerWindow(AfterClick newSceneToShow){
         Stage window = newSceneToShow.getWindow();
         Rectangle2D screenBoundsHome = Screen.getPrimary().getVisualBounds();
-        window.setX(((screenBoundsHome.getWidth()) - newSceneToShow.getWidth()) / 2);
-        window.setY(((screenBoundsHome.getHeight()) - newSceneToShow.getHeight()) / 2);
+        window.setX(((screenBoundsHome.getWidth()) - newSceneToShow.getWindowWidth()) / 2);
+        window.setY(((screenBoundsHome.getHeight()) - newSceneToShow.getWindowHeight()) / 2);
         window.setScene(newSceneToShow.getScene());
     }
     
-    double getWidth();
-    double getHeight();
+    double getWindowWidth();
+    double getWindowHeight();
     Stage getWindow();
     Scene getScene();
 

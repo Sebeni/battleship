@@ -1,4 +1,4 @@
-package UI;
+package GameUI;
 
 import GameMechanic.Player;
 import GameMechanic.RandomPlacement;
@@ -16,9 +16,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game {
+public class Game implements AfterClick{
     //game elements
-    public static boolean debug;
     private int roundCounter = 1;
     private boolean firePhase = false;
 
@@ -35,7 +34,7 @@ public class Game {
     
     // parameters of elements
     private final double windowWidth = 1400;
-    private final double windowHeight = 990;
+    private final double windowHeight = 1000;
     private final double scrollPaneWidth = 350;
     private final double scrollPaneHeight = 425;
     private final double labelWidth = scrollPaneWidth - 20;
@@ -318,9 +317,7 @@ public class Game {
         return this.scene;
     }
     
-    public static void setDebug(boolean debug) {
-        Game.debug = debug;
-    }
+
 
     public Ship getCurrentShip() {
         return currentShip;
@@ -399,5 +396,16 @@ public class Game {
 
     public VBox getSunkEnemyShips() {
         return sunkEnemyShips;
+    }
+
+
+    @Override
+    public double getWindowWidth() {
+        return windowWidth;
+    }
+
+    @Override
+    public double getWindowHeight() {
+        return windowHeight;
     }
 }
