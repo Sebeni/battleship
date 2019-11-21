@@ -21,6 +21,9 @@ public class CpuChoiceMaker {
     
 
     private Random random = new Random();
+    
+    private int horiCounter;
+    private int vertiCounter;
 
 
     public CpuChoiceMaker(Game game, GridPaneButtonMethods gridMethods) {
@@ -54,6 +57,8 @@ public class CpuChoiceMaker {
     }
 
     public int getCpuChoice() {
+        removeImpossibilitiesFromChoices();
+        
         if (!cpuAllShots.containsValue(HitState.HIT)) {
             currentFireDirection = HitFireDirection.NONE;
             return searchMode();
@@ -63,7 +68,7 @@ public class CpuChoiceMaker {
     }
 
     private int searchMode() {
-        removeImpossibilitiesFromChoices();
+        
 
         int choice = checkerboardAlgorithm();
         
@@ -93,7 +98,7 @@ public class CpuChoiceMaker {
         
         currentChoiceList.removeIf(integer -> !canShortestShipFit(integer));
         getAnotherList().removeIf(integer -> !canShortestShipFit(integer));
-
+        
     }
 
     private int checkerboardAlgorithm() {
@@ -119,25 +124,25 @@ public class CpuChoiceMaker {
     }
 
     private int fourDirections(Map.Entry<Integer, HitState> entryWithHit) {
+        
         int cellHit = entryWithHit.getKey();
-        boolean goingUpFirst = random.nextBoolean();
+        boolean goingVerticalFirst = random.nextBoolean();
         
         
-        if(goingUpFirst && (!canShortestShipFit(cellHit - 1) || !canShortestShipFit(cellHit + 1))){
-            goingUpFirst = false;
+        
+        if(goingVerticalFirst && !canFitShipUpOrDown(cellHit)){
+            goingVerticalFirst = false;
             System.out.println("changing goingUpFirst To False");
         }
         
-        if(!goingUpFirst && (!canShortestShipFit( cellHit - 10) || !canShortestShipFit(cellHit + 10))){
-            goingUpFirst = true;
+        if(!goingVerticalFirst && !canFitShipLeftOrRight(cellHit)){
+            goingVerticalFirst = true;
             System.out.println("changing goingUpFirst To True");
-
         }
-        
         
         int nextShot;
 
-        if (goingUpFirst) {
+        if (goingVerticalFirst) {
             if (canShootUp(cellHit)) {
                 nextShot = cellHit - 1;
                 checkAndPutNextShot(nextShot, false);
@@ -350,17 +355,19 @@ public class CpuChoiceMaker {
             System.out.println("Can't fit smallest " + shortestLivingShip + " decker in: " + cellToCheck);
         }
         
+        horiCounter = 0;
+        vertiCounter = 0;
+        
         return result;
         
     }
     
     private void horizontalPossibilities(List<Integer> horizontal){
-        Collections.sort(horizontal);
         
         int theMostLeft = horizontal.get(0);
         
         if(canShootLeft(theMostLeft)){
-            horizontal.add(theMostLeft - 10);
+            horizontal.add(0,theMostLeft - 10);
             horizontalPossibilities(horizontal);
         }
         
@@ -376,12 +383,10 @@ public class CpuChoiceMaker {
     }
     
     private void verticalPossibilities(List<Integer> vertical){
-        Collections.sort(vertical);
-        
         int theMostUp = vertical.get(0);
         
         if(canShootUp(theMostUp)){
-            vertical.add(theMostUp - 1);
+            vertical.add(0, theMostUp - 1);
             verticalPossibilities(vertical);
         }
         
@@ -391,6 +396,23 @@ public class CpuChoiceMaker {
             vertical.add(theMostDown + 1);
             verticalPossibilities(vertical);
         }
+    }
+    
+    private boolean canFitShipUpOrDown(int cellHit){
+        boolean currentChoicesUpOrDown = currentChoiceList.contains(cellHit -1) || currentChoiceList.contains(cellHit + 1);
+        boolean otherChoicesUpOrDown = getAnotherList().contains(cellHit - 1) || getAnotherList().contains(cellHit + 1);
+
+        System.out.println("current upOrDown: " + currentChoicesUpOrDown + "other: " + otherChoicesUpOrDown);
         
+        return currentChoicesUpOrDown || otherChoicesUpOrDown;
+    }
+    
+    private boolean canFitShipLeftOrRight(int cellHit){
+        boolean currentChoicesLeftOrRight = currentChoiceList.contains(cellHit - 10) || currentChoiceList.contains(cellHit + 10);
+        boolean otherChoicesLeftOrRight = getAnotherList().contains(cellHit - 10) || getAnotherList().contains(cellHit + 10);
+
+        System.out.println("current leftOrRight: " + currentChoicesLeftOrRight + "other: " + otherChoicesLeftOrRight);
+        
+        return currentChoicesLeftOrRight || otherChoicesLeftOrRight;
     }
 }
