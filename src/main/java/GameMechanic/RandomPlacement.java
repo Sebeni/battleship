@@ -9,7 +9,7 @@ import java.util.Random;
 public class RandomPlacement {
     private static List<Ship> result;
     
-    public static List<Ship> randomShipPlacement(List<Button> buttonListToDisable) {
+    public static List<Ship> randomShipPlacementList(List<Button> buttonListToPlaceShips) {
         result = new ArrayList<>();
         
         for (ShipName s : Ship.getAllShips().keySet()) {
@@ -20,7 +20,7 @@ public class RandomPlacement {
         
         result.stream()
                 .flatMap(ship -> ship.getCoordinates().stream())
-                .forEach(s -> buttonListToDisable.get(s).setDisable(true));
+                .forEach(s -> buttonListToPlaceShips.get(s).setDisable(true));
 
         return result;
     }

@@ -1,23 +1,35 @@
-package GameUI;
+package GameUI.Handlers;
 
 import GameMechanic.*;
+import GameUI.Boxes.Game;
+import GameUI.GridHelperMethods;
+import GameUI.Boxes.ResultBox;
+import Statistics.StatisticSaver;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class FireButtonHandlers {
-    
-    private Game game;
+    private final Game game;
 
-    private CpuChoiceMaker cpuChoiceMaker;
-    private String playerFires = "You fired at: ";
-    private String cpuFires = "Cpu fired at: ";
+    private final CpuChoiceMaker cpuChoiceMaker;
+    private final String playerFires = "You fired at: ";
+    private final String cpuFires = "Cpu fired at: ";
     private final static Map<ShipName, ImageView> SHIP_PICS = new HashMap<ShipName, ImageView>();
+    
+    private Set<Integer> humanAllSuccessfulShots = new HashSet<>();
+    private Set<Integer> cpuAllSuccessfulShots = new HashSet<>();
+    private Set<Integer> humanAllMissedShots = new HashSet<>();
+    private Set<Integer> cpuAllMissedShots = new HashSet<>();
+    
+    private StatisticSaver saver = new StatisticSaver();
 
     static {
         SHIP_PICS.put(ShipName.BATTLESHIP, new ImageView("battleship.png"));
@@ -33,9 +45,6 @@ public class FireButtonHandlers {
         });
     }
     
-    
-    
-    
     public FireButtonHandlers(Game game) {
         this.game = game;
         this.cpuChoiceMaker = new CpuChoiceMaker(game);
@@ -50,13 +59,12 @@ public class FireButtonHandlers {
         Integer coordinate = xParam * 10 + yParam;
 
         if (GridHelperMethods.hitCheck(game.getCpu(), coordinate)) {
+            humanAllSuccessfulShots.add(coordinate);
             shipHitByHumanMethod(button, xParam, yParam);
-            
         } else {
+            humanAllMissedShots.add(coordinate);
             game.setBattleLog(playerFires + GridHelperMethods.numberToLetter(xParam) + (yParam + 1) + " miss");
-
-            game.getCpuVisual().getButtonList().get(coordinate).setId("miss");
-            
+            game.getCpuVisualBox().getButtonList().get(coordinate).setId("miss");
             button.setId("miss");
         }
         button.setDisable(true);
@@ -74,9 +82,9 @@ public class FireButtonHandlers {
         changingShipPartBoardAndLog(buttonToChangeColor, xParam, yParam, listWithButtonToChange, shipHit, playerFires);
 
         if(shipHit.getShipPartsInGameCount() > 0){
-            game.getCpuVisual().getButtonList().get(xParam*10 + yParam).setId("hit");
+            game.getCpuVisualBox().getButtonList().get(xParam*10 + yParam).setId("hit");
         } else {
-            changeAllButtonsToSunk(game.getCpuVisual().getButtonList(), shipHit);
+            changeAllButtonsToSunk(game.getCpuVisualBox().getButtonList(), shipHit);
             addSunkShipPic(shipHit);
         }
     }
@@ -122,8 +130,10 @@ public class FireButtonHandlers {
 
         Button buttonToChange = game.getSeaButtonsListBottom().get(choice);
         if (GridHelperMethods.hitCheck(game.getHuman(), choice)) {
+            cpuAllSuccessfulShots.add(choice);
             shipHitByCpuMethod(buttonToChange, xParam, yParam);
         } else {
+            cpuAllMissedShots.add(choice);
             buttonToChange.setId("miss");
             game.setBattleLog(cpuFires + GridHelperMethods.numberToLetter(xParam) + (yParam + 1) + " miss");
             buttonToChange.setDisable(true);
@@ -149,18 +159,40 @@ public class FireButtonHandlers {
     private boolean gameIsFinished() {
         //win condition
         if (game.getCpu().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
+            saveStats(true);
             game.setBattleLog("GAME OVER! YOU WON!");
             ResultBox.display(true, game);
+            
             return true;
         } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
+            saveStats(false);
             game.setBattleLog("GAME OVER! YOU LOOSE!");
             ResultBox.display(false, game);
+            
             return true;
         } else {
             return false;
         }
     }
-    
+
+    private void saveStats(boolean playerWon) {
+        saver.addSuccessfulShotsToCpuMap(cpuAllSuccessfulShots);
+        saver.addMissedShotsToCpuMap(cpuAllMissedShots);
+        
+        saver.addSuccessfulShotsToHumanMap(humanAllSuccessfulShots);
+        saver.addMissedShotsToHumanMap(humanAllMissedShots);
+        
+        saver.setRoundCounter(saver.getRoundCounter() + 1);
+        
+        if(playerWon){
+            saver.setPlayerWonCounter(saver.getPlayerWonCounter() + 1);
+        } else {
+            saver.setPlayerLoseCounter(saver.getPlayerLoseCounter() + 1);
+        }
+        
+        saver.saveStats();
+    }
+
     public Game getGame() {
         return game;
     }

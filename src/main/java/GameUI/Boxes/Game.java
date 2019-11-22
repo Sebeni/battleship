@@ -1,9 +1,14 @@
-package GameUI;
+package GameUI.Boxes;
 
 import GameMechanic.Player;
 import GameMechanic.RandomPlacement;
 import GameMechanic.Ship;
 import GameMechanic.ShipName;
+import GameUI.GridHelperMethods;
+import GameUI.Handlers.ButtonHandlers;
+import GameUI.Handlers.FireButtonHandlers;
+import GameUI.Handlers.SeaButtonHandlers;
+import GameUI.SceneChanger;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -26,7 +31,7 @@ public class Game implements SceneChanger {
 
     private final Player human = new Player(true);
     private final Player cpu = new Player(false);
-    private CpuVisual cpuVisual;
+    private final CpuVisualBox cpuVisualBox;
     
     //javaFX elements
     private Stage window;
@@ -64,11 +69,11 @@ public class Game implements SceneChanger {
 
     public Game(Stage primaryStage) {
         window = primaryStage;
-        cpuVisual = new CpuVisual(this);
+        cpuVisualBox = new CpuVisualBox(this);
 
         window.setOnCloseRequest(e -> {
             e.consume();
-            SceneChanger.closeProgram(window, cpuVisual.getWindow());
+            SceneChanger.closeProgram(window, cpuVisualBox.getWindow());
         });
         
         SeaButtonHandlers seaHandler = new SeaButtonHandlers(this);
@@ -157,7 +162,7 @@ public class Game implements SceneChanger {
         
         
         Button exit = new Button("Exit");
-        exit.setOnAction(event -> SceneChanger.closeProgram(window, cpuVisual.getWindow()));
+        exit.setOnAction(event -> SceneChanger.closeProgram(window, cpuVisualBox.getWindow()));
         newGameButtons.add(exit);
         
         for (Button b : newGameButtons) {
@@ -317,7 +322,6 @@ public class Game implements SceneChanger {
     }
     
 
-
     public Ship getCurrentShip() {
         return currentShip;
     }
@@ -343,11 +347,11 @@ public class Game implements SceneChanger {
     }
 
     public void setHumanShips() {
-        human.setPlayerShips(RandomPlacement.randomShipPlacement(seaButtonsListBottom));
+        human.setPlayerShips(RandomPlacement.randomShipPlacementList(seaButtonsListBottom));
     }
 
     public void setCpuShips() {
-        cpu.setPlayerShips(RandomPlacement.randomShipPlacement(cpuVisual.getButtonList()));
+        cpu.setPlayerShips(RandomPlacement.randomShipPlacementList(cpuVisualBox.getButtonList()));
     }
 
     public Player getCpu() {
@@ -385,8 +389,8 @@ public class Game implements SceneChanger {
         setBattleLog("Turn " + roundCounter);
     }
 
-    public CpuVisual getCpuVisual() {
-        return cpuVisual;
+    public CpuVisualBox getCpuVisualBox() {
+        return cpuVisualBox;
     }
 
     public Stage getWindow() {

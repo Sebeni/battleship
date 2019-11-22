@@ -1,6 +1,8 @@
-package GameUI;
+package GameUI.Boxes;
 
 import GameMechanic.Ship;
+import GameUI.Handlers.ButtonHandlers;
+import GameUI.SceneChanger;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -107,13 +109,13 @@ public class ResultBox {
         
         Button showCpuVisual = new Button("Show CPU's board");
         showCpuVisual.setOnAction(event -> {
-            currentGame.getCpuVisual().getWindow().show();
+            currentGame.getCpuVisualBox().getWindow().show();
         });
         buttonList.add(showCpuVisual);
         
         Button exit = new Button("Exit");
         exit.setOnAction(event -> {
-            SceneChanger.closeProgram(currentGame.getWindow(), currentGame.getCpuVisual().getWindow(), window);
+            SceneChanger.closeProgram(currentGame.getWindow(), currentGame.getCpuVisualBox().getWindow(), window);
         });
         buttonList.add(exit);
 

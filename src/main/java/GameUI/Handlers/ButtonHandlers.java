@@ -1,7 +1,10 @@
-package GameUI;
+package GameUI.Handlers;
 
 import GameMechanic.Ship;
 import GameMechanic.ShipName;
+import GameUI.Boxes.AlertBox;
+import GameUI.Boxes.ConfirmBox;
+import GameUI.Boxes.Game;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -171,7 +174,7 @@ public class ButtonHandlers {
     }
 
     public void resetGameButtonEH(ActionEvent event) {
-        game.getCpuVisual().getWindow().close();
+        game.getCpuVisualBox().getWindow().close();
         Stage window = game.getWindow();
         Game newGame = new Game(window);
         window.setScene(newGame.getScene());

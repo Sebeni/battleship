@@ -1,7 +1,7 @@
 package MenuUI;
 
 import GameUI.SceneChanger;
-import GameUI.Game;
+import GameUI.Boxes.Game;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

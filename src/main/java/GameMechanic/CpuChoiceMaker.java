@@ -1,6 +1,6 @@
 package GameMechanic;
 
-import GameUI.Game;
+import GameUI.Boxes.Game;
 import GameUI.GridHelperMethods;
 
 import java.util.*;

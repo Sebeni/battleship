@@ -1,6 +1,9 @@
-package GameUI;
+package GameUI.Handlers;
 
 import GameMechanic.Ship;
+import GameUI.Boxes.AlertBox;
+import GameUI.Boxes.Game;
+import GameUI.GridHelperMethods;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;

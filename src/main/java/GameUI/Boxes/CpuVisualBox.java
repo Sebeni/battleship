@@ -1,6 +1,7 @@
-package GameUI;
+package GameUI.Boxes;
 
 
+import GameUI.GridHelperMethods;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -11,13 +12,13 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-public class CpuVisual {
+public class CpuVisualBox {
     private final Stage window = new Stage();
     private final int width = 500;
     private final int height = 500;
     private final List<Button> buttonList;
 
-    public CpuVisual(Game game) {
+    public CpuVisualBox(Game game) {
         GridPane root = new GridPane();
 
         GridPane cpuShipPlacement = new GridPane();
