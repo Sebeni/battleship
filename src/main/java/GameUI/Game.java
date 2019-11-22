@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game implements AfterClick{
+public class Game implements SceneChanger {
     //game elements
     private int roundCounter = 1;
     private boolean firePhase = false;
@@ -39,11 +39,6 @@ public class Game implements AfterClick{
     private final double scrollPaneHeight = 425;
     private final double labelWidth = scrollPaneWidth - 20;
     
-
-    //handlers for javaFX elements
-    private final ButtonHandlers gameHandler = new ButtonHandlers(this);
-    private final GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(this);
-
     //center top - human firing board
     private final GridPane playerFireBoardTop = new GridPane();
     private final List<Button> fireButtonListTop;
@@ -73,12 +68,16 @@ public class Game implements AfterClick{
 
         window.setOnCloseRequest(e -> {
             e.consume();
-            AfterClick.closeProgram(window, cpuVisual.getWindow());
+            SceneChanger.closeProgram(window, cpuVisual.getWindow());
         });
         
+        SeaButtonHandlers seaHandler = new SeaButtonHandlers(this);
+        FireButtonHandlers fireHandler = new FireButtonHandlers(this);
+        ButtonHandlers buttonHandlers = new ButtonHandlers(this);
+        
 
-        fireButtonListTop = gridMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, gridMethods::fireButtonHandler);
-        seaButtonsListBottom = gridMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, gridMethods::placementButtonHandler);
+        fireButtonListTop = GridHelperMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, event1 -> fireHandler.fireButtonHandler(event1));
+        seaButtonsListBottom = GridHelperMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, event -> seaHandler.placementButtonHandler(event));
 
 //      root pane for all other panes
         BorderPane layout = new BorderPane();
@@ -92,14 +91,14 @@ public class Game implements AfterClick{
 
         playerLocationBoardBottom.getChildren().forEach(node -> {
             Pane pane = (Pane) node;
-            pane.setOnMouseEntered(gridMethods::mouseShipNameEH);
-            pane.setOnMouseExited(gridMethods::mouseExitShipNameEH);
+            pane.setOnMouseEntered(event -> seaHandler.mouseShipNameEH(event));
+            pane.setOnMouseExited(event -> seaHandler.mouseExitShipNameEH(event));
 
         });
         
         fireButtonListTop.forEach(button -> {
-            button.setOnMouseEntered(gridMethods::mouseFireFieldName);
-            button.setOnMouseExited(gridMethods::mouseExitFireFieldName);
+            button.setOnMouseEntered(fireHandler::mouseFireFieldName);
+            button.setOnMouseExited(fireHandler::mouseExitFireFieldName);
         });
         
         GridPane topRootForGrid = new GridPane();
@@ -110,8 +109,8 @@ public class Game implements AfterClick{
         bottomRootForGrid.add(playerLocationBoardBottom, 1, 1, 10, 10);
         bottomRootForGrid.setAlignment(Pos.CENTER);
         
-        gridMethods.gridMarkers(topRootForGrid);
-        gridMethods.gridMarkers(bottomRootForGrid);
+        GridHelperMethods.gridMarkers(topRootForGrid);
+        GridHelperMethods.gridMarkers(bottomRootForGrid);
 
 
 
@@ -138,13 +137,13 @@ public class Game implements AfterClick{
         upperLeft.setPadding(new Insets(100, 10, 10, 10));
         
         Button newGameButton = new Button("Start game");
-        newGameButton.setOnAction(gameHandler::startGameButtonEH);
+        newGameButton.setOnAction(buttonHandlers::startGameButtonEH);
         newGameButtons.add(newGameButton);
         
         Button resetButton = new Button("Reset game");
         resetButton.setOnAction(event -> {
             if(ConfirmBox.display("Warning", "Your current game will be lost. Continue?")){
-                gameHandler.resetGameButtonEH(event);
+                buttonHandlers.resetGameButtonEH(event);
             }
         });
         newGameButtons.add(resetButton);
@@ -158,7 +157,7 @@ public class Game implements AfterClick{
         
         
         Button exit = new Button("Exit");
-        exit.setOnAction(event -> AfterClick.closeProgram(window, cpuVisual.getWindow()));
+        exit.setOnAction(event -> SceneChanger.closeProgram(window, cpuVisual.getWindow()));
         newGameButtons.add(exit);
         
         for (Button b : newGameButtons) {
@@ -192,27 +191,27 @@ public class Game implements AfterClick{
         randomLine.setAlignment(Pos.CENTER);
         
         Button carrierButton = new Button("Carrier - 5 decker");
-        carrierButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.CARRIER));
+        carrierButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.CARRIER));
         placementShipButtonListLeft.add(carrierButton);
         
         Button battleshipButton = new Button("Battleship - 4 decker");
-        battleshipButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.BATTLESHIP));
+        battleshipButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.BATTLESHIP));
         placementShipButtonListLeft.add(battleshipButton);
 
         Button cruiserButton = new Button("Cruiser - 3 decker");
-        cruiserButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.CRUISER));
+        cruiserButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.CRUISER));
         placementShipButtonListLeft.add(cruiserButton);
 
         Button submarineButton = new Button("Submarine - 3 decker");
-        submarineButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.SUBMARINE));
+        submarineButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.SUBMARINE));
         placementShipButtonListLeft.add(submarineButton);
 
         Button destroyerButton = new Button("Destroyer - 2 decker");
-        destroyerButton.setOnAction(event -> gameHandler.shipPlacementButtonEH(event, ShipName.DESTROYER));
+        destroyerButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.DESTROYER));
         placementShipButtonListLeft.add(destroyerButton);
 
         Button randomPlacement = new Button("Random placement");
-        randomPlacement.setOnAction(gameHandler::randomPlacementButtonEH);
+        randomPlacement.setOnAction(buttonHandlers::randomPlacementButtonEH);
         placementShipButtonListLeft.add(randomPlacement);
 
         for (Button b : placementShipButtonListLeft) {
@@ -221,27 +220,27 @@ public class Game implements AfterClick{
 
 
         Button resetCarrierButton = new Button("Reset");
-        resetCarrierButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CARRIER));
+        resetCarrierButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.CARRIER));
         resetShipButtonListRight.add(resetCarrierButton);
 
         Button resetBattleshipButton = new Button("Reset");
-        resetBattleshipButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.BATTLESHIP));
+        resetBattleshipButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.BATTLESHIP));
         resetShipButtonListRight.add(resetBattleshipButton);
 
         Button resetCruiserButton = new Button("Reset");
-        resetCruiserButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.CRUISER));
+        resetCruiserButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.CRUISER));
         resetShipButtonListRight.add(resetCruiserButton);
 
         Button resetSubmarineButton = new Button("Reset");
-        resetSubmarineButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.SUBMARINE));
+        resetSubmarineButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.SUBMARINE));
         resetShipButtonListRight.add(resetSubmarineButton);
 
         Button resetDestroyerButton = new Button("Reset");
-        resetDestroyerButton.setOnAction(event -> gameHandler.resetPlacementButtonEH(event, ShipName.DESTROYER));
+        resetDestroyerButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.DESTROYER));
         resetShipButtonListRight.add(resetDestroyerButton);
 
         Button resetAll = new Button("Reset all");
-        resetAll.setOnAction(gameHandler::resetAllButtonEH);
+        resetAll.setOnAction(buttonHandlers::resetAllButtonEH);
         resetShipButtonListRight.add(resetAll);
 
         for (Button b : resetShipButtonListRight) {

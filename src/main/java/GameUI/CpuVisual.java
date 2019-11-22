@@ -21,8 +21,8 @@ public class CpuVisual {
         GridPane root = new GridPane();
 
         GridPane cpuShipPlacement = new GridPane();
-        GridPaneButtonMethods gridMethods = new GridPaneButtonMethods(game);
-        buttonList = gridMethods.create100ButtonList(cpuShipPlacement, "boardButton", false, Event::consume);
+       
+        buttonList = GridHelperMethods.create100ButtonList(cpuShipPlacement, "boardButton", false, Event::consume);
 
 
         window.setTitle("CPU's position");
@@ -31,7 +31,7 @@ public class CpuVisual {
 
 
         root.add(cpuShipPlacement, 1, 1, 10, 10);
-        gridMethods.gridMarkers(root);
+        GridHelperMethods.gridMarkers(root);
         
         BorderPane layout = new BorderPane(root);
         layout.setPadding(new Insets(10));

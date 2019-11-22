@@ -1,6 +1,6 @@
 package MenuUI;
 
-import GameUI.AfterClick;
+import GameUI.SceneChanger;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class About implements AfterClick {
+public class About implements SceneChanger {
     private Scene scene;
     private Stage window;
     private static About about;
@@ -49,7 +49,7 @@ public class About implements AfterClick {
         Button returnButton = new Button("Return");
         returnButton.setMinSize(130,20);
         
-        returnButton.setOnAction(event -> AfterClick.centerWindow(MainMenu.getInstance(window)));
+        returnButton.setOnAction(event -> SceneChanger.centerWindow(MainMenu.getInstance(window)));
 
 
 

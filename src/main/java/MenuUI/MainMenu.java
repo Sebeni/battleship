@@ -1,6 +1,6 @@
 package MenuUI;
 
-import GameUI.AfterClick;
+import GameUI.SceneChanger;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class MainMenu implements AfterClick {
+public class MainMenu implements SceneChanger {
     private Stage window;
     private Scene scene;
     private double windowWidth = 400;
@@ -29,7 +29,7 @@ public class MainMenu implements AfterClick {
 
         window.setOnCloseRequest(e -> {
             e.consume();
-            AfterClick.closeProgram(window);
+            SceneChanger.closeProgram(window);
         });
         
         VBox layout = new VBox(20);
@@ -38,16 +38,16 @@ public class MainMenu implements AfterClick {
 
         Button newGame = new Button("New Game");
         newGame.setPrefSize(130,20);
-        newGame.setOnAction(event -> AfterClick.centerWindow(Options.getInstance(window)));
+        newGame.setOnAction(event -> SceneChanger.centerWindow(Options.getInstance(window)));
 
         Button about = new Button("About");
         about.setPrefSize(130,20);
-        about.setOnAction(event -> AfterClick.centerWindow(About.getInstance(window)));
+        about.setOnAction(event -> SceneChanger.centerWindow(About.getInstance(window)));
         
 
         Button exit = new Button("Exit");
         exit.setPrefSize(130,20);
-        exit.setOnAction(event -> AfterClick.closeProgram(window));
+        exit.setOnAction(event -> SceneChanger.closeProgram(window));
 
         layout.getChildren().addAll(newGame, about, exit);
         layout.setAlignment(Pos.CENTER);

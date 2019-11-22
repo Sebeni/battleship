@@ -5,11 +5,11 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public interface AfterClick {
+public interface SceneChanger {
     //this interface gives methods common to all scenes and stages
 
     //changes AND center on the screen new scene
-    static void centerWindow(AfterClick newSceneToShow){
+    static void centerWindow(SceneChanger newSceneToShow){
         Stage window = newSceneToShow.getWindow();
         Rectangle2D screenBoundsHome = Screen.getPrimary().getVisualBounds();
         window.setX(((screenBoundsHome.getWidth()) - newSceneToShow.getWindowWidth()) / 2);

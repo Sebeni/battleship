@@ -113,7 +113,7 @@ public class ResultBox {
         
         Button exit = new Button("Exit");
         exit.setOnAction(event -> {
-            AfterClick.closeProgram(currentGame.getWindow(), currentGame.getCpuVisual().getWindow(), window);
+            SceneChanger.closeProgram(currentGame.getWindow(), currentGame.getCpuVisual().getWindow(), window);
         });
         buttonList.add(exit);
 

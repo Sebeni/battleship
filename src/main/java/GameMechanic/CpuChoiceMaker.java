@@ -1,15 +1,14 @@
 package GameMechanic;
 
 import GameUI.Game;
-import GameUI.GridPaneButtonMethods;
+import GameUI.GridHelperMethods;
 
 import java.util.*;
 
 public class CpuChoiceMaker {
 
-
     private Game game;
-    private GridPaneButtonMethods gridMethods;
+   
     private HitFireDirection currentFireDirection = HitFireDirection.NONE;
 
     private Map<Integer, HitState> cpuAllShots = new LinkedHashMap<>();
@@ -23,10 +22,9 @@ public class CpuChoiceMaker {
     private Random random = new Random();
 
 
-    public CpuChoiceMaker(Game game, GridPaneButtonMethods gridMethods) {
+    public CpuChoiceMaker(Game game) {
         this.game = game;
-        this.gridMethods = gridMethods;
-
+  
         populateWhiteAndBlackFields();
 
         currentChoiceList = random.nextBoolean() ? whiteFields : blackFields;
@@ -35,15 +33,12 @@ public class CpuChoiceMaker {
     private void populateWhiteAndBlackFields() {
         for (int i = 0; i < 100; i++) {
             if ((i / 10) % 2 == 0) {
-
                 if (i % 2 == 0) {
                     whiteFields.add(i);
                 } else {
                     blackFields.add(i);
                 }
-
             } else {
-
                 if (i % 2 == 0) {
                     blackFields.add(i);
                 } else {
@@ -55,7 +50,7 @@ public class CpuChoiceMaker {
 
     public int getCpuChoice() {
         removeImpossibilitiesFromChoices();
-
+        
         if (!cpuAllShots.containsValue(HitState.HIT)) {
             currentFireDirection = HitFireDirection.NONE;
             return searchMode();
@@ -196,12 +191,10 @@ public class CpuChoiceMaker {
             entryWithHit.setValue(HitState.DEPLETED);
             if (cpuAllShots.containsValue(HitState.HIT)) {
                 return onlyHorizontalHits(getHitEntry());
-
             } else if (cpuAllShots.containsValue(HitState.DEPLETED)) {
                 resetDepletedToHit();
                 return fourDirections(getHitEntry());
             } else {
-                //                just in case
                 return searchMode();
             }
         }
@@ -227,7 +220,6 @@ public class CpuChoiceMaker {
                 resetDepletedToHit();
                 return fourDirections(getHitEntry());
             } else {
-                //                just in case
                 return searchMode();
             }
         }
@@ -273,7 +265,6 @@ public class CpuChoiceMaker {
     }
 
     private void checkAndPutNextShot(int nextShot, boolean horizontal) {
-
         if (hitCheckDelegate(nextShot)) {
             if (horizontal) {
                 currentFireDirection = HitFireDirection.HORIZONTAL;
@@ -287,7 +278,7 @@ public class CpuChoiceMaker {
     }
 
     private boolean hitCheckDelegate(int choiceToCheck) {
-        return gridMethods.hitCheck(game.getHuman(), choiceToCheck);
+        return GridHelperMethods.hitCheck(game.getHuman(), choiceToCheck);
     }
 
     public Map<Integer, HitState> getCpuAllShots() {
