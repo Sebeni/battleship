@@ -55,7 +55,7 @@ public class InstructionBox {
 
         VBox pane = new VBox(10);
         Button button = new Button("OK");
-        button.setPrefSize(130, 20);
+        button.setId("newGameButtons");
 
         pane.getChildren().addAll(label, button);
         pane.setAlignment(Pos.CENTER);
@@ -64,6 +64,7 @@ public class InstructionBox {
         button.setOnAction(e -> window.close());
 
         Scene layout = new Scene(pane);
+        layout.getStylesheets().add("gameStyles.css");
         window.setScene(layout);
 
         window.showAndWait();

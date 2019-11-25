@@ -64,7 +64,7 @@ public class GridHelperMethods {
                 .findAny().get();
     }
 
-    public static void gridMarkers(GridPane gridRoot) {
+    public static void gridMarkers(GridPane gridRoot, Double minWidth, Double minHeight) {
         List<Label> markerLabels = new ArrayList<Label>();
         for (int i = 1; i <= 10; i++) {
             Label markerLetters = new Label(numberToLetter(i - 1));
@@ -79,8 +79,9 @@ public class GridHelperMethods {
         }
 
         markerLabels.forEach(label -> {
-            label.setMinHeight(minButtonSize);
-            label.setMinWidth(minButtonSize);
+            label.setMinSize(minWidth, minHeight);
+//            label.setMinHeight(minButtonSize);
+//            label.setMinWidth(minButtonSize);
             label.setTextAlignment(TextAlignment.CENTER);
             label.setAlignment(Pos.CENTER);
             label.setId("boardMarkers");
@@ -92,5 +93,7 @@ public class GridHelperMethods {
         return Character.toString(alphabet.charAt(number));
     }
 
-   
+    public static double getMinButtonSize() {
+        return minButtonSize;
+    }
 }

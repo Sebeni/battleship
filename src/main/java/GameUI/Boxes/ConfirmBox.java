@@ -50,6 +50,8 @@ public class ConfirmBox {
         layout.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(outerLayout);
+        scene.getStylesheets().add("gameStyles.css");
+        
         window.setScene(scene);
 
         window.showAndWait();

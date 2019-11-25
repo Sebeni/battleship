@@ -1,13 +1,11 @@
 package Statistics;
 
 import java.io.*;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class StatisticSaver {
+public class Stats {
     
     private final static Map<Integer, Integer> CPU_SUCCESSFUL_SHOTS = new HashMap<>();
     private final static Map<Integer, Integer> CPU_MISSED_SHOTS = new HashMap<>();
@@ -18,6 +16,15 @@ public class StatisticSaver {
     private static Integer roundCounter = 0;
     private static Integer playerWonCounter = 0;
     private static Integer playerLoseCounter = 0;
+    
+    private static int humanAllSuccessfulShots = 0;
+    private static int humanAllMissedShots = 0;
+    
+    private static int cpuAllSuccessfulShots = 0;
+    private static int cpuAllMissedShots = 0;
+    
+    private static File saveFile = new File("stats.txt");
+    
 
     static {
         populateMap(CPU_SUCCESSFUL_SHOTS);
@@ -25,15 +32,10 @@ public class StatisticSaver {
 
         populateMap(HUMAN_SUCCESSFUL_SHOTS);
         populateMap(HUMAN_MISSED_SHOTS);
-
-    }
-
-    private File saveFile;
-
-    public StatisticSaver() {
-        saveFile = new File("stats.txt");
+        
         loadStats();
     }
+    
 
     private static void populateMap(Map<Integer, Integer> mapToPopulate) {
         for (int i = 0; i < 100; i++) {
@@ -42,7 +44,7 @@ public class StatisticSaver {
     }
 
 
-    public void addSuccessfulShotsToHumanMap(Set<Integer> allCellsHit) {
+    public static void addSuccessfulShotsToHumanMap(Set<Integer> allCellsHit) {
         for (Integer i : allCellsHit) {
             Integer newValue = HUMAN_SUCCESSFUL_SHOTS.get(i) + 1;
             HUMAN_SUCCESSFUL_SHOTS.put(i, newValue);
@@ -50,15 +52,22 @@ public class StatisticSaver {
 
     }
 
-    public  void addSuccessfulShotsToCpuMap(Set<Integer> allCellsHit) {
+    public static void addSuccessfulShotsToCpuMap(Set<Integer> allCellsHit) {
         for (Integer i : allCellsHit) {
             Integer newValue = CPU_SUCCESSFUL_SHOTS.get(i) + 1;
             CPU_SUCCESSFUL_SHOTS.put(i, newValue);
         }
         
     }
-    
-    public  void addMissedShotsToCpuMap(Set<Integer> allCellsMissed) {
+
+    public static void addMissedShotsToHumanMap(Set<Integer> allCellsMissed) {
+        for (Integer i : allCellsMissed) {
+            Integer newValue = HUMAN_MISSED_SHOTS.get(i) + 1;
+            HUMAN_MISSED_SHOTS.put(i, newValue);
+        }
+    }
+
+    public static void addMissedShotsToCpuMap(Set<Integer> allCellsMissed) {
         for (Integer i : allCellsMissed) {
             Integer newValue = CPU_MISSED_SHOTS.get(i) + 1;
             CPU_MISSED_SHOTS.put(i, newValue);
@@ -66,39 +75,31 @@ public class StatisticSaver {
 
     }
 
-    public  void addMissedShotsToHumanMap(Set<Integer> allCellsMissed) {
-        for (Integer i : allCellsMissed) {
-            Integer newValue = CPU_MISSED_SHOTS.get(i) + 1;
-            CPU_MISSED_SHOTS.put(i, newValue);
-        }
-
+    public static void setRoundCounter(int roundCounter) {
+        Stats.roundCounter = roundCounter;
     }
 
-    public  void setRoundCounter(int roundCounter) {
-        StatisticSaver.roundCounter = roundCounter;
-    }
-
-    public  int getRoundCounter() {
+    public static int getRoundCounter() {
         return roundCounter;
     }
 
-    public  int getPlayerWonCounter() {
+    public static int getPlayerWonCounter() {
         return playerWonCounter;
     }
 
-    public  void setPlayerWonCounter(int playerWonCounter) {
-        StatisticSaver.playerWonCounter = playerWonCounter;
+    public static void setPlayerWonCounter(int playerWonCounter) {
+        Stats.playerWonCounter = playerWonCounter;
     }
 
-    public  int getPlayerLoseCounter() {
+    public static int getPlayerLoseCounter() {
         return playerLoseCounter;
     }
 
-    public  void setPlayerLoseCounter(int playerLoseCounter) {
-        StatisticSaver.playerLoseCounter = playerLoseCounter;
+    public static void setPlayerLoseCounter(int playerLoseCounter) {
+        Stats.playerLoseCounter = playerLoseCounter;
     }
     
-    public void saveStats(){
+    public static void saveStats(){
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(saveFile))){
             bw.write(CPU_SUCCESSFUL_SHOTS.toString() + "\n");
             bw.write(CPU_MISSED_SHOTS.toString() + "\n");
@@ -113,17 +114,14 @@ public class StatisticSaver {
         }
     }
     
-    private void loadStats(){
+    public static void loadStats(){
         StringBuilder sb = new StringBuilder();
 
         try(BufferedReader br = new BufferedReader(new FileReader(saveFile))){
-            
             while(br.ready()){
                 sb.append(br.readLine() + "\n");
             }
-
-            System.out.println(sb);
-
+            
         } catch (Exception e){
             System.out.println("EXCEPTION IN LOADING");
             e.printStackTrace();
@@ -144,7 +142,7 @@ public class StatisticSaver {
         }
     }
     
-    private void stringToMap(String stringWithMap, Map<Integer, Integer> mapToPopulate){
+    private static void stringToMap(String stringWithMap, Map<Integer, Integer> mapToPopulate){
         String removeCurlyBraces = stringWithMap.substring(1, stringWithMap.length() - 1);
         
         String[] keyValuePairs = removeCurlyBraces.split(",");
@@ -156,5 +154,64 @@ public class StatisticSaver {
         }
     }
     
+    public static int getHumanAllShotsNum(){
+        humanAllSuccessfulShots = HUMAN_SUCCESSFUL_SHOTS.entrySet().stream()
+                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+                .mapToInt(value -> value)
+                .sum();
+        
+        humanAllMissedShots = HUMAN_MISSED_SHOTS.entrySet().stream()
+                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+                .mapToInt(value -> value)
+                .sum();
+        
+        return humanAllMissedShots + humanAllSuccessfulShots;
+    }
     
+    public static int getCpuAllShotsNum(){
+        cpuAllSuccessfulShots = CPU_SUCCESSFUL_SHOTS.entrySet().stream()
+                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+                .mapToInt(value -> value)
+                .sum();
+
+        cpuAllMissedShots = CPU_MISSED_SHOTS.entrySet().stream()
+                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+                .mapToInt(value -> value)
+                .sum();
+
+        return cpuAllSuccessfulShots + cpuAllMissedShots;
+        
+    }
+
+    public static int getHumanAllSuccessfulShots() {
+        return humanAllSuccessfulShots;
+    }
+
+    public static int getHumanAllMissedShots() {
+        return humanAllMissedShots;
+    }
+
+    public static int getCpuAllSuccessfulShots() {
+        return cpuAllSuccessfulShots;
+    }
+
+    public static int getCpuAllMissedShots() {
+        return cpuAllMissedShots;
+    }
+
+    public static Map<Integer, Integer> getCpuSuccessfulShots() {
+        return CPU_SUCCESSFUL_SHOTS;
+    }
+
+    public static Map<Integer, Integer> getCpuMissedShots() {
+        return CPU_MISSED_SHOTS;
+    }
+
+    public static Map<Integer, Integer> getHumanSuccessfulShots() {
+        return HUMAN_SUCCESSFUL_SHOTS;
+    }
+
+    public static Map<Integer, Integer> getHumanMissedShots() {
+        return HUMAN_MISSED_SHOTS;
+    }
 }

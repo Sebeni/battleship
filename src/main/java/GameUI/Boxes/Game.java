@@ -9,6 +9,7 @@ import GameUI.Handlers.ButtonHandlers;
 import GameUI.Handlers.FireButtonHandlers;
 import GameUI.Handlers.SeaButtonHandlers;
 import GameUI.SceneChanger;
+import Statistics.Stats;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -53,7 +54,7 @@ public class Game implements SceneChanger {
     private final List<Button> seaButtonsListBottom;
 
     //left pane
-    private final VBox leftPane = new VBox(350);
+    private final VBox leftPane = new VBox(250);
     private final List<Button> newGameButtons = new ArrayList<>();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
     private final List<Button> resetShipButtonListRight = new ArrayList<>();
@@ -114,8 +115,8 @@ public class Game implements SceneChanger {
         bottomRootForGrid.add(playerLocationBoardBottom, 1, 1, 10, 10);
         bottomRootForGrid.setAlignment(Pos.CENTER);
         
-        GridHelperMethods.gridMarkers(topRootForGrid);
-        GridHelperMethods.gridMarkers(bottomRootForGrid);
+        GridHelperMethods.gridMarkers(topRootForGrid, GridHelperMethods.getMinButtonSize(), GridHelperMethods.getMinButtonSize());
+        GridHelperMethods.gridMarkers(bottomRootForGrid, GridHelperMethods.getMinButtonSize(), GridHelperMethods.getMinButtonSize());
 
 
 
@@ -134,8 +135,7 @@ public class Game implements SceneChanger {
 //      left pane
         leftPane.setPadding(new Insets(10));
 
-
-
+        
 
 //        upper left
         VBox upperLeft = new VBox(10);
@@ -159,7 +159,11 @@ public class Game implements SceneChanger {
         });
         newGameButtons.add(helpButton);
         
-        
+        Button globalStats = new Button("Statistics");
+        globalStats.setOnAction(event -> {
+            new GlobalStatsBox();
+        });
+        newGameButtons.add(globalStats);
         
         Button exit = new Button("Exit");
         exit.setOnAction(event -> SceneChanger.closeProgram(window, cpuVisualBox.getWindow()));
@@ -169,7 +173,7 @@ public class Game implements SceneChanger {
             b.setId("newGameButtons");
         }
         
-        upperLeft.getChildren().addAll(newGameButton, resetButton, helpButton, exit);
+        upperLeft.getChildren().addAll(newGameButton, resetButton, helpButton, globalStats, exit);
         upperLeft.setAlignment(Pos.CENTER);
         
 //        bottom left

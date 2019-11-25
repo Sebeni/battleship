@@ -39,6 +39,9 @@ public class ResultBox {
         
         GridPane layout = new GridPane();
         layout.setPadding(new Insets(30, 20, 30, 20));
+        layout.setHgap(10);
+        layout.setVgap(10);
+        
         
         Label resultLabel = new Label();
         resultLabel.setPadding(new Insets(5));
@@ -46,13 +49,11 @@ public class ResultBox {
         if(humanWin){
             resultLabel.setText("CONGRATULATIONS! \nYOU WON!");
             resultLabel.setStyle("-fx-text-fill: green; " +
-                    "-fx-font-size:20;" +
-                    "-fx-font-family: 'Courier New'");
+                    "-fx-font-size:20;");
         } else {
             resultLabel.setText("SORRY! \nYOU LOST!");
             resultLabel.setStyle("-fx-text-fill: red; " +
-                    "-fx-font-size:20;" +
-                    "-fx-font-family: 'Courier New'");
+                    "-fx-font-size:20;");
         }
         
         
@@ -87,12 +88,10 @@ public class ResultBox {
         rightLabels.add(accuracyNum);
         
         for(int i = 0; i < leftLabels.size(); i++){
-            leftLabels.get(i).setStyle("-fx-font-family: 'Courier New'");
             layout.add(leftLabels.get(i), 0, i + 1);
         }
         
         for(int i = 0; i < rightLabels.size(); i++){
-            rightLabels.get(i).setStyle("-fx-font-family: 'Courier New'");
             layout.add(rightLabels.get(i), 1, i + 1);
         }
 
@@ -123,8 +122,7 @@ public class ResultBox {
         buttonsPane.setPadding(new Insets(10));
         
         buttonList.forEach(button -> {
-            button.setPrefSize(180, 30);
-            button.setStyle("-fx-font-family: 'Courier New'");
+            button.setId("newGameButtons");
             buttonsPane.getChildren().add(button);
             button.setAlignment(Pos.CENTER);
         });
@@ -135,7 +133,10 @@ public class ResultBox {
         
         layout.setAlignment(Pos.BASELINE_CENTER);
         
+        
         Scene scene = new Scene(layout);
+        
+        scene.getStylesheets().add("gameStyles.css");
         window.setScene(scene);
 
         window.showAndWait();

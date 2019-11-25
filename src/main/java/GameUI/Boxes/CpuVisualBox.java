@@ -32,7 +32,7 @@ public class CpuVisualBox {
 
 
         root.add(cpuShipPlacement, 1, 1, 10, 10);
-        GridHelperMethods.gridMarkers(root);
+        GridHelperMethods.gridMarkers(root, GridHelperMethods.getMinButtonSize(), GridHelperMethods.getMinButtonSize());
         
         BorderPane layout = new BorderPane(root);
         layout.setPadding(new Insets(10));

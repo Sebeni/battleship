@@ -28,7 +28,8 @@ public class About implements SceneChanger {
         window = primaryStage;
 
 
-        Label about = new Label("text source: Wikipedia\n" +
+        Label about = new Label("Naval battle is inspired by battleships." +
+                "\ntext source: Wikipedia\n" +
                 "Battleship (also Battleships or Sea Battle) is a strategy type guessing game for two players. " +
                 "It is played on ruled grids (paper or board) on which each player's fleet of ships " +
                 "(including battleships) are marked. The locations of the fleets are concealed from " +

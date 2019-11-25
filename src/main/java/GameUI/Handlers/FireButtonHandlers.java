@@ -4,16 +4,13 @@ import GameMechanic.*;
 import GameUI.Boxes.Game;
 import GameUI.GridHelperMethods;
 import GameUI.Boxes.ResultBox;
-import Statistics.StatisticSaver;
+import Statistics.Stats;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
-import java.io.File;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class FireButtonHandlers {
@@ -29,8 +26,6 @@ public class FireButtonHandlers {
     private Set<Integer> humanAllMissedShots = new HashSet<>();
     private Set<Integer> cpuAllMissedShots = new HashSet<>();
     
-    private StatisticSaver saver = new StatisticSaver();
-
     static {
         SHIP_PICS.put(ShipName.BATTLESHIP, new ImageView("battleship.png"));
         SHIP_PICS.put(ShipName.CARRIER, new ImageView("carrier.png"));
@@ -176,28 +171,27 @@ public class FireButtonHandlers {
     }
 
     private void saveStats(boolean playerWon) {
-        saver.addSuccessfulShotsToCpuMap(cpuAllSuccessfulShots);
-        saver.addMissedShotsToCpuMap(cpuAllMissedShots);
+        Stats.addSuccessfulShotsToCpuMap(cpuAllSuccessfulShots);
+        Stats.addMissedShotsToCpuMap(cpuAllMissedShots);
         
-        saver.addSuccessfulShotsToHumanMap(humanAllSuccessfulShots);
-        saver.addMissedShotsToHumanMap(humanAllMissedShots);
+        Stats.addSuccessfulShotsToHumanMap(humanAllSuccessfulShots);
+        Stats.addMissedShotsToHumanMap(humanAllMissedShots);
         
-        saver.setRoundCounter(saver.getRoundCounter() + 1);
+        Stats.setRoundCounter(Stats.getRoundCounter() + 1);
         
         if(playerWon){
-            saver.setPlayerWonCounter(saver.getPlayerWonCounter() + 1);
+            Stats.setPlayerWonCounter(Stats.getPlayerWonCounter() + 1);
         } else {
-            saver.setPlayerLoseCounter(saver.getPlayerLoseCounter() + 1);
+            Stats.setPlayerLoseCounter(Stats.getPlayerLoseCounter() + 1);
         }
         
-        saver.saveStats();
+        Stats.saveStats();
     }
 
     public Game getGame() {
         return game;
     }
-
-
+    
     private void addSunkShipPic(Ship sunkShip) {
         game.getSunkEnemyShips().getChildren().add(SHIP_PICS.get(sunkShip.getName()));
     }

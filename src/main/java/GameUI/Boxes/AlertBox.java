@@ -37,6 +37,8 @@ public class AlertBox {
         button.setOnAction(e -> window.close());
 
         Scene layout = new Scene(pane);
+        layout.getStylesheets().add("gameStyles.css");
+        
         window.setScene(layout);
 
         window.showAndWait();

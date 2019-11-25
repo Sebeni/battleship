@@ -13,7 +13,7 @@ public class Main extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Battleship");
+        primaryStage.setTitle("Naval battles");
         SceneChanger mainMenu = MainMenu.getInstance(primaryStage);
         primaryStage.setScene(mainMenu.getScene());
         primaryStage.show();

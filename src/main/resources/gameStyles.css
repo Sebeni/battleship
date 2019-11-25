@@ -130,4 +130,36 @@ fire area
     -fx-effect: dropshadow( gaussian , #000000, 8 , 0.8 , 2 , 2 );
 }
 
+#labelStats {
+    -fx-border-color: black;
+    -fx-border-width: 1;
+}
+
+#25 {
+    -fx-border-color: black;
+    -fx-background-color : white;
+    -fx-text-fill: black;
+}
+
+#50 {
+    -fx-border-color: black;
+    -fx-background-color : #b8b8b8;
+    -fx-text-fill: black;
+}
+
+#75 {
+    -fx-border-color: black;
+    -fx-background-color : #404040;
+    -fx-text-fill: white;
+}
+
+#100 {
+    -fx-border-color: black;
+    -fx-background-color : black;
+    -fx-text-fill: white;
+}
+
+
+
+
 
