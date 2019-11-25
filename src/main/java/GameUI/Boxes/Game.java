@@ -267,8 +267,10 @@ public class Game implements SceneChanger {
         submarineLine.getChildren().addAll(submarineButton, resetSubmarineButton);
         destroyerLine.getChildren().addAll(destroyerButton, resetDestroyerButton);
         
+        String shipsTouching = shipsCanTouch() ? "yes" : "no";
+        Label isCurrentTouch = new Label("Ships can touch: " + shipsTouching);
         
-        bottomLeft.getChildren().addAll(randomLine, carrierLine, battleShipLine, cruiserLine, submarineLine, destroyerLine);
+        bottomLeft.getChildren().addAll(isCurrentTouch, randomLine, carrierLine, battleShipLine, cruiserLine, submarineLine, destroyerLine);
         bottomLeft.setAlignment(Pos.CENTER);
         
         leftPane.getChildren().addAll(upperLeft, bottomLeft);

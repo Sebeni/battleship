@@ -38,7 +38,7 @@ public class MainMenu implements SceneChanger {
 
         layout.setPadding(new Insets(10, 50, 50, 50));
         
-        Label title = new Label ("Naval battles");
+        Label title = new Label ("SHIPS");
         title.setId("title");
 
         Button newGame = new Button("New Game");

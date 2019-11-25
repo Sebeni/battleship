@@ -21,18 +21,10 @@ public class GridHelperMethods {
     public static List<Button> create100ButtonList(GridPane toPopulate, String cssId, boolean disableGridButtons, EventHandler<ActionEvent> eventHandlerGridButtons) {
         List<Button> resultButtonList = new ArrayList<>();
 
-        int buttonCounter = 0;
-
         for (int column = 0; column < 10; column++) {
             for (int row = 0; row < 10; row++) {
                 Button button = new Button();
-
-                //TODO
-                //only for debug
-                button.setText("" + buttonCounter);
-                buttonCounter++;
-
-
+                
                 button.setId(cssId);
                 button.setDisable(disableGridButtons);
                 button.setMinSize(minButtonSize, minButtonSize);

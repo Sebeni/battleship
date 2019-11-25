@@ -40,6 +40,7 @@ public class Options implements SceneChanger {
         ChoiceBox<String> canTouchChoiceRight = new ChoiceBox<>();
         String yes = "yes";
         String no = "no";
+        canTouchChoiceRight.setMinWidth(100);
         
         canTouchChoiceRight.getItems().addAll(yes, no);
         canTouchChoiceRight.setValue(yes);
@@ -50,13 +51,13 @@ public class Options implements SceneChanger {
         Button startGameButton = new Button("Start");
         startGameButton.setPrefSize(130,20);
         startGameButton.setOnAction(event -> {
+            if (canTouchChoiceRight.getValue().equals(yes)) {
+                Game.setShipsCanTouch(true);
+            } else {
+                Game.setShipsCanTouch(false);
+            }
             Game game = new Game(window);
             SceneChanger.centerWindow(game);
-            if (canTouchChoiceRight.getValue().equals(yes)) {
-                game.setShipsCanTouch(true);
-            } else {
-                game.setShipsCanTouch(false);
-            }
         });
         
         Button returnButton = new Button("Return");

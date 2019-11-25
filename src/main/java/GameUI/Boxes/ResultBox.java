@@ -116,6 +116,11 @@ public class ResultBox {
             window.close();
             SceneChanger.centerWindow(Options.getInstance(window));
         });
+        buttonList.add(returnToOptions);
+        
+        Button stats = new Button("Statistics");
+        stats.setOnAction(event -> new GlobalStatsBox());
+        buttonList.add(stats);
         
         Button exit = new Button("Exit");
         exit.setOnAction(event -> SceneChanger.closeProgram(currentGame.getWindow(), currentGame.getCpuVisualBox().getWindow(), window));
