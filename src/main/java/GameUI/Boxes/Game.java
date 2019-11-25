@@ -9,7 +9,7 @@ import GameUI.Handlers.ButtonHandlers;
 import GameUI.Handlers.FireButtonHandlers;
 import GameUI.Handlers.SeaButtonHandlers;
 import GameUI.SceneChanger;
-import Statistics.Stats;
+import MenuUI.Options;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -26,17 +26,18 @@ public class Game implements SceneChanger {
     //game elements
     private int roundCounter = 1;
     private boolean firePhase = false;
+    private static boolean shipsCanTouch;
 
     private Ship currentShip;
-    private Label middleLabel;
+    private final Label middleLabel;
 
-    private final Player human = new Player(true);
-    private final Player cpu = new Player(false);
+    private final Player human = new Player();
+    private final Player cpu = new Player();
     private final CpuVisualBox cpuVisualBox;
     
     //javaFX elements
-    private Stage window;
-    private Scene scene;
+    private final Stage window;
+    private final Scene scene;
     
     // parameters of elements
     private final double windowWidth = 1400;
@@ -54,7 +55,7 @@ public class Game implements SceneChanger {
     private final List<Button> seaButtonsListBottom;
 
     //left pane
-    private final VBox leftPane = new VBox(250);
+    private final VBox leftPane = new VBox(200);
     private final List<Button> newGameButtons = new ArrayList<>();
     private final List<Button> placementShipButtonListLeft = new ArrayList<>();
     private final List<Button> resetShipButtonListRight = new ArrayList<>();
@@ -70,7 +71,7 @@ public class Game implements SceneChanger {
 
     public Game(Stage primaryStage) {
         window = primaryStage;
-        cpuVisualBox = new CpuVisualBox(this);
+        cpuVisualBox = new CpuVisualBox();
 
         window.setOnCloseRequest(e -> {
             e.consume();
@@ -82,8 +83,8 @@ public class Game implements SceneChanger {
         ButtonHandlers buttonHandlers = new ButtonHandlers(this);
         
 
-        fireButtonListTop = GridHelperMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, event1 -> fireHandler.fireButtonHandler(event1));
-        seaButtonsListBottom = GridHelperMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, event -> seaHandler.placementButtonHandler(event));
+        fireButtonListTop = GridHelperMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, fireHandler::fireButtonHandler);
+        seaButtonsListBottom = GridHelperMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, seaHandler::placementButtonHandler);
 
 //      root pane for all other panes
         BorderPane layout = new BorderPane();
@@ -97,8 +98,8 @@ public class Game implements SceneChanger {
 
         playerLocationBoardBottom.getChildren().forEach(node -> {
             Pane pane = (Pane) node;
-            pane.setOnMouseEntered(event -> seaHandler.mouseShipNameEH(event));
-            pane.setOnMouseExited(event -> seaHandler.mouseExitShipNameEH(event));
+            pane.setOnMouseEntered(seaHandler::mouseShipNameEH);
+            pane.setOnMouseExited(seaHandler::mouseExitShipNameEH);
 
         });
         
@@ -148,21 +149,23 @@ public class Game implements SceneChanger {
         Button resetButton = new Button("Reset game");
         resetButton.setOnAction(event -> {
             if(ConfirmBox.display("Warning", "Your current game will be lost. Continue?")){
-                buttonHandlers.resetGameButtonEH(event);
+                buttonHandlers.resetGameButtonEH();
             }
         });
         newGameButtons.add(resetButton);
         
-        Button helpButton = new Button("Help");
-        helpButton.setOnAction(event -> {
-            InstructionBox.display(firePhase);
+        Button returnButton = new Button("Return to options");
+        returnButton.setOnAction(event -> {
+            SceneChanger.centerWindow(Options.getInstance(window));
         });
+        newGameButtons.add(returnButton);
+        
+        Button helpButton = new Button("Help");
+        helpButton.setOnAction(event -> InstructionBox.display(firePhase));
         newGameButtons.add(helpButton);
         
         Button globalStats = new Button("Statistics");
-        globalStats.setOnAction(event -> {
-            new GlobalStatsBox();
-        });
+        globalStats.setOnAction(event -> new GlobalStatsBox());
         newGameButtons.add(globalStats);
         
         Button exit = new Button("Exit");
@@ -173,7 +176,7 @@ public class Game implements SceneChanger {
             b.setId("newGameButtons");
         }
         
-        upperLeft.getChildren().addAll(newGameButton, resetButton, helpButton, globalStats, exit);
+        upperLeft.getChildren().addAll(newGameButton, returnButton, resetButton, helpButton, globalStats, exit);
         upperLeft.setAlignment(Pos.CENTER);
         
 //        bottom left
@@ -200,23 +203,23 @@ public class Game implements SceneChanger {
         randomLine.setAlignment(Pos.CENTER);
         
         Button carrierButton = new Button("Carrier - 5 decker");
-        carrierButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.CARRIER));
+        carrierButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(ShipName.CARRIER));
         placementShipButtonListLeft.add(carrierButton);
         
         Button battleshipButton = new Button("Battleship - 4 decker");
-        battleshipButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.BATTLESHIP));
+        battleshipButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(ShipName.BATTLESHIP));
         placementShipButtonListLeft.add(battleshipButton);
 
         Button cruiserButton = new Button("Cruiser - 3 decker");
-        cruiserButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.CRUISER));
+        cruiserButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(ShipName.CRUISER));
         placementShipButtonListLeft.add(cruiserButton);
 
         Button submarineButton = new Button("Submarine - 3 decker");
-        submarineButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.SUBMARINE));
+        submarineButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(ShipName.SUBMARINE));
         placementShipButtonListLeft.add(submarineButton);
 
         Button destroyerButton = new Button("Destroyer - 2 decker");
-        destroyerButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(event, ShipName.DESTROYER));
+        destroyerButton.setOnAction(event -> buttonHandlers.shipPlacementButtonEH(ShipName.DESTROYER));
         placementShipButtonListLeft.add(destroyerButton);
 
         Button randomPlacement = new Button("Random placement");
@@ -229,23 +232,23 @@ public class Game implements SceneChanger {
 
 
         Button resetCarrierButton = new Button("Reset");
-        resetCarrierButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.CARRIER));
+        resetCarrierButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(ShipName.CARRIER));
         resetShipButtonListRight.add(resetCarrierButton);
 
         Button resetBattleshipButton = new Button("Reset");
-        resetBattleshipButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.BATTLESHIP));
+        resetBattleshipButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(ShipName.BATTLESHIP));
         resetShipButtonListRight.add(resetBattleshipButton);
 
         Button resetCruiserButton = new Button("Reset");
-        resetCruiserButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.CRUISER));
+        resetCruiserButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(ShipName.CRUISER));
         resetShipButtonListRight.add(resetCruiserButton);
 
         Button resetSubmarineButton = new Button("Reset");
-        resetSubmarineButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.SUBMARINE));
+        resetSubmarineButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(ShipName.SUBMARINE));
         resetShipButtonListRight.add(resetSubmarineButton);
 
         Button resetDestroyerButton = new Button("Reset");
-        resetDestroyerButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(event, ShipName.DESTROYER));
+        resetDestroyerButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(ShipName.DESTROYER));
         resetShipButtonListRight.add(resetDestroyerButton);
 
         Button resetAll = new Button("Reset all");
@@ -298,8 +301,6 @@ public class Game implements SceneChanger {
         
 //        setting scene
         scene = new Scene(layout, windowWidth, windowHeight);
-        window.setMinHeight(windowHeight);
-        window.setMinWidth(windowWidth);
         scene.getStylesheets().add("gameStyles.css");
     }
     
@@ -365,17 +366,9 @@ public class Game implements SceneChanger {
     public Player getHuman() {
         return human;
     }
-
-    public boolean isFirePhase() {
-        return firePhase;
-    }
-
-    public int getRoundCounter() {
+    
+    int getRoundCounter() {
         return roundCounter;
-    }
-
-    public void setRoundCounter(int roundCounter) {
-        this.roundCounter = roundCounter;
     }
     
     public void setBattleLog(String messageToSet){
@@ -414,5 +407,13 @@ public class Game implements SceneChanger {
     @Override
     public double getWindowHeight() {
         return windowHeight;
+    }
+
+    public static boolean shipsCanTouch() {
+        return shipsCanTouch;
+    }
+
+    public static void setShipsCanTouch(boolean canShipsTouchEachOther) {
+        shipsCanTouch = canShipsTouchEachOther;
     }
 }

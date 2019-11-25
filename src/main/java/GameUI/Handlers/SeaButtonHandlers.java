@@ -1,5 +1,6 @@
 package GameUI.Handlers;
 
+import GameMechanic.RandomPlacement;
 import GameMechanic.Ship;
 import GameUI.Boxes.AlertBox;
 import GameUI.Boxes.Game;
@@ -11,11 +12,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SeaButtonHandlers {
    
-    private Game game;
+    private final Game game;
 
     public SeaButtonHandlers(Game game) {
         this.game = game;
@@ -39,18 +43,28 @@ public class SeaButtonHandlers {
                         button.setDisable(true);
                         game.middleLabelUpdateText();
                     } else {
-                        AlertBox.display("Warning", "Ship parts must be placed in adjacent cells in one line!");
+                        String message = "Ship parts must be placed in adjacent cells in one line";
+                        if(!Game.shipsCanTouch()){
+                            message += " and can't touch each other";
+                        }
+                        
+                        AlertBox.display("Warning", message + "!");
                     }
 
                     if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
                         ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
+                        
                         game.setCurrentShip(null);
                         game.middleLabelUpdateText();
                     }
                 } else {
-                    currentShip.setCoordinate(xParam, yParam);
-                    button.setDisable(true);
-                    game.middleLabelUpdateText();
+                    if(!Game.shipsCanTouch() && !isTouching(xParam * 10 + yParam)){
+                        currentShip.setCoordinate(xParam, yParam);
+                        button.setDisable(true);
+                        game.middleLabelUpdateText();
+                    } else {
+                        AlertBox.display("Warning", "Ships can't touch each other!");
+                    }
                 }
             }
         }
@@ -65,6 +79,10 @@ public class SeaButtonHandlers {
     }
 
     private boolean secondPlacementCheck(int xToCheck, int yToCheck) {
+        if(!Game.shipsCanTouch() && isTouching(xToCheck * 10 + yToCheck)){
+            return false;
+        }
+        
         Integer firstPlacementCoordinate = game.getCurrentShip().getCoordinates().get(0);
 
         //possible choices: +- 1 
@@ -83,11 +101,16 @@ public class SeaButtonHandlers {
             game.getCurrentShip().setHorizontalPlacement(true);
         }
 
+        
         return possibleXChoice || possibleYChoice;
     }
 
     private boolean thirdAndMorePlacementCheck(int xToCheck, int yToCheck) {
         //third and subsequent placement
+        if(!Game.shipsCanTouch() && isTouching(xToCheck * 10 + yToCheck)){
+            return false;
+        }
+        
         List<Integer> currentCoordinates = game.getCurrentShip().getCoordinates();
         Collections.sort(currentCoordinates);
 
@@ -148,5 +171,17 @@ public class SeaButtonHandlers {
         if (buttonEntered.isDisable()) {
             game.middleLabelUpdateText();
         }
+    }
+    
+    private boolean isTouching(int coordinate){
+        List<Integer> allShipsCoordinates = game.getHuman().getShipsList().stream()
+                .filter(ship -> !ship.equals(game.getCurrentShip()))
+                .flatMap(ship -> ship.getCoordinates().stream())
+                .collect(Collectors.toList());
+        
+        Set<Integer> allTouchingCells = new HashSet<>();
+        allShipsCoordinates.forEach(integer -> allTouchingCells.addAll(RandomPlacement.getTouchingParams(integer)));
+        
+        return allTouchingCells.contains(coordinate);
     }
 }

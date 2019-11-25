@@ -10,21 +10,19 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class InstructionBox {
+class InstructionBox {
     
-    public static void display(boolean firePhase){
+    static void display(boolean firePhase){
         String instructionPhaseOne = "PHASE ONE - SHIP PLACEMENT" +
-                "\nAbout:" +
                 "\n\nBefore play begins, you must arranges all your ships on your bottom grid." +
                 " Each ship occupies a number of consecutive squares on the grid, arranged either horizontally or vertically." +
                 " The number of squares for each ship is determined by the type of the ship. " +
-                " The ships cannot overlap (i.e., only one ship can occupy any given square in the grid), but they can touch each other." +
+                " The ships cannot overlap (i.e., only one ship can occupy any given square in the grid)." +
                 " To start placing your ships click on one of the green buttons and then start placing ship parts on " +
                 "the blue grid by clicking on chosen cell." +
                 " You can also click on Random Placement button to randomly place all your ships.";
 
         String instructionPhaseTwo = "PHASE TWO - FIRING" +
-                "\nAbout:" +
                 "\n\nTo fire click on the top grid." +
                 " If you hit enemy's ship selected cell will change color to yellow." +
                 " If you sunk enemy's ship all cells, where this ship was placed will change color to red." +

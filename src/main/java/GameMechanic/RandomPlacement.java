@@ -1,10 +1,12 @@
 package GameMechanic;
 
+import GameUI.Boxes.Game;
 import javafx.scene.control.Button;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class RandomPlacement {
     private static List<Ship> result;
@@ -45,30 +47,77 @@ public class RandomPlacement {
         }
     }
 
-    private static void placeShipPart(Integer x, Integer y, Ship ship) {
-        if (!coordinateIsOccupied(x, y)) {
-            ship.setCoordinate(x, y);
+    private static void placeShipPart(Integer x, Integer y, Ship currentShip) {
+        if (!coordinateIsOccupied(x, y, currentShip)) {
+            currentShip.setCoordinate(x, y);
 
-            if (ship.getShipPartsInGameCount() < ship.getShipMaxSize()) {
-                if (ship.isHorizontalPlacement()) {
-                    placeShipPart(x + 1, y, ship);
+            if (currentShip.getShipPartsInGameCount() < currentShip.getShipMaxSize()) {
+                if (currentShip.isHorizontalPlacement()) {
+                    placeShipPart(x + 1, y, currentShip);
                 } else {
-                    placeShipPart(x, y + 1, ship);
+                    placeShipPart(x, y + 1, currentShip);
                 }
             }
         } else {
-            ship.getCoordinates().clear();
-            ship.setShipPartsInGameCount(0);
+            currentShip.getCoordinates().clear();
+            currentShip.setShipPartsInGameCount(0);
 
-            horizontalCheck(ship);
+            horizontalCheck(currentShip);
         }
     }
 
-    private static boolean coordinateIsOccupied(Integer x, Integer y) {
+    private static boolean coordinateIsOccupied(Integer x, Integer y, Ship currentShip) {
         boolean coordinateOccupied = false;
         if (!result.isEmpty()) {
             coordinateOccupied = result.stream().flatMap(ship -> ship.getCoordinates().stream()).anyMatch(s -> s.equals(x*10+y));
+            if(!Game.shipsCanTouch() && !coordinateOccupied){
+                coordinateOccupied = coordinateIsTouching(x, y, currentShip);
+            }
         }
+        
         return coordinateOccupied;
+    }
+    
+    private static boolean coordinateIsTouching(Integer x, Integer y, Ship currentShip){
+        List<Integer> allTouchingCells = getTouchingParams(x * 10 + y);
+
+        List<Integer> coordinatesAlreadyPlaced = result.stream()
+                .filter(ship -> !ship.equals(currentShip))
+                .flatMap(ship -> ship.getCoordinates().stream())
+                .collect(Collectors.toList());
+        
+        return allTouchingCells.stream().anyMatch(coordinatesAlreadyPlaced::contains);
+    }
+
+    public static List<Integer> getTouchingParams(int coordinate) {
+
+        int left = coordinate - 10;
+        int bottomLeft = left + 1;
+        int upperLeft = left - 1;
+
+        int right = coordinate + 10;
+        int bottomRight = right + 1;
+        int upperRight = right - 1;
+
+        int up = coordinate - 1;
+        int down = coordinate + 1;
+
+        List<Integer> allTouchingCells = new ArrayList<>();
+        allTouchingCells.add(left);
+        allTouchingCells.add(right);
+        
+        if(coordinate % 10 != 0){
+            allTouchingCells.add(upperLeft);
+            allTouchingCells.add(upperRight);
+            allTouchingCells.add(up);
+        }
+        
+        if(coordinate % 10 != 9){
+            allTouchingCells.add(bottomLeft);
+            allTouchingCells.add(bottomRight);
+            allTouchingCells.add(down);
+        }
+        
+        return allTouchingCells;
     }
 }

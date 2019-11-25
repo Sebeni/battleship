@@ -3,6 +3,7 @@ package GameUI.Boxes;
 import GameMechanic.Ship;
 import GameUI.Handlers.ButtonHandlers;
 import GameUI.SceneChanger;
+import MenuUI.Options;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,7 +24,7 @@ public class ResultBox {
     
     public static void display(boolean humanWin, Game currentGame){
         int remainingShipParts = currentGame.getCpu().getShipsList().stream()
-                .map(ship -> ship.getShipPartsInGameCount())
+                .map(Ship::getShipPartsInGameCount)
                 .mapToInt(value -> value)
                 .sum();
         
@@ -102,20 +103,22 @@ public class ResultBox {
         Button newGameButton = new Button("New Game");
         newGameButton.setOnAction(event -> {
             window.close();
-            bh.resetGameButtonEH(event);
+            bh.resetGameButtonEH();
         });
         buttonList.add(newGameButton);
         
         Button showCpuVisual = new Button("Show CPU's board");
-        showCpuVisual.setOnAction(event -> {
-            currentGame.getCpuVisualBox().getWindow().show();
-        });
+        showCpuVisual.setOnAction(event -> currentGame.getCpuVisualBox().getWindow().show());
         buttonList.add(showCpuVisual);
         
-        Button exit = new Button("Exit");
-        exit.setOnAction(event -> {
-            SceneChanger.closeProgram(currentGame.getWindow(), currentGame.getCpuVisualBox().getWindow(), window);
+        Button returnToOptions = new Button("Return to options");
+        returnToOptions.setOnAction(event -> {
+            window.close();
+            SceneChanger.centerWindow(Options.getInstance(window));
         });
+        
+        Button exit = new Button("Exit");
+        exit.setOnAction(event -> SceneChanger.closeProgram(currentGame.getWindow(), currentGame.getCpuVisualBox().getWindow(), window));
         buttonList.add(exit);
 
         VBox buttonsPane = new VBox(5);

@@ -21,7 +21,7 @@ public class ButtonHandlers {
         this.game = game;
     }
 
-    public void shipPlacementButtonEH(ActionEvent event, ShipName shipToHandleName) {
+    public void shipPlacementButtonEH(ShipName shipToHandleName) {
         Ship shipToHandle;
 
         if (!shipPlacementCheck(shipToHandleName)) {
@@ -35,7 +35,7 @@ public class ButtonHandlers {
         game.middleLabelUpdateText();
     }
 
-    public void resetPlacementButtonEH(ActionEvent event, ShipName shipToHandleName) {
+    public void resetPlacementButtonEH(ShipName shipToHandleName) {
 
         if (shipPlacementCheck(shipToHandleName)) {
             // set current ship to null
@@ -60,7 +60,7 @@ public class ButtonHandlers {
     }
 
     private void resetPlacementBoard(Ship shipToReset) {
-        shipToReset.getCoordinates().stream()
+        shipToReset.getCoordinates()
                 .forEach(s -> {
                     Button toReset = game.getSeaButtonsListBottom().get(s);
                     toReset.setDisable(false);
@@ -74,7 +74,7 @@ public class ButtonHandlers {
                 .anyMatch(shipName -> shipName.equals(shipToHandleName));
     }
 
-    public static void changeShipPlacementButtonState(Game game, Ship shipToReset, boolean setDisable) {
+    static void changeShipPlacementButtonState(Game game, Ship shipToReset, boolean setDisable) {
         switch (shipToReset.getName()) {
             case CARRIER:
                 game.getPlacementShipButtonListLeft().get(0).setDisable(setDisable);
@@ -96,15 +96,16 @@ public class ButtonHandlers {
 
 
     public void resetAllButtonEH(ActionEvent event) {
+        event.consume();
 
         if (!game.getHuman().getShipsList().isEmpty()) {
             game.setCurrentShip(null);
             game.middleLabelUpdateText();
 
-            game.getHuman().getShipsList().forEach(s -> resetPlacementBoard(s));
+            game.getHuman().getShipsList().forEach(this::resetPlacementBoard);
 
             game.getHuman().getShipsList().clear();
-            game.getPlacementShipButtonListLeft().stream().forEach(button -> button.setDisable(false));
+            game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(false));
         }
     }
 
@@ -135,11 +136,11 @@ public class ButtonHandlers {
                     .map(ship -> ship.getName().toString())
                     .collect(Collectors.joining(" "));
 
-            List<ShipName> namesOfShipsPlaced = game.getHuman().getShipsList().stream().map(ship -> ship.getName()).collect(Collectors.toList());
+            List<ShipName> namesOfShipsPlaced = game.getHuman().getShipsList().stream().map(Ship::getName).collect(Collectors.toList());
 
             String shipsNotPlacedYet = Ship.getAllShips().keySet().stream()
                     .filter(shipName -> !namesOfShipsPlaced.contains(shipName))
-                    .map(shipName -> shipName.toString())
+                    .map(Enum::toString)
                     .collect(Collectors.joining(" "));
 
             String message = "Before starting a game you must place all your ships!";
@@ -158,11 +159,13 @@ public class ButtonHandlers {
     }
 
     public void randomPlacementButtonEH(ActionEvent event) {
+        event.consume();
+        
         if (!game.getHuman().getShipsList().isEmpty()) {
             if (ConfirmBox.display("Warning!", "This action will reset all ships that might have been already placed. Continue?")) {
                 game.setCurrentShip(null);
                 game.middleLabelUpdateText();
-                game.getHuman().getShipsList().stream().forEach(shipToReset -> resetPlacementBoard(shipToReset));
+                game.getHuman().getShipsList().forEach(this::resetPlacementBoard);
                 game.getPlacementShipButtonListLeft().forEach(button -> button.setDisable(true));
                 game.getHuman().getShipsList().clear();
             } else {
@@ -173,7 +176,7 @@ public class ButtonHandlers {
         game.setHumanShips();
     }
 
-    public void resetGameButtonEH(ActionEvent event) {
+    public void resetGameButtonEH() {
         game.getCpuVisualBox().getWindow().close();
         Stage window = game.getWindow();
         Game newGame = new Game(window);

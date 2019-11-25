@@ -11,13 +11,13 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class About implements SceneChanger {
-    private Scene scene;
-    private Stage window;
+    private final Scene scene;
+    private final Stage window;
     private static About about;
-    private double windowWidth = 700;
-    private double windowHeight = 800;
+    private final double windowWidth = 700;
+    private final double windowHeight = 800;
 
-    public static About getInstance(Stage primaryStage){
+    static About getInstance(Stage primaryStage){
         if(about == null){
             about = new About(primaryStage);
         }

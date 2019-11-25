@@ -11,14 +11,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainMenu implements SceneChanger {
-    private Stage window;
-    private Scene scene;
-    private double windowWidth = 400;
-    private double windowHeight = 600;
+    private final Stage window;
+    private final Scene scene;
+    private final double windowWidth = 400;
+    private final double windowHeight = 600;
     
     private static MainMenu mainMenu;
     
-    public static MainMenu getInstance(Stage primaryStage){
+    static MainMenu getInstance(Stage primaryStage){
         if(mainMenu == null){
             mainMenu = new MainMenu(primaryStage);
         }
@@ -39,7 +39,7 @@ public class MainMenu implements SceneChanger {
         layout.setPadding(new Insets(10, 50, 50, 50));
         
         Label title = new Label ("Naval battles");
-        title.setId("aboutLabel");
+        title.setId("title");
 
         Button newGame = new Button("New Game");
         newGame.setId("newGameButtons");

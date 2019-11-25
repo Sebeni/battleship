@@ -12,7 +12,7 @@ public class Ship {
         allShips.put(ShipName.SUBMARINE, 3);
         allShips.put(ShipName.DESTROYER, 2);
     }
-    private static int allShipsParts = allShips.values().stream().mapToInt(i -> i).sum(); 
+    private static final int allShipsParts = allShips.values().stream().mapToInt(i -> i).sum(); 
     
     private final int shipMaxSize;
     private int shipPartsInGameCount = 0;
@@ -67,7 +67,7 @@ public class Ship {
                 ", shipPartsInGameCount=" + shipPartsInGameCount +
                 ", horizontalPlacement=" + horizontalPlacement +
                 ", name=" + name +
-                ", coordinates= " + coordinates.stream().map(integer -> integer.toString()).collect(Collectors.joining(", ")) +
+                ", coordinates= " + coordinates.stream().map(Object::toString).collect(Collectors.joining(", ")) +
                 '}';
     }
 

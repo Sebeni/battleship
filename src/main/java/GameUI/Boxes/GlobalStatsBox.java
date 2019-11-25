@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GlobalStatsBox {
-    private static List<Label> statisticsLabel = new ArrayList<>();
+    private static final List<Label> statisticsLabel = new ArrayList<>();
     static {
         for(int i = 0; i <= 100; i++){
             Label label = new Label("0");
@@ -60,7 +61,7 @@ public class GlobalStatsBox {
         Label allRoundsNumRight = new Label(Stats.getRoundCounter() + "");
 
 
-        Label roundsWinLeft = new Label("Rounds win: ");
+        Label roundsWinLeft = new Label("Rounds won: ");
         Label roundsWinRight = new Label(Stats.getPlayerWonCounter() + "");
 
 
@@ -97,7 +98,7 @@ public class GlobalStatsBox {
         double cpuAccuracy = (double) Stats.getCpuAllSuccessfulShots() / Stats.getCpuAllShotsNum() * 100;
         Label accuracyCpuRight = new Label(String.format("%.2f %%", cpuAccuracy));
 
-        Label gridChoiceBoxLeft = new Label("Show cells: ");
+        Label gridChoiceBoxLeft = new Label("Show cells:");
         ChoiceBox<String> gridChoiceBoxRight = new ChoiceBox<>();
         
         final String hitByYou = "successfully hit by you";
@@ -143,6 +144,11 @@ public class GlobalStatsBox {
         
         GridPane statistics = makeStatisticsGrid();
         gridPaneRoot.add(statistics, 0, left.length + 1, 2, 1);
+        
+        
+        Label info = new Label("Number tells how many times given cell was shot at.");
+        gridPaneRoot.add(info, 0, left.length + 2, 2, 1);
+        
         gridPaneRoot.setAlignment(Pos.CENTER);
         
         gridPaneRoot.setHgap(10);
@@ -183,7 +189,7 @@ public class GlobalStatsBox {
     }
     
     private void changeStatsGrid(Map<Integer, Integer> mapToLabel){
-        mapToLabel.entrySet().forEach(mapEntry -> statisticsLabel.get(mapEntry.getKey()).setText(mapEntry.getValue() + ""));
+        mapToLabel.forEach((key, value) -> statisticsLabel.get(key).setText(value + ""));
         changeColors();
     }
     
@@ -208,8 +214,8 @@ public class GlobalStatsBox {
     
     private static int currentMaxValue(){
         return statisticsLabel.stream()
-                .map(label -> label.getText())
-                .mapToInt(value -> Integer.parseInt(value))
+                .map(Labeled::getText)
+                .mapToInt(Integer::parseInt)
                 .max()
                 .orElse(1);
     }

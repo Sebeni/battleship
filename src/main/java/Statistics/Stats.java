@@ -23,7 +23,7 @@ public class Stats {
     private static int cpuAllSuccessfulShots = 0;
     private static int cpuAllMissedShots = 0;
     
-    private static File saveFile = new File("stats.txt");
+    private static final File saveFile = new File("stats.txt");
     
 
     static {
@@ -119,7 +119,7 @@ public class Stats {
 
         try(BufferedReader br = new BufferedReader(new FileReader(saveFile))){
             while(br.ready()){
-                sb.append(br.readLine() + "\n");
+                sb.append(br.readLine()).append("\n");
             }
             
         } catch (Exception e){
@@ -155,13 +155,11 @@ public class Stats {
     }
     
     public static int getHumanAllShotsNum(){
-        humanAllSuccessfulShots = HUMAN_SUCCESSFUL_SHOTS.entrySet().stream()
-                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+        humanAllSuccessfulShots = HUMAN_SUCCESSFUL_SHOTS.values().stream()
                 .mapToInt(value -> value)
                 .sum();
         
-        humanAllMissedShots = HUMAN_MISSED_SHOTS.entrySet().stream()
-                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+        humanAllMissedShots = HUMAN_MISSED_SHOTS.values().stream()
                 .mapToInt(value -> value)
                 .sum();
         
@@ -169,13 +167,11 @@ public class Stats {
     }
     
     public static int getCpuAllShotsNum(){
-        cpuAllSuccessfulShots = CPU_SUCCESSFUL_SHOTS.entrySet().stream()
-                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+        cpuAllSuccessfulShots = CPU_SUCCESSFUL_SHOTS.values().stream()
                 .mapToInt(value -> value)
                 .sum();
 
-        cpuAllMissedShots = CPU_MISSED_SHOTS.entrySet().stream()
-                .map(integerIntegerEntry -> integerIntegerEntry.getValue())
+        cpuAllMissedShots = CPU_MISSED_SHOTS.values().stream()
                 .mapToInt(value -> value)
                 .sum();
 

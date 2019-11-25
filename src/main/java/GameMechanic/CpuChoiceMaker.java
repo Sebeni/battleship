@@ -7,19 +7,19 @@ import java.util.*;
 
 public class CpuChoiceMaker {
 
-    private Game game;
+    private final Game game;
    
     private HitFireDirection currentFireDirection = HitFireDirection.NONE;
 
-    private Map<Integer, HitState> cpuAllShots = new LinkedHashMap<>();
+    private final Map<Integer, HitState> cpuAllShots = new LinkedHashMap<>();
 
-    private List<Integer> whiteFields = new ArrayList<>();
-    private List<Integer> blackFields = new ArrayList<>();
+    private final List<Integer> whiteFields = new ArrayList<>();
+    private final List<Integer> blackFields = new ArrayList<>();
 
-    private List<Integer> currentChoiceList;
+    private final List<Integer> currentChoiceList;
 
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
 
     public CpuChoiceMaker(Game game) {
@@ -289,7 +289,7 @@ public class CpuChoiceMaker {
     private enum HitFireDirection {
         NONE,
         HORIZONTAL,
-        VERTICAL;
+        VERTICAL
     }
 
     private List<Integer> getAnotherList() {
@@ -299,7 +299,7 @@ public class CpuChoiceMaker {
     private int getShortestLivingShipNum() {
         return game.getHuman().getShipsList().stream()
                 .filter(ship -> ship.getShipPartsInGameCount() == Ship.getAllShips().get(ship.getName()))
-                .map(ship -> ship.getShipPartsInGameCount())
+                .map(Ship::getShipPartsInGameCount)
                 .mapToInt(value -> value)
                 .min()
                 .orElse(2);
@@ -368,4 +368,14 @@ public class CpuChoiceMaker {
 
         return currentChoicesLeftOrRight || otherChoicesLeftOrRight;
     }
+    
+    
+    public void deleteTouchingCells(Ship sunkShip){
+        Set<Integer> allTouchingCells = new HashSet<>();
+        sunkShip.getCoordinates().forEach(integer -> allTouchingCells.addAll(RandomPlacement.getTouchingParams(integer)));
+        
+        currentChoiceList.removeAll(allTouchingCells);
+        getAnotherList().removeAll(allTouchingCells);
+    }
+    
 }

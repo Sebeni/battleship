@@ -19,12 +19,12 @@ public class FireButtonHandlers {
     private final CpuChoiceMaker cpuChoiceMaker;
     private final String playerFires = "You fired at: ";
     private final String cpuFires = "Cpu fired at: ";
-    private final static Map<ShipName, ImageView> SHIP_PICS = new HashMap<ShipName, ImageView>();
+    private final static Map<ShipName, ImageView> SHIP_PICS = new HashMap<>();
     
-    private Set<Integer> humanAllSuccessfulShots = new HashSet<>();
-    private Set<Integer> cpuAllSuccessfulShots = new HashSet<>();
-    private Set<Integer> humanAllMissedShots = new HashSet<>();
-    private Set<Integer> cpuAllMissedShots = new HashSet<>();
+    private final Set<Integer> humanAllSuccessfulShots = new HashSet<>();
+    private final Set<Integer> cpuAllSuccessfulShots = new HashSet<>();
+    private final Set<Integer> humanAllMissedShots = new HashSet<>();
+    private final Set<Integer> cpuAllMissedShots = new HashSet<>();
     
     static {
         SHIP_PICS.put(ShipName.BATTLESHIP, new ImageView("battleship.png"));
@@ -33,8 +33,7 @@ public class FireButtonHandlers {
         SHIP_PICS.put(ShipName.DESTROYER, new ImageView("destroyer.png"));
         SHIP_PICS.put(ShipName.SUBMARINE, new ImageView("submarine.png"));
 
-        SHIP_PICS.entrySet().stream().forEach(shipNameImageViewEntry -> {
-            ImageView iv = shipNameImageViewEntry.getValue();
+        SHIP_PICS.forEach((key, iv) -> {
             iv.setFitWidth(240);
             iv.setFitHeight(60);
         });
@@ -95,6 +94,10 @@ public class FireButtonHandlers {
             cpuChoiceMaker.getCpuAllShots().entrySet().stream()
                     .filter(integerHitStateEntry -> integerHitStateEntry.getValue().equals(HitState.DEPLETED))
                     .forEach(integerHitStateEntry -> integerHitStateEntry.setValue(HitState.HIT));
+            
+            if(!Game.shipsCanTouch()){
+                cpuChoiceMaker.deleteTouchingCells(shipHit);
+            }
         }
     }
 
@@ -149,6 +152,7 @@ public class FireButtonHandlers {
     
     public void mouseExitFireFieldName(MouseEvent event){
         game.middleLabelUpdateText();
+        event.consume();
     }
 
     private boolean gameIsFinished() {
@@ -188,10 +192,6 @@ public class FireButtonHandlers {
         Stats.saveStats();
     }
 
-    public Game getGame() {
-        return game;
-    }
-    
     private void addSunkShipPic(Ship sunkShip) {
         game.getSunkEnemyShips().getChildren().add(SHIP_PICS.get(sunkShip.getName()));
     }

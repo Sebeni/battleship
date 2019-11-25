@@ -18,7 +18,7 @@ public class CpuVisualBox {
     private final int height = 500;
     private final List<Button> buttonList;
 
-    public CpuVisualBox(Game game) {
+    CpuVisualBox() {
         GridPane root = new GridPane();
 
         GridPane cpuShipPlacement = new GridPane();
