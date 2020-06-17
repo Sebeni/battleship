@@ -1,10 +1,10 @@
-package GameUI.Handlers;
+package pl.seb.czech.GameUI.Handlers;
 
-import GameMechanic.Ship;
-import GameMechanic.ShipName;
-import GameUI.Boxes.AlertBox;
-import GameUI.Boxes.ConfirmBox;
-import GameUI.Boxes.Game;
+import pl.seb.czech.GameMechanic.Ship;
+import pl.seb.czech.GameMechanic.ShipName;
+import pl.seb.czech.GameUI.Boxes.AlertBox;
+import pl.seb.czech.GameUI.Boxes.ConfirmBox;
+import pl.seb.czech.GameUI.Boxes.Game;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

@@ -1,6 +1,6 @@
-package GameMechanic;
+package pl.seb.czech.GameMechanic;
 
-import GameUI.Boxes.Game;
+import pl.seb.czech.GameUI.Boxes.Game;
 import javafx.scene.control.Button;
 
 import java.util.ArrayList;
@@ -37,8 +37,6 @@ public class RandomPlacement {
             Integer x = random.nextInt(10 - ship.getShipMaxSize());
             Integer y = random.nextInt(10);
             placeShipPart(x, y, ship);
-
-
         } else {
             //y 0 : (9-ship max size), x 0 : 9
             Integer x = random.nextInt(10);

@@ -1,15 +1,15 @@
-package GameUI.Boxes;
+package pl.seb.czech.GameUI.Boxes;
 
-import GameMechanic.Player;
-import GameMechanic.RandomPlacement;
-import GameMechanic.Ship;
-import GameMechanic.ShipName;
-import GameUI.GridHelperMethods;
-import GameUI.Handlers.ButtonHandlers;
-import GameUI.Handlers.FireButtonHandlers;
-import GameUI.Handlers.SeaButtonHandlers;
-import GameUI.SceneChanger;
-import MenuUI.Options;
+import pl.seb.czech.GameMechanic.Player;
+import pl.seb.czech.GameMechanic.RandomPlacement;
+import pl.seb.czech.GameMechanic.Ship;
+import pl.seb.czech.GameMechanic.ShipName;
+import pl.seb.czech.GameUI.GridHelperMethods;
+import pl.seb.czech.GameUI.Handlers.ButtonHandlers;
+import pl.seb.czech.GameUI.Handlers.FireButtonHandlers;
+import pl.seb.czech.GameUI.Handlers.SeaButtonHandlers;
+import pl.seb.czech.GameUI.SceneChanger;
+import pl.seb.czech.MenuUI.Options;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -82,7 +82,6 @@ public class Game implements SceneChanger {
         FireButtonHandlers fireHandler = new FireButtonHandlers(this);
         ButtonHandlers buttonHandlers = new ButtonHandlers(this);
         
-
         fireButtonListTop = GridHelperMethods.create100ButtonList(playerFireBoardTop, "fireButton", true, fireHandler::fireButtonHandler);
         seaButtonsListBottom = GridHelperMethods.create100ButtonList(playerLocationBoardBottom, "boardButton", false, seaHandler::placementButtonHandler);
 
@@ -118,12 +117,9 @@ public class Game implements SceneChanger {
         
         GridHelperMethods.gridMarkers(topRootForGrid, GridHelperMethods.getMinButtonSize(), GridHelperMethods.getMinButtonSize());
         GridHelperMethods.gridMarkers(bottomRootForGrid, GridHelperMethods.getMinButtonSize(), GridHelperMethods.getMinButtonSize());
-
-
-
+        
         centerPane.getChildren().addAll(topRootForGrid, middleLabel, bottomRootForGrid);
         centerPane.setAlignment(Pos.CENTER);
-        
         
         playerFireBoardTop.setAlignment(Pos.CENTER);
         playerFireBoardTop.setStyle("-fx-cursor: crosshair;");
@@ -135,9 +131,7 @@ public class Game implements SceneChanger {
         
 //      left pane
         leftPane.setPadding(new Insets(10));
-
         
-
 //        upper left
         VBox upperLeft = new VBox(10);
         upperLeft.setPadding(new Insets(100, 10, 10, 10));
@@ -229,8 +223,7 @@ public class Game implements SceneChanger {
         for (Button b : placementShipButtonListLeft) {
             b.setId("shipButtonsPlacement");
         }
-
-
+        
         Button resetCarrierButton = new Button("Reset");
         resetCarrierButton.setOnAction(event -> buttonHandlers.resetPlacementButtonEH(ShipName.CARRIER));
         resetShipButtonListRight.add(resetCarrierButton);
@@ -297,7 +290,6 @@ public class Game implements SceneChanger {
 
         sunkEnemyShips.setAlignment(Pos.CENTER);
         
-        
         rightPane.getChildren().addAll(updateStatus, sunkEnemyShips);
         layout.setRight(rightPane);
         
@@ -327,7 +319,6 @@ public class Game implements SceneChanger {
     public Scene getScene() {
         return this.scene;
     }
-    
 
     public Ship getCurrentShip() {
         return currentShip;

@@ -1,7 +1,7 @@
-package MenuUI;
+package pl.seb.czech.MenuUI;
 
-import GameUI.SceneChanger;
-import GameUI.Boxes.Game;
+import pl.seb.czech.GameUI.SceneChanger;
+import pl.seb.czech.GameUI.Boxes.Game;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,11 +51,7 @@ public class Options implements SceneChanger {
         Button startGameButton = new Button("Start");
         startGameButton.setPrefSize(130,20);
         startGameButton.setOnAction(event -> {
-            if (canTouchChoiceRight.getValue().equals(yes)) {
-                Game.setShipsCanTouch(true);
-            } else {
-                Game.setShipsCanTouch(false);
-            }
+            Game.setShipsCanTouch(canTouchChoiceRight.getValue().equals(yes));
             Game game = new Game(window);
             SceneChanger.centerWindow(game);
         });
@@ -64,8 +60,6 @@ public class Options implements SceneChanger {
         returnButton.setPrefSize(130,20);
         returnButton.setOnAction(event -> SceneChanger.centerWindow(MainMenu.getInstance(window)));
         
-        
-
         VBox layout = new VBox(10, canTouchContainer, startGameButton, returnButton);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-background-image: url('submarinePhoto.jpg');" +

@@ -1,4 +1,4 @@
-package GameMechanic;
+package pl.seb.czech.GameMechanic;
 
 public enum HitState {
     HIT,

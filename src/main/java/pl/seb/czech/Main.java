@@ -1,15 +1,15 @@
-package MenuUI;
+package pl.seb.czech;
 
-import GameUI.SceneChanger;
+import pl.seb.czech.GameUI.SceneChanger;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import pl.seb.czech.MenuUI.MainMenu;
 
 public class Main extends Application {
     
     public static void main(String[] args) {
         launch(args);
     }
-    
     
     @Override
     public void start(Stage primaryStage) {
@@ -18,6 +18,4 @@ public class Main extends Application {
         primaryStage.setScene(mainMenu.getScene());
         primaryStage.show();
     }
-    
-    
 }

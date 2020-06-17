@@ -1,4 +1,4 @@
-package GameMechanic;
+package pl.seb.czech.GameMechanic;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,6 +1,6 @@
-package GameUI;
+package pl.seb.czech.GameUI;
 
-import GameUI.Boxes.ConfirmBox;
+import pl.seb.czech.GameUI.Boxes.ConfirmBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.Screen;

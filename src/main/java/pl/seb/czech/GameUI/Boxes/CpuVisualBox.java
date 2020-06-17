@@ -1,7 +1,7 @@
-package GameUI.Boxes;
+package pl.seb.czech.GameUI.Boxes;
 
 
-import GameUI.GridHelperMethods;
+import pl.seb.czech.GameUI.GridHelperMethods;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -20,30 +20,24 @@ public class CpuVisualBox {
 
     CpuVisualBox() {
         GridPane root = new GridPane();
-
         GridPane cpuShipPlacement = new GridPane();
        
         buttonList = GridHelperMethods.create100ButtonList(cpuShipPlacement, "boardButton", false, Event::consume);
-
-
+        
         window.setTitle("CPU's position");
         window.setMinWidth(width);
         window.setMinHeight(height);
-
 
         root.add(cpuShipPlacement, 1, 1, 10, 10);
         GridHelperMethods.gridMarkers(root, GridHelperMethods.getMinButtonSize(), GridHelperMethods.getMinButtonSize());
         
         BorderPane layout = new BorderPane(root);
         layout.setPadding(new Insets(10));
-       
-
-
+        
         Scene scene = new Scene(layout);
         scene.getStylesheets().add("gameStyles.css");
 
         window.setScene(scene);
-
     }
 
     public List<Button> getButtonList() {

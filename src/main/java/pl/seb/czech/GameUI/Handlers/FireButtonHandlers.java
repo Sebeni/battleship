@@ -1,10 +1,10 @@
-package GameUI.Handlers;
+package pl.seb.czech.GameUI.Handlers;
 
-import GameMechanic.*;
-import GameUI.Boxes.Game;
-import GameUI.GridHelperMethods;
-import GameUI.Boxes.ResultBox;
-import Statistics.Stats;
+import pl.seb.czech.GameMechanic.*;
+import pl.seb.czech.GameUI.Boxes.Game;
+import pl.seb.czech.GameUI.GridHelperMethods;
+import pl.seb.czech.GameUI.Boxes.ResultBox;
+import pl.seb.czech.Statistics.Stats;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -161,13 +161,11 @@ public class FireButtonHandlers {
             saveStats(true);
             game.setBattleLog("GAME OVER! YOU WON!");
             ResultBox.display(true, game);
-            
             return true;
         } else if (game.getHuman().getShipsList().stream().filter(ship -> ship.getShipPartsInGameCount() == 0).count() == Ship.getAllShips().size()) {
             saveStats(false);
             game.setBattleLog("GAME OVER! YOU LOOSE!");
             ResultBox.display(false, game);
-            
             return true;
         } else {
             return false;

@@ -1,7 +1,7 @@
-package MenuUI;
+package pl.seb.czech.MenuUI;
 
-import GameUI.Boxes.GlobalStatsBox;
-import GameUI.SceneChanger;
+import pl.seb.czech.GameUI.Boxes.GlobalStatsBox;
+import pl.seb.czech.GameUI.SceneChanger;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,7 +18,7 @@ public class MainMenu implements SceneChanger {
     
     private static MainMenu mainMenu;
     
-    static MainMenu getInstance(Stage primaryStage){
+    public static MainMenu getInstance(Stage primaryStage){
         if(mainMenu == null){
             mainMenu = new MainMenu(primaryStage);
         }

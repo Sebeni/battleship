@@ -1,4 +1,4 @@
-package GameUI.Boxes;
+package pl.seb.czech.GameUI.Boxes;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

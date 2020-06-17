@@ -1,7 +1,7 @@
-package GameUI;
+package pl.seb.czech.GameUI;
 
-import GameMechanic.Player;
-import GameMechanic.Ship;
+import pl.seb.czech.GameMechanic.Player;
+import pl.seb.czech.GameMechanic.Ship;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;

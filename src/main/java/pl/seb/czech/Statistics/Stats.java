@@ -1,4 +1,4 @@
-package Statistics;
+package pl.seb.czech.Statistics;
 
 import java.io.*;
 import java.util.HashMap;
@@ -23,10 +23,12 @@ public class Stats {
     private static int cpuAllSuccessfulShots = 0;
     private static int cpuAllMissedShots = 0;
     
-    private static final File saveFile = new File("stats.txt");
+    private static final File SAVE_FILE;
     
 
     static {
+        SAVE_FILE = new File(Stats.class.getClassLoader().getResource("stats.txt").getFile());
+        
         populateMap(CPU_SUCCESSFUL_SHOTS);
         populateMap(CPU_MISSED_SHOTS);
 
@@ -100,7 +102,7 @@ public class Stats {
     }
     
     public static void saveStats(){
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter(saveFile))){
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(SAVE_FILE))){
             bw.write(CPU_SUCCESSFUL_SHOTS.toString() + "\n");
             bw.write(CPU_MISSED_SHOTS.toString() + "\n");
             bw.write(HUMAN_SUCCESSFUL_SHOTS.toString() + "\n");
@@ -117,7 +119,7 @@ public class Stats {
     public static void loadStats(){
         StringBuilder sb = new StringBuilder();
 
-        try(BufferedReader br = new BufferedReader(new FileReader(saveFile))){
+        try(BufferedReader br = new BufferedReader(new FileReader(SAVE_FILE))){
             while(br.ready()){
                 sb.append(br.readLine()).append("\n");
             }

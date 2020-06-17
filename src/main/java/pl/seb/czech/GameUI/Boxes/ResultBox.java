@@ -1,9 +1,9 @@
-package GameUI.Boxes;
+package pl.seb.czech.GameUI.Boxes;
 
-import GameMechanic.Ship;
-import GameUI.Handlers.ButtonHandlers;
-import GameUI.SceneChanger;
-import MenuUI.Options;
+import pl.seb.czech.GameMechanic.Ship;
+import pl.seb.czech.GameUI.Handlers.ButtonHandlers;
+import pl.seb.czech.GameUI.SceneChanger;
+import pl.seb.czech.MenuUI.Options;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

@@ -1,8 +1,8 @@
-package GameUI.Boxes;
+package pl.seb.czech.GameUI.Boxes;
 
-import GameUI.GridHelperMethods;
+import pl.seb.czech.GameUI.GridHelperMethods;
 
-import Statistics.Stats;
+import pl.seb.czech.Statistics.Stats;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -34,7 +34,6 @@ public class GlobalStatsBox {
         }
     }
 
-
     public GlobalStatsBox() {
         Stats.loadStats();
         Stage window = new Stage();
@@ -42,8 +41,7 @@ public class GlobalStatsBox {
         window.setTitle("Global statistics (updated after every round)");
 
         window.setMinWidth(600);
-
-
+        
         GridPane gridPaneRoot = new GridPane();
 
         Label titleLabel = new Label("Global statistics");
@@ -59,32 +57,26 @@ public class GlobalStatsBox {
 
         Label allRoundsNumLeft = new Label("Rounds played: ");
         Label allRoundsNumRight = new Label(Stats.getRoundCounter() + "");
-
-
+        
         Label roundsWinLeft = new Label("Rounds won: ");
         Label roundsWinRight = new Label(Stats.getPlayerWonCounter() + "");
-
 
         Label roundsLostLeft = new Label("Rounds lost: ");
         Label roundsLostRight = new Label(Stats.getPlayerLoseCounter() + "");
 
-
         Label allShotsFiredLeft = new Label("Number of shots fired: ");
         Label allShotsFiredRight = new Label(Stats.getHumanAllShotsNum() + "");
-
-
+        
         Label shotsHitLeft = new Label("Number of shots hit: ");
         Label shotsHitRight = new Label(Stats.getHumanAllSuccessfulShots() + "");
-
-
+        
         Label shotsMissedLeft = new Label("Number of shots missed: ");
         Label shotsMissedRight = new Label(Stats.getHumanAllMissedShots() + "");
 
         Label accuracyLeft = new Label("Accuracy: ");
         double accuracy = (double) Stats.getHumanAllSuccessfulShots() / Stats.getHumanAllShotsNum() * 100;
         Label accuracyRight = new Label(String.format("%.2f %%", accuracy));
-
-
+        
         Label allCpuShotsLeft = new Label("Number of CPU's shots fired: ");
         Label allCpuShotsRight = new Label(Stats.getCpuAllShotsNum() + "");
 
@@ -130,8 +122,7 @@ public class GlobalStatsBox {
 
         Node[] left = {allRoundsNumLeft, roundsWinLeft, roundsLostLeft, allShotsFiredLeft, shotsHitLeft, shotsMissedLeft, accuracyLeft, allCpuShotsLeft, shotsCpuHitLeft, shotsCpuMissedLeft, accuracyCpuLeft, gridChoiceBoxLeft};
         Node[] right = {allRoundsNumRight, roundsWinRight, roundsLostRight, allShotsFiredRight, shotsHitRight, shotsMissedRight, accuracyRight, allCpuShotsRight, shotsCpuHitRight, shotsCpuMissedRight, accuracyCpuRight, gridChoiceBoxRight};
-
-
+        
         for (int i = 0; i < left.length; i++) {
             gridPaneRoot.add(left[i], 0, i + 1);
             gridPaneRoot.setAlignment(Pos.CENTER);
@@ -168,7 +159,6 @@ public class GlobalStatsBox {
         window.showAndWait();
     }
 
-
     private GridPane makeStatisticsGrid() {
         GridPane statistics = new GridPane();
         int counter = 0;
@@ -193,7 +183,6 @@ public class GlobalStatsBox {
         changeColors();
     }
     
-    
     private void changeColors(){
         int maxValue = currentMaxValue();
         
@@ -209,7 +198,6 @@ public class GlobalStatsBox {
                 label.setId("100");
             }
         });
-        
     }
     
     private static int currentMaxValue(){
@@ -219,8 +207,4 @@ public class GlobalStatsBox {
                 .max()
                 .orElse(1);
     }
-
-
-
-    
 }

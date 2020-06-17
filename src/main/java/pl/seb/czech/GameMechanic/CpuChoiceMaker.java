@@ -1,7 +1,7 @@
-package GameMechanic;
+package pl.seb.czech.GameMechanic;
 
-import GameUI.Boxes.Game;
-import GameUI.GridHelperMethods;
+import pl.seb.czech.GameUI.Boxes.Game;
+import pl.seb.czech.GameUI.GridHelperMethods;
 
 import java.util.*;
 
@@ -171,7 +171,6 @@ public class CpuChoiceMaker {
                 }
             }
         }
-
     }
 
     private int onlyHorizontalHits(Map.Entry<Integer, HitState> entryWithHit) {
@@ -321,7 +320,6 @@ public class CpuChoiceMaker {
     }
 
     private void horizontalPossibilities(List<Integer> horizontal) {
-
         int theMostLeft = horizontal.get(0);
 
         if (canShootLeft(theMostLeft)) {
@@ -335,8 +333,6 @@ public class CpuChoiceMaker {
             horizontal.add(theMostRight + 10);
             horizontalPossibilities(horizontal);
         }
-
-
     }
 
     private void verticalPossibilities(List<Integer> vertical) {
@@ -377,5 +373,4 @@ public class CpuChoiceMaker {
         currentChoiceList.removeAll(allTouchingCells);
         getAnotherList().removeAll(allTouchingCells);
     }
-    
 }

@@ -1,10 +1,10 @@
-package GameUI.Handlers;
+package pl.seb.czech.GameUI.Handlers;
 
-import GameMechanic.RandomPlacement;
-import GameMechanic.Ship;
-import GameUI.Boxes.AlertBox;
-import GameUI.Boxes.Game;
-import GameUI.GridHelperMethods;
+import pl.seb.czech.GameMechanic.RandomPlacement;
+import pl.seb.czech.GameMechanic.Ship;
+import pl.seb.czech.GameUI.Boxes.AlertBox;
+import pl.seb.czech.GameUI.Boxes.Game;
+import pl.seb.czech.GameUI.GridHelperMethods;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
@@ -18,8 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SeaButtonHandlers {
-   
-    private final Game game;
+    private Game game;
 
     public SeaButtonHandlers(Game game) {
         this.game = game;
@@ -47,23 +46,21 @@ public class SeaButtonHandlers {
                         if(!Game.shipsCanTouch()){
                             message += " and can't touch each other";
                         }
-                        
                         AlertBox.display("Warning", message + "!");
                     }
 
                     if (currentShip.getShipMaxSize() == currentShip.getShipPartsInGameCount()) {
                         ButtonHandlers.changeShipPlacementButtonState(game, currentShip, true);
-                        
                         game.setCurrentShip(null);
                         game.middleLabelUpdateText();
                     }
                 } else {
-                    if(!Game.shipsCanTouch() && !isTouching(xParam * 10 + yParam)){
+                    if(!Game.shipsCanTouch() && isTouching(xParam * 10 + yParam)){
+                        AlertBox.display("Warning", "Ships can't touch each other!");
+                    } else {
                         currentShip.setCoordinate(xParam, yParam);
                         button.setDisable(true);
                         game.middleLabelUpdateText();
-                    } else {
-                        AlertBox.display("Warning", "Ships can't touch each other!");
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package GameUI.Boxes;
+package pl.seb.czech.GameUI.Boxes;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,7 +24,6 @@ public class AlertBox {
       
         label.setTextAlignment(TextAlignment.CENTER);
         label.setWrapText(true);
-      
         
         VBox pane = new VBox(10);
         Button button = new Button("OK");
