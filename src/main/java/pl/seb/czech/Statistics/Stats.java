@@ -23,18 +23,28 @@ public class Stats {
     private static int cpuAllSuccessfulShots = 0;
     private static int cpuAllMissedShots = 0;
     
-    private static final File SAVE_FILE;
+    private static File SAVE_FILE;
     
 
     static {
-        SAVE_FILE = new File(Stats.class.getClassLoader().getResource("stats.txt").getFile());
+        boolean statsCreated = false;
+        
+        try{
+            File jarFile = new File(Stats.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            SAVE_FILE = new File(jarFile.getParent() + File.separator + "stats.txt");
+            statsCreated = SAVE_FILE.createNewFile();
+        } catch (Exception e){
+            System.out.println("ERROR WHILE CREATING FILE");
+        }
         
         populateMap(CPU_SUCCESSFUL_SHOTS);
         populateMap(CPU_MISSED_SHOTS);
 
         populateMap(HUMAN_SUCCESSFUL_SHOTS);
         populateMap(HUMAN_MISSED_SHOTS);
-        
+        if(statsCreated) {
+            saveStats();
+        }
         loadStats();
     }
     
@@ -123,7 +133,6 @@ public class Stats {
             while(br.ready()){
                 sb.append(br.readLine()).append("\n");
             }
-            
         } catch (Exception e){
             System.out.println("EXCEPTION IN LOADING");
             e.printStackTrace();
